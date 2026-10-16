@@ -278,3 +278,7 @@ table.t tr.grp td{background:#FAF9F5;font-weight:600;font-size:13.5px;padding-to
 .ptopics td,.ptopics th{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left}
 @media (max-width:860px){.pboard{grid-template-columns:1fr}.plist{max-height:none}.tbars small{display:none}}
 .ver .contact a{color:var(--mute)}.ver .contact a:hover{color:var(--accent)}
+/* 页头两行：第一行站名＋数据版本与联系方式（右），第二行导航——避免右上小字被挤到导航下方单独成行 */
+.top .brand{order:0}.top .ver{order:1;margin-left:auto;text-align:right}.top .nav{order:2;flex-basis:100%}
+@media (max-width:640px){.top .ver{flex-basis:100%;text-align:left;margin-left:0;font-size:12px}}
+.mech.entries{grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr))}

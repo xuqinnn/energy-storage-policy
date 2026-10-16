@@ -163,7 +163,7 @@
     const t0 = new Date().toISOString().slice(0, 10);
     const li = e => `<li><span class="mono">${esc((e.date || '').slice(5))}</span><span class="pv">${esc(e.prov || '')}</span><span>${e.kind !== '新发布' ? `<span class="st ${e.kind === '征求截止' ? 'draft' : e.kind === '即将执行' ? 'ok' : 'none'}">${esc(e.kind)}</span> ` : ''}${e.code ? `<button type="button" class="cite ${statusClass(e.status)}" data-code="${esc(e.code)}">${esc(e.code)}</button> ` : ''}${esc(String(e.title || '').replace(/^\d{6}/, '').slice(0, 42))}${e.code && briefOf(e.code) ? ` <button type="button" class="blink" data-code="${esc(e.code)}">简析</button>` : ''}</span></li>`;
     const up = ev.filter(e => e.kind !== '新发布' && e.date >= t0).slice(0, 10);
-    const nw = ev.filter(e => e.kind === '新发布').sort((a, b) => ((b.landed || b.date) || '').localeCompare((a.landed || a.date) || '') || (b.date || '').localeCompare(a.date || ''));
+    const nw = ev.filter(e => e.kind === '新发布').sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.landed || '').localeCompare(a.landed || ''));   /* 按发文日倒序（原按收录时间排，日期看着乱） */
     const cats = [...new Set(nw.map(e => e.cat).filter(Boolean))];
     const newList = (items, n) => `<ul class="evl" style="margin-top:10px">${items.slice(0, n).map(li).join('') || '<li class="note">暂无</li>'}</ul>${items.length > n ? `<details class="more"><summary>展开全部 ${items.length} 件</summary><ul class="evl">${items.slice(n).map(li).join('')}</ul></details>` : ''}`;
     // 用户 10-16：全部分类、近 60 天发布或近 30 天新收录，按分类筛；有简析的带链接
@@ -173,7 +173,7 @@
         const k = b.dataset.cat, items = k ? nw.filter(e => e.cat === k) : nw;
         document.getElementById('newlist').innerHTML = newList(items, 15);
       }), 0);
-      return `<section class="card" style="margin-top:20px"><h2>近期新发布的政策 <small class="note" style="display:inline">${nw.length} 件 · ${nw.filter(e => briefOf(e.code)).length} 件有简析</small></h2><div class="sub">近 60 天发布或近 30 天新收录，按收录时间排；点「简析」看要点与变化，悬停编号看文件与状态。<a href="#/brief" style="margin-left:8px">全部简析 →</a></div>
+      return `<section class="card" style="margin-top:20px"><h2>近期新发布的政策 <small class="note" style="display:inline">${nw.length} 件 · ${nw.filter(e => briefOf(e.code)).length} 件有简析</small></h2><div class="sub">近 60 天发布或近 30 天新收录，按发文日倒序；点「简析」看要点与变化，悬停编号看文件与状态。<a href="#/policy" style="margin-left:8px">看政策看板 →</a></div>
         <div class="seg" id="newcats" style="margin-top:10px;flex-wrap:wrap"><button class="on" data-cat="">全部</button>${cats.map(k => `<button data-cat="${esc(k)}">${esc(k)} ${nw.filter(e => e.cat === k).length}</button>`).join('')}</div>
         <div id="newlist">${newList(nw, 15)}</div></section>`;
     }
@@ -411,7 +411,7 @@
   const midDate = r => isYMD(r[4]) ? (r[4].endsWith('-01') ? r[4].slice(0, 8) + '15' : r[4]) : '';     /* 更新状态：占位日期按月中计 */
   const tilesOf = r => r[5] === '内蒙古' ? ['蒙西', '蒙东'] : r[5] === '跨省区域' ? (r[9] || []) : TILES[r[5]] ? [r[5]] : [];
   const libProv = p => (p === '蒙西' || p === '蒙东') ? '内蒙古' : p;
-  const GRAY = '#ECEDEF', BLUES = ['#EEF1F7', '#CBD5EC', '#97AAD7', '#5B78BD', '#2F4B8A'];
+  const GRAY = '#ECEDEF', BLUES = ['#D3DCF0', '#AFBFE3', '#8299CF', '#5B78BD', '#2F4B8A'];   /* 最浅档须与「无／未采集」灰色分得开 */
   function tileMapHTML(cell, id) {
     return `<div class="tilemap" id="${id}">${PROVS.map(p => { const [x, y] = TILES[p], c = cell(p); return `<button type="button" class="tile${DARK.includes(c.bg) ? ' dark' : ''}${c.dim ? ' faded' : ''}" style="grid-column:${x + 1};grid-row:${y + 1};background:${c.bg}" data-tp="${esc(p)}" title="${esc(c.tip || '')}"><span class="nm">${esc(p)}</span><span class="val">${esc(c.val || '')}</span></button>`; }).join('')}</div>`;
   }
@@ -419,7 +419,7 @@
   const quint = vals => { const v = vals.filter(x => x > 0).sort((a, b) => a - b); return x => !(x > 0) ? -1 : Math.min(4, Math.floor(v.filter(y => y <= x).length / v.length * 5 - 1e-9)); };
   const impDots = n => n ? `<span class="imp" title="重要性 ${n}／5">${'●'.repeat(n)}${'○'.repeat(5 - n)}</span>` : '';
   function policyPage(arg) {
-    const L = D.lib || [], recent = L.filter(r => { const d = actDate(r); return d && days(d) >= 0 && days(d) <= 30 && !/参考/.test(r[3]); });
+    const L = D.lib || [], recent = L.filter(r => { const d = actDate(r); return d && days(d) >= 0 && days(d) <= 30 && !/参考|已替代|重复作废|废止/.test(r[3]); });
     const act = {}, cnt = {}, hi = {}, last = {}; let nat = 0;
     recent.forEach(r => { const d = actDate(r), w = (r[7] || 1) * Math.pow(0.5, days(d) / 10);
       if (r[5] === '全国') { nat++; return; }
@@ -919,19 +919,20 @@
     const drafts = L.filter(x => /征求/.test(x.r.容量收益标注 || '') && !x.mktLease).map(x => x.r.主体);   // 宁夏补偿为征求稿但示例采用市场租赁价，另写（研究线 10-14）
     const mktL = L.filter(x => x.mktLease).map(x => x.r.主体);
     const futs = G2.filter(x => /起执行/.test(x.why)).map(x => x.r.主体 + ' ' + ((x.why.match(/20\d\d/) || [''])[0]));
-    const hero = REV ? `<section class="hero"><div><div class="eyebrow">电网侧独立储能 · 收益构成全景 · ${CFG === '200MW/400MWh' ? '2' : '4'} 小时项目 · 示例测算口径 v${D.example.n}</div>
+    const hero = REV ? `<section class="hero"><div><div class="eyebrow">电网侧独立储能 · 收益构成全景 · ${parseInt(CFG.split('/')[1]) / parseInt(CFG) || 4} 小时项目 · 示例测算口径 v${D.example.n}</div>
         <h1>${G1.length} 个省区有已生效、新项目可拿的容量收入；${G3.length} 个省区只有市场收入</h1>
         <p class="lede">${futs.length ? '另有' + esc(futs.join('、')) + ' 年起执行；' : ''}${drafts.length ? esc(drafts.join('、')) + ' 的容量补偿只有征求稿、未照算；' : ''}${mktL.length ? esc(mktL.join('、')) + ' 容量补偿为征求稿，示例采用 2025 年市场租赁价；' : ''}${L.some(x => /未能折算/.test(x.r.容量收益标注 || '')) ? esc(L.filter(x => /未能折算/.test(x.r.容量收益标注 || '')).map(x => x.r.主体).join('、')) + ' 为市场化容量补偿、无法折算；' : ''}按「收入稳不稳」分三组，红色箭头后是扣掉充电过网成本后的数。<b>示例测算·不构成投资建议</b>；线损购电价按 0.30 元/千瓦时量级假设。</p></div>
-        <div class="controls"><span class="seg" id="cfgseg"><button data-v="200MW/400MWh">2 小时</button><button data-v="200MW/800MWh">4 小时</button></span></div></section>`
+        <div class="controls"><span class="seg" id="cfgseg"><button data-v="200MW/400MWh">2 小时</button><button data-v="200MW/800MWh">4 小时</button><button data-v="200MW/1200MWh">6 小时</button><button data-v="200MW/1600MWh">8 小时</button></span></div></section>`
       : `<section class="hero"><div><div class="eyebrow">示例测算 · 口径 v${D.example.n || 1} · <span class="st draft">待用户过目，未对外</span></div>
         <h1>一座 ${CFG} 储能，按现行政策一年能拿多少</h1>
         <p class="lede"><b>示例测算·不构成投资建议。</b>只算政策收益与现货量级，不算投资回报率。${V2 ? '过网成本按 114 号文口径逐省计算（线损购电价按 0.30 元/千瓦时量级<b>假设</b>）。' : '过网成本待按 114 号文复核，本版不计入。'}</p></div>
-        <div class="controls"><span class="seg" id="cfgseg"><button data-v="200MW/400MWh">2 小时</button><button data-v="200MW/800MWh">4 小时</button></span></div></section>`;
+        <div class="controls"><span class="seg" id="cfgseg"><button data-v="200MW/400MWh">2 小时</button><button data-v="200MW/800MWh">4 小时</button><button data-v="200MW/1200MWh">6 小时</button><button data-v="200MW/1600MWh">8 小时</button></span></div></section>`;
     $('#app').innerHTML = `${hero}
       ${sumCards([
         { id: 'a', k: '有现行容量收入', v: G1.length, n: nameList(G1.map(x => x.r.主体)), x: (V2 ? '收入 ' : '合计 ') + tot(G1) },
         { id: 'b', k: '容量收入待定', v: G2.length, n: nameList(G2.map(x => x.r.主体)), x: esc([...new Set(G2.map(x => /出处待查/.test(x.why) ? '参考价出处待查' : /起执行/.test(x.why) ? '未来起执行' : /征求/.test(x.why) ? '征求稿' : '待定'))].join('、')) },
         { id: 'c', k: '只有市场收入', v: G3.length, n: nameList(G3.map(x => x.r.主体)), x: (V2 ? '收入 ' : '合计 ') + tot(G3) }])}
+      ${/1200|1600/.test(CFG) ? '<div class="insight"><b>6、8 小时档：</b>容量收入按各省折算公式照算（多数省份折算比例封顶为 1）；现货套利按同一价差、同一循环次数线性外推，长时长偏乐观，只作量级参考。</div>' : ''}
       ${insight}
       <section class="card lgcard">
         <div class="lgbar"><div class="revlegend"><span><i style="background:${C_SURE}"></i>容量收入·已生效</span><span><i class="hatch"></i>容量收入·待定</span><span><i style="background:${C_MKT}"></i>现货套利（量级参考）</span></div>
