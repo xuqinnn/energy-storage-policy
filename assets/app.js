@@ -59,7 +59,7 @@
     const c = e.target.closest('[data-code]'); if (!c) return;
     const d = D.docs[c.dataset.code];
     tip.innerHTML = d ? `<b>${esc(c.dataset.code)}</b>　<span class="st ${statusClass(d.status)}">${esc(d.status)}</span><br>${esc(d.title)}<br>${esc(d.no || '')}　${esc(d.date || '')}${d.yjc ? '<br>研究库编号：' + esc(d.yjc.join('、')) : ''}`
-      : `<b>${esc(c.dataset.code)}</b><br>库内未登记或非①⑦表件`;
+      : `<b>${esc(c.dataset.code)}</b><br>非本站收录的政策文件`;
     tip.hidden = false; move(e);
   });
   document.addEventListener('mousemove', e => { if (!tip.hidden) move(e); });
@@ -75,7 +75,7 @@
   };
   function capPolicy(p) {      // 容量政策状态分类（⑧c8 首句）
     const s = clean(V(p, '⑧c8')).split('\n')[0];
-    if (!s || /无省级容量补偿/.test(s)) return '库内未见省级容量补偿';
+    if (!s || /无省级容量补偿/.test(s)) return '未见省级容量补偿';
     if (/无容量电价/.test(s)) return '其他补偿形式';
     if (/已过期/.test(s)) return '已过期';
     if (/征求/.test(s)) return '征求意见稿';
@@ -92,8 +92,10 @@
   const rampOf = p => { const s = first1(p, '⑧c35'); return !s ? '未采集' : /^—/.test(s) ? '无补偿·不适用' : (s.match(/^(中高|中低|高|中|低|待定)/) || ['待核'])[0]; };
   // 地图着色维度：后续可继续加（每个维度＝一个把省份分类的函数＋说明＋各类的说明）
   const S = { metric: 'grade', pick: null };
+  const pgradeOf = p => (((D.score || {}).rows || []).find(x => x.主体 === p) || {}).档位 || '未评';
   const METRICS = {
-    grade: { group: '研判', label: '投资分级', cat: gradeOf, order: ['优先开发', '储备开发', '谨慎开发', '未评'], note: '综合容量电价是否出台、现货成熟度、收益确定性与退坡风险' },
+    pgrade: { group: '研判', label: '投资分级（公开方法）', cat: pgradeOf, order: ['第一档', '第二档', '第三档', '未评'], note: '五维评分：容量收益机制 30、容量收益水平 20、现货阶段 20、现货价差 15、退坡与到期风险 15；≥70 第一档、50—69 第二档、<50 第三档。只反映政策收益条件，不构成投资建议' },
+    grade: { group: '研判', label: '内部综合分级', cat: gradeOf, order: ['优先开发', '储备开发', '谨慎开发', '未评'], note: '综合容量电价是否出台、现货成熟度、收益确定性与退坡风险' },
     cap: { group: '政策', label: '容量电价／补偿', cat: capPolicy, order: ['已出台', '征求意见稿', '其他补偿形式', '已过期', '库内未见省级容量补偿', '待核'], note: '「库内未见」＝本库尚未收到该省正式文件，不等于没有规定' },
     list: { group: '政策', label: '清单制管理', cat: listOf, order: ['清单制', '清单制·征求稿', '非清单制', '未采集', '待核'], note: '只有纳入省级清单的项目才享受容量电价（补偿）' },
     charge: { group: '政策', label: '充电费用承担', cat: chargeOf, order: ['A0', 'A1', 'A2', 'B', 'A2（待证实）', '待查'], note: 'A0 四项全免 · A1 只担线损 · A2 免输配与基金、仍缴系统运行费 · B 视同用户全额缴纳' },
@@ -101,10 +103,10 @@
     ramp: { group: '风险', label: '补偿退坡风险', cat: rampOf, order: ['高', '中高', '中', '中低', '低', '待定', '无补偿·不适用', '未采集', '待核'], note: '现行容量补偿标准下调或并轨的风险' }
   };
   const PUB = () => !!(D && D.meta && D.meta.public);     // 对外版：不含投资分级、收益测算金额与内部信息（用户 10-14）
-  const MET = () => PUB() ? Object.fromEntries(Object.entries(METRICS).filter(([k]) => k !== 'grade')) : METRICS;
+  const MET = () => PUB() ? Object.fromEntries(Object.entries(METRICS).filter(([k]) => k !== 'grade' && (k !== 'pgrade' || D.score))) : Object.fromEntries(Object.entries(METRICS).filter(([k]) => k !== 'pgrade' || D.score));
   const PAL = ['#2F4B8A', '#5B78BD', '#97AAD7', '#CBD5EC', '#E9C46A', '#EFE3CF', '#CBCED4', '#EFEDE6', '#EFEDE6'];
-  const FIXED = { '征求意见稿': '#E9C46A', '清单制·征求稿': '#E9C46A', '谨慎开发': '#EFE3CF', '高': '#C9553F', '中高': '#E39A7E', '中': '#EFC9A8', '中低': '#CBD5EC', '低': '#97AAD7' };
-  const colorOf = (m, c) => FIXED[c] || (/未采集|待核|待查|未评|库内未见|不适用|未开展/.test(c) ? '#EFEDE6' : PAL[Math.max(0, m.order.indexOf(c))] || '#EFEDE6');
+  const FIXED = { '第一档': '#2F4B8A', '第二档': '#97AAD7', '第三档': '#EFE3CF', '征求意见稿': '#E9C46A', '清单制·征求稿': '#E9C46A', '谨慎开发': '#EFE3CF', '高': '#C9553F', '中高': '#E39A7E', '中': '#EFC9A8', '中低': '#CBD5EC', '低': '#97AAD7' };
+  const colorOf = (m, c) => FIXED[c] || (/未采集|待核|待查|未评|库内未见|未见省级|不适用|未开展/.test(c) ? '#EFEDE6' : PAL[Math.max(0, m.order.indexOf(c))] || '#EFEDE6');
   const DARK = ['#2F4B8A', '#5B78BD', '#C9553F'];
   const short = c => c.replace('连续结算试运行', '连续试运行').replace('启动模拟试运行', '模拟试运行').replace('库内未见省级容量补偿', '库内未见').replace(/^(优先|储备|谨慎)开发$/, '$1')
     .replace('其他补偿形式', '其他形式').replace('征求意见稿', '征求稿').replace('无补偿·不适用', '不适用').replace('清单制·征求稿', '清单·征求稿');
@@ -123,7 +125,7 @@
     const capOut = PROVS.filter(p => capPolicy(p) === '已出台').length;
     const capDraft = PROVS.filter(p => capPolicy(p) === '征求意见稿').length;
     const formalSpot = PROVS.filter(p => stageOf(p) === '正式运行').length;
-    if (PUB() && S.metric === 'grade') S.metric = 'cap';
+    if (PUB() && S.metric === 'grade') S.metric = D.score ? 'pgrade' : 'cap';
     const groups = [...new Set(Object.values(MET()).map(m => m.group))];
     app.innerHTML = `
       <section class="hero">
@@ -132,8 +134,8 @@
           <p class="lede">${PUB() ? '看各省容量电价（补偿）是否出台、清单制、充电费用规则、现货市场阶段与退坡风险。' : '分级综合看容量电价（补偿）是否出台、现货市场成熟度、收益确定性与退坡风险。'}地图可切换着色维度、点图例筛选；点任一省进入它的「政策－开发－问题」看板。每个结论都能回到红头文件与页码。</p></div>
       </section>
       <section class="kpis">
-        ${PUB() ? `<div class="kpi"><div class="k">实行清单制管理</div><div class="v">${PROVS.filter(p => /^清单制/.test(listOf(p))).length}</div><div class="n">只有入清单的项目才享受容量电价（补偿）</div></div>`
-          : `<div class="kpi"><div class="k">优先开发</div><div class="v">${cnt('优先开发')}</div><div class="n">储备开发 ${cnt('储备开发')} 省 · 谨慎开发 ${cnt('谨慎开发')} 省</div></div>`}
+        ${PUB() && D.score ? `<div class="kpi"><div class="k">投资分级·第一档</div><div class="v">${PROVS.filter(p => pgradeOf(p) === '第一档').length}</div><div class="n">第二档 ${PROVS.filter(p => pgradeOf(p) === '第二档').length} 省 · 第三档 ${PROVS.filter(p => pgradeOf(p) === '第三档').length} 省（公开方法）</div></div>` : PUB() ? `<div class="kpi"><div class="k">实行清单制管理</div><div class="v">${PROVS.filter(p => /^清单制/.test(listOf(p))).length}</div><div class="n">只有入清单的项目才享受容量电价（补偿）</div></div>`
+          : `<div class="kpi"><div class="k">优先开发（内部）</div><div class="v">${cnt('优先开发')}</div><div class="n">储备开发 ${cnt('储备开发')} 省 · 谨慎开发 ${cnt('谨慎开发')} 省</div></div>`}
         <div class="kpi"><div class="k">容量电价／补偿已出台</div><div class="v">${capOut}</div><div class="n">征求意见稿 ${capDraft} 省（尚未生效）</div></div>
         <div class="kpi"><div class="k">现货市场正式运行</div><div class="v">${formalSpot}</div><div class="n">其余为连续结算试运行或更早阶段</div></div>
         <div class="kpi"><div class="k">数据版本</div><div class="v" style="font-size:22px">${esc(D.meta.version)}</div><div class="n">快照 ${esc(D.meta.exported)}</div></div>
@@ -149,12 +151,57 @@
           <div id="peek" class="peek"><span class="note">把鼠标移到省份上，这里显示速览</span></div>
         </aside>
       </section>
+      ${eventsHTML()}
       <section class="card" style="margin-top:20px"><h2>分级清单与各省速览</h2><div class="sub" id="tblSub"></div>
         <div class="tablewrap"><table class="t" id="tbl"></table></div></section>`;
     app.querySelectorAll('[data-dim]').forEach(b => b.onclick = () => { S.metric = b.dataset.dim; S.pick = null; home(); });
     drawTiles(); drawTable();
   }
 
+  function eventsHTML() {      // 本月要事（补厚计划 B2）：即将执行、到期／复查、近 30 天新发布
+    const ev = D.events || []; if (!ev.length) return '';
+    const t0 = new Date().toISOString().slice(0, 10);
+    const li = e => `<li><span class="mono">${esc((e.date || '').slice(5))}</span><span class="pv">${esc(e.prov || '')}</span><span>${e.kind !== '新发布' ? `<span class="st ${e.kind === '征求截止' ? 'draft' : e.kind === '即将执行' ? 'ok' : 'none'}">${esc(e.kind)}</span> ` : ''}${e.code ? `<button type="button" class="cite ${statusClass(e.status)}" data-code="${esc(e.code)}">${esc(e.code)}</button> ` : ''}${esc(String(e.title || '').replace(/^\d{6}/, '').slice(0, 42))}${e.code && briefOf(e.code) ? ` <a class="blink" href="#/brief/${esc(e.code)}">简析</a>` : ''}</span></li>`;
+    const up = ev.filter(e => e.kind !== '新发布' && e.date >= t0).slice(0, 10);
+    const nw = ev.filter(e => e.kind === '新发布').sort((a, b) => ((b.landed || b.date) || '').localeCompare((a.landed || a.date) || '') || (b.date || '').localeCompare(a.date || ''));
+    const cats = [...new Set(nw.map(e => e.cat).filter(Boolean))];
+    const newList = (items, n) => `<ul class="evl" style="margin-top:10px">${items.slice(0, n).map(li).join('') || '<li class="note">暂无</li>'}</ul>${items.length > n ? `<details class="more"><summary>展开全部 ${items.length} 件</summary><ul class="evl">${items.slice(n).map(li).join('')}</ul></details>` : ''}`;
+    // 用户 10-16：全部分类、近 60 天发布或近 30 天新收录，按分类筛；有简析的带链接
+    if (PUB() || !up.length) {
+      setTimeout(() => document.querySelectorAll('#newcats button').forEach(b => b.onclick = () => {
+        document.querySelectorAll('#newcats button').forEach(x => x.classList.toggle('on', x === b));
+        const k = b.dataset.cat, items = k ? nw.filter(e => e.cat === k) : nw;
+        document.getElementById('newlist').innerHTML = newList(items, 15);
+      }), 0);
+      return `<section class="card" style="margin-top:20px"><h2>近期新发布的政策 <small class="note" style="display:inline">${nw.length} 件 · ${nw.filter(e => briefOf(e.code)).length} 件有简析</small></h2><div class="sub">近 60 天发布或近 30 天新收录，按收录时间排；点「简析」看要点与变化，悬停编号看文件与状态。<a href="#/brief" style="margin-left:8px">全部简析 →</a></div>
+        <div class="seg" id="newcats" style="margin-top:10px;flex-wrap:wrap"><button class="on" data-cat="">全部</button>${cats.map(k => `<button data-cat="${esc(k)}">${esc(k)} ${nw.filter(e => e.cat === k).length}</button>`).join('')}</div>
+        <div id="newlist">${newList(nw, 15)}</div></section>`;
+    }
+    return `<section class="card" style="margin-top:20px"><h2>本月要事</h2><div class="sub">储能、电价、市场、辅助服务四类；悬停编号看文件与状态。</div>
+      <div class="evgrid"><div><h3>接下来：即将执行 · 征求截止 · 到期或复查</h3><ul class="evl">${up.map(li).join('') || '<li class="note">半年内暂无</li>'}</ul></div>
+      <div><h3>近期新发布 <a href="#/brief" style="font-size:12.5px;font-weight:400">全部简析 →</a></h3>${newList(nw, 15)}</div></div></section>`;
+  }
+  // ---------- 政策简析（补厚计划 D5，用户 10-15）：新政策与重要政策一件一卡——一句话／改了什么／纵向／横向／何时会变 ----------
+  const BRIEF_F = [['一句话', '一句话'], ['对比结论', '新旧对比'], ['改了什么', '改了什么'], ['纵向', '纵向 · 本省前后'], ['横向', '横向 · 与他省'], ['何时会变', '何时会变'],
+                   ['谁受影响', '谁受影响 · 内部'], ['冲突或印证', '冲突或印证 · 内部'], ['落点', '对我们的影响 · 内部']];
+  const briefOf = code => (D.briefs || []).find(b => b.编号 === code);
+  function briefCard(b) {
+    const d = b.编号 && D.docs[b.编号];
+    return `<article class="card brief" id="b-${esc(b.编号 || '')}"><div class="bh"><span class="st ${b.级别 === '重点' ? 'ref' : 'none'}">${esc(b.级别 || '')}件</span>
+        ${b.编号 ? `<button type="button" class="cite ${d ? statusClass(d.status) : 'none'}" data-code="${esc(b.编号)}">${esc(b.编号)}</button>` : '<span class="st draft">待入库</span>'}
+        <span class="pv">${esc(b.省份 || '')}</span>${b.状态 ? `<span class="st ${statusClass(b.状态)}">${esc(b.状态)}</span>` : ''}</div>
+      <h3>${esc(b.标题 || '')}</h3>
+      ${BRIEF_F.filter(([k]) => b[k]).map(([k, t]) => `<div class="bf"><span class="bk">${esc(t)}</span><div>${citeHTML(b[k])}</div></div>`).join('')}
+      ${PUB() ? '' : `<div class="note">出自学习站日报 ${esc(b.日报日期 || '')}${b.草稿 ? ' · <span class="st draft">草稿·待研究线审定，未对外</span>' : ''}</div>`}</article>`;
+  }
+  function briefPage(code) {
+    const bs = (D.briefs || []).slice().sort((a, b) => (b.日报日期 || '').localeCompare(a.日报日期 || '') || (a.级别 === '重点' ? -1 : 1));
+    $('#app').innerHTML = `<section class="hero"><div><div class="eyebrow">政策简析 · 新政策与重要政策</div>
+        <h1>新出的政策改了什么、和以前比、和别省比</h1>
+        <p class="lede">一件一卡：一句话说清是什么，再看改了什么、本省前后（纵向）、与他省（横向）、何时会变。依据编号可悬停看原件状态。${PUB() ? '' : '内部版另显示「谁受影响」「对我们的影响」。'}</p></div></section>
+      ${bs.length ? bs.map(briefCard).join('') : '<div class="card note">暂无简析。</div>'}`;
+    if (code) { const el = document.getElementById('b-' + code); if (el) { el.scrollIntoView({ block: 'start' }); el.classList.add('flash'); } }
+  }
   function drawTiles() {
     const m = METRICS[S.metric], wrap = $('#tiles');
     $('#mapTitle').textContent = m.label;
@@ -179,6 +226,7 @@
 
   const COLS = [
     ['省份', p => p],
+    ['公开分级', p => { const x = ((D.score || {}).rows || []).find(r => r.主体 === p); return x ? `${x.档位}·${x.总分}` : '—'; }],
     ['投资分级', gradeOf],
     ['容量机制', capLine],
     ['政策状态', p => first1(p, '⑧c8') || '—'],
@@ -186,13 +234,13 @@
     ['现货阶段', stageOf],
     ['充电费用', chargeOf],
     ['退坡风险', rampOf],
-    ['收益确定性', p => (first1(p, '⑧c3').split(/[（(]/)[0]) || '未评']
+    ['收益确定性', p => (first1(p, '⑧c3').split(/[（(〔]/)[0]) || '未评']
   ];
   const ORDER = { '优先开发': 0, '储备开发': 1, '谨慎开发': 2, '未评': 3 };
   let sortK = 1, sortDir = 1;
   function drawTable() {
     const m = METRICS[S.metric];
-    const cols = PUB() ? COLS.filter(c => !['投资分级', '收益确定性'].includes(c[0])) : COLS;
+    const cols = (PUB() ? COLS.filter(c => c[0] !== '投资分级') : COLS).filter(c => c[0] !== '公开分级' || D.score);
     if (sortK >= cols.length) sortK = 0;
     const isGrade = cols[sortK][0] === '投资分级';
     const key = (p, i) => cols[i][0] === '投资分级' ? ORDER[gradeOf(p)] : cols[i][1](p);
@@ -255,60 +303,131 @@
   }
   const TAGCLS = t => /征求/.test(t) ? 'draft' : /^20\d\d/.test(t) ? 'trial' : /^可算|放电量/.test(t) ? 'ok' : 'none';
 
-  function revenue() {
-    if (PUB()) return sources();
-    const ps = PROVS.filter(p => D.provinces[p] && F(p, '⑧c21'))
-      .sort((a, b) => (ORDER[gradeOf(a)] - ORDER[gradeOf(b)]) || a.localeCompare(b, 'zh'));
-    const R = Object.fromEntries(ps.map(p => [p, revOf(p)]));
-    $('#app').innerHTML = `
-      <section class="hero"><div><div class="eyebrow">电网侧独立储能 · 收益构成全景</div>
-        <h1>一座标杆电站一年能挣哪几块钱</h1>
-        <p class="lede">标杆项目 200MW／800MWh（4 小时）。每省拆成现货套利、容量收益、调频与过网成本四层，每层标明能不能算、依据是否生效。<b>互斥的不相加</b>：容量电价（补偿）与容量租赁是同一块容量，只能二选一，取较高者。</p></div></section>
-      <div class="legend" style="margin:0 0 14px">
-        <span><span class="sw" style="background:#97AAD7"></span>现货套利（量级参考）</span>
-        <span><span class="sw" style="background:#2F4B8A"></span>容量收益·已出台</span>
-        <span><span class="sw" style="background:#E9C46A"></span>容量收益·征求稿未生效</span>
-        <span><span class="sw" style="background:#5BA08A"></span>容量收益·未来起执行</span>
-        <span><span class="sw" style="background:#D8A39D"></span>过网成本（另列，未从合计扣除）</span>
-      </div>
-      <section class="card"><h2>各省收益构成（万元/年）</h2>
-        <div class="sub">按投资分级分组。现货套利来自单季价差外推，<b>只作量级参考，不用于跨省排序</b>；调频、辅助服务尚未测算年收益。</div>
-        <div class="chart" id="revchart" style="height:${Math.max(420, ps.length * 26 + 60)}px"></div></section>
-      <section class="card" style="margin-top:20px"><h2>逐层明细</h2><div class="sub">悬停编号看依据文件与当前状态。「未采集」不等于没有这项收益。</div>
-        <div class="tablewrap"><table class="t rev"><thead><tr><th>省份</th><th>分级</th><th>现货套利</th><th>容量电价／补偿</th><th>容量租赁</th><th>计入的容量收益</th><th>调频</th><th>过网成本</th><th>可点算合计</th></tr></thead>
-        <tbody>${ps.map(p => { const r = R[p]; const f = v => v != null ? Math.round(v).toLocaleString() : '—';
-          return `<tr><td><a href="#/p/${encodeURIComponent(p)}">${esc(p)}</a></td><td>${esc(gradeOf(p))}</td>
-            <td class="mono">${f(r.spot)} <span class="st none">量级参考</span></td>
-            <td class="mono">${r.cap ? f(r.cap) + ' ' + citeHTML(sourcesOf(p, '⑧c4')) : '<span style="color:var(--mute)">' + esc(capPolicy(p) === '库内未见省级容量补偿' ? '库内未见' : capPolicy(p)) + '</span>'}</td>
-            <td class="mono">${r.lease != null ? f(r.lease) : '<span style="color:var(--mute)">未采集</span>'}</td>
-            <td class="mono">${f(r.capV)} <span class="st ${TAGCLS(r.capTag)}">${esc(r.capTag)}</span>${r.lease != null && r.cap ? '<div class="note">补偿与租赁二选一，取' + (r.useLease ? '租赁' : '补偿') + '</div>' : ''}</td>
-            <td style="font-size:13px;color:var(--ink2)">${esc(r.fmTag)}</td>
-            <td class="mono">${f(r.cost)}</td>
-            <td class="mono"><b>${f(r.total)}</b></td></tr>`; }).join('')}</tbody></table></div>
-        <ul class="rules" style="margin-top:14px;font-size:13.5px;color:var(--ink2)">
-          <li><b>可点算合计</b>＝现货套利＋容量收益（补偿与租赁二选一取高）。调频、顶峰等辅助服务与过网成本未计入。</li>
-          <li><b>未来起执行</b>（如安徽 2027-01-01）：执行前没有这块现金流，合计里的容量收益是执行后的年化值。</li>
-          <li><b>征求稿</b>：尚未生效，数值可能变；正式稿出台后本页随库更新。</li>
-          <li><b>过网成本</b>＝年充电量 × 储能实际承担的过网单价（输配电费、系统运行费、政府性基金按本省规则折减，线损未计）。甘肃、重庆、河南、北京、山西等省充电时全额承担，所以偏高——这些省的现货套利要先扣掉这块再看。</li>
-        </ul></section>`;
-    const el = $('#revchart');
-    const ch = echarts.init(el, null, { renderer: 'svg' });
-    new ResizeObserver(() => ch.resize()).observe(el);
-    const capColor = t => /征求/.test(t) ? '#E9C46A' : /^20\d\d/.test(t) ? '#5BA08A' : '#2F4B8A';
-    const names = ps.map(p => `${p}（${gradeOf(p).slice(0, 2)}）`);
-    ch.setOption({
-      grid: { left: 110, right: 40, top: 10, bottom: 30 },
-      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, formatter: qs => { const p = ps[qs[0].dataIndex], r = R[p];
-        return `<b>${p}</b>（${gradeOf(p)}）<br>现货套利 ${r.spot != null ? Math.round(r.spot) : '—'}（量级参考）<br>容量收益 ${Math.round(r.capV)}（${r.capTag}）<br>调频：${r.fmTag}<br>过网成本 ${r.cost != null ? Math.round(r.cost) : '—'}（另列）`; } },
-      xAxis: { type: 'value', axisLabel: { color: '#5F6670' }, splitLine: { lineStyle: { color: '#EFEDE6' } } },
-      yAxis: { type: 'category', inverse: true, data: names, axisTick: { show: false }, axisLine: { show: false }, axisLabel: { color: '#1B1F24', fontSize: 12.5 } },
-      series: [
-        { name: '现货套利', type: 'bar', stack: 'r', barWidth: 13, data: ps.map(p => R[p].spot || 0), itemStyle: { color: '#97AAD7' } },
-        { name: '容量收益', type: 'bar', stack: 'r', data: ps.map(p => ({ value: Math.round(R[p].capV), itemStyle: { color: capColor(R[p].capTag) } })) },
-        { name: '过网成本', type: 'bar', stack: 'c', barWidth: 13, data: ps.map(p => R[p].cost ? -Math.round(R[p].cost) : 0), itemStyle: { color: '#D8A39D' } }
-      ]
+
+  // ---------- 分层分组条形图（收益构成全景、示例测算共用；10-14 用户：重点和层次不突出 → 答案先行、分三组、少颜色、直接标数） ----------
+  const C_SURE = '#2F4B8A', C_MKT = '#B7C5E6', C_MKT_X = '#D9DCE2';
+  function hatchFill() { const c = document.createElement('canvas'); c.width = c.height = 8; const g = c.getContext('2d'); g.fillStyle = '#E3E9F6'; g.fillRect(0, 0, 8, 8); g.strokeStyle = '#5B78BD'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(0, 8); g.lineTo(8, 0); g.stroke(); return { image: c, repeat: 'repeat' }; }
+  // groups: [{id, t, d, rows:[{n, sure, pend, mkt, lo, hi, tot, net, tip, href, gray}]}]；o: {rng, net}
+  function layerGroups(host, groups, o) {
+    const gs = groups.filter(g => g.rows.length);
+    const ends = gs.flatMap(g => g.rows.map(r => Math.max(r.sure + r.pend + r.mkt, r.tot || 0, o.rng && r.hi != null ? r.hi : 0)));
+    const xmax = Math.ceil(Math.max(...ends, 1) * 1.08 / 100) * 100;
+    const xmin = o.net ? Math.min(0, Math.floor(Math.min(...gs.flatMap(g => g.rows.map(r => r.net == null ? 0 : r.net))) / 100) * 100) : 0;
+    host.innerHTML = gs.map((g, i) => `<div class="lgp" id="grp-${g.id}"><div class="lgh"><h3><i class="gk gk-${g.id}"></i>${g.t}<small>${g.rows.length} 省区</small></h3><p>${g.d}</p></div>
+      <div class="lgc" style="height:${g.rows.length * 28 + (i === gs.length - 1 ? 34 : 8)}px"></div></div>`).join('');
+    const hatch = hatchFill();
+    host.querySelectorAll('.lgc').forEach((el, i) => {
+      const g = gs[i], R = g.rows, last = i === gs.length - 1;
+      const ch = echarts.init(el, null, { renderer: 'svg' }); new ResizeObserver(() => ch.resize()).observe(el);
+      ch.setOption({
+        animation: false,
+        grid: { left: 70, right: 64, top: 4, bottom: last ? 28 : 4 },
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(47,75,138,.06)' } }, formatter: qs => R[qs[0].dataIndex].tip },
+        xAxis: { type: 'value', min: xmin, max: xmax, axisLabel: { show: last, color: '#5F6670', fontSize: 11 }, axisLine: { show: false }, axisTick: { show: false }, splitLine: { lineStyle: { color: '#F0EEE8' } },
+          name: last ? '元/千瓦·年' : '', nameLocation: 'end', nameGap: 8, nameTextStyle: { color: '#5F6670', fontSize: 11, padding: [22, 0, 0, 0] } },
+        yAxis: { type: 'category', inverse: true, data: R.map(r => r.n), axisTick: { show: false }, axisLine: { show: false }, axisLabel: { color: '#1B1F24', fontSize: 13 } },
+        series: [
+          { type: 'bar', stack: 's', barWidth: 14, data: R.map(r => Math.round(r.sure)), itemStyle: { color: C_SURE } },
+          { type: 'bar', stack: 's', data: R.map(r => Math.round(r.pend)), itemStyle: { color: hatch } },
+          { type: 'bar', stack: 's', data: R.map(r => ({ value: Math.round(r.mkt), itemStyle: { color: r.gray ? C_MKT_X : C_MKT } })) },
+          { type: 'custom', z: 5, silent: true, data: o.rng ? R.map((r, j) => r.lo != null ? [j, r.lo, r.hi] : [j, null, null]) : [],
+            renderItem: (p, api) => { if (api.value(1) == null) return null; const a = api.coord([api.value(1), api.value(0)]), b = api.coord([api.value(2), api.value(0)]);
+              return { type: 'group', children: [{ type: 'line', shape: { x1: a[0], y1: a[1], x2: b[0], y2: b[1] }, style: { stroke: '#5F6670', lineWidth: 1 } }, { type: 'line', shape: { x1: b[0], y1: b[1] - 4, x2: b[0], y2: b[1] + 4 }, style: { stroke: '#5F6670', lineWidth: 1 } }] }; } },
+          { type: 'scatter', z: 6, symbolSize: 9, data: o.net ? R.map((r, j) => r.net != null ? [Math.round(r.net), j] : null).filter(Boolean) : [], encode: { x: 0, y: 1 }, itemStyle: { color: '#fff', borderColor: '#A8251B', borderWidth: 2 } },
+          { type: 'scatter', z: 7, symbolSize: 0, silent: true, encode: { x: 0, y: 1 },
+            data: R.map((r, j) => [Math.max(r.sure + r.pend + r.mkt, o.rng && r.hi != null ? r.hi : 0, o.net && r.net != null ? r.net : 0), j, r.tot, o.net ? r.net : null]),
+            label: { show: true, position: 'right', distance: 6, fontFamily: 'IBM Plex Mono, Menlo, monospace', fontSize: 12,
+              formatter: q => (q.value[2] == null ? '' : `{a|${Math.round(q.value[2]).toLocaleString()}}`) + (q.value[3] == null ? '' : `{b| → ${Math.round(q.value[3]).toLocaleString()}}`),
+              rich: { a: { color: '#1B1F24', fontWeight: 600, fontFamily: 'IBM Plex Mono, Menlo, monospace', fontSize: 12 }, b: { color: '#A8251B', fontFamily: 'IBM Plex Mono, Menlo, monospace', fontSize: 12 } } } }
+        ] });
+      ch.on('click', q => { const r = R[q.dataIndex]; if (r && r.href) location.hash = r.href; });
     });
-    ch.on('click', q => { location.hash = '#/p/' + encodeURIComponent(ps[q.dataIndex]); });
+  }
+  function sumCards(cards) {        // 答案先行：三张摘要卡，点击跳到对应分组
+    return `<div class="sumcards">${cards.map(c => `<button class="sc sc-${c.id}" data-go="grp-${c.id}"><div class="sc-k"><i class="gk gk-${c.id}"></i>${c.k}</div>
+      <div class="sc-v">${c.v}<small> 省区</small></div><div class="sc-n">${c.n}</div>${c.x ? `<div class="sc-x">${c.x}</div>` : ''}</button>`).join('')}</div>`;
+  }
+  function wireCards() { document.querySelectorAll('.sc[data-go]').forEach(b => b.onclick = () => { const t = document.getElementById(b.dataset.go); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }); }
+  const nameList = (xs, n = 6) => esc(xs.slice(0, n).join('、')) + (xs.length > n ? ` 等` : '');
+  const rangeOf = (vs, unit = '') => { vs = vs.filter(v => v > 0); if (!vs.length) return ''; const a = Math.round(Math.min(...vs)), b = Math.round(Math.max(...vs)); return (a === b ? `${a}` : `${a}—${b}`) + unit; };
+
+  function revenue() {
+    if (PUB() && !(D.example && D.example.n >= 2)) return sources();
+    // 研究线 10-14：两页统一一个数据源——有示例测算 v2 就全部读它的 4 小时档（容量、租赁、现货、过网成本），⑧只作内部底稿
+    if (D.example && D.example.n >= 2) return examplePage({ rev: true });
+    // v2（10-14 用户：可读性不强，借鉴头部机构）：单位元/千瓦·年；按确定性分层（政策确定→政策待定→市场）；
+    // 现货按实现率 70% 画、须线 60%—80%（JL57：研报价差为理论上限）；过网成本不画反向条，用「扣过网后」点标出；按确定层排序
+    const K = 20;                                   // 200MW 标杆：万元/年 ÷ 20 ＝ 元/千瓦·年
+    const RZ = [0.6, 0.7, 0.8];
+    const NONSAME = ['浙江', '福建', '江西', '重庆', '上海'];   // ⑧c13 非 YJ61 同源（v381 列头注），价差不可横比
+    const EXV2 = Object.fromEntries(((D.example || {}).n >= 2 ? D.example.rows : []).filter(r => r.配置 === '200MW/800MWh').map(r => [r.主体, r]));
+    const ps = PROVS.filter(p => D.provinces[p] && F(p, '⑧c21')).map(p => {
+      const r = revOf(p), pol = capPolicy(p), fut = !!effDate(p), stock = /仅限|存量/.test(first1(p, '⑧c8'));   // 只适用存量项目的（如浙江仅限 2024-06-30 前并网），新项目拿不到
+      const capk = (r.capV || 0) / K;
+      const mktLease = r.useLease && ['宁夏'].includes(p);   // 研究线 10-14：宁夏 88.54 元/千瓦·年为 2025 年市场成交价（中电联【ZCGJ84】p52，二手），不是政策价
+      const approx = ['山东'].includes(p);   // 研究线 10-14：0.0705 元/kWh 是用户侧收取标准，补偿池按发电侧可用容量占比分配（【ZCSD08】p1），本站放电量估算只示量级 → 政策待定
+      const unsrc = r.useLease && ['云南'].includes(p);   // 研究线 10-14：参考价出处待查（《实施方案》未采集）→ 政策待定，核实后回政策确定
+      const sure = r.capV && !mktLease && !unsrc && !approx && (r.useLease || (!fut && !stock && pol !== '征求意见稿')) ? capk : 0;
+      const pend = r.capV && !mktLease && (unsrc || approx || (!r.useLease && (fut || stock || pol === '征求意见稿'))) ? capk : 0;
+      const spot = r.spot != null ? r.spot / K + (mktLease ? capk / 0.7 : 0) : null;   // 市场成交租赁并入市场层（图上按 0.7 画，抵消回原值）
+      const ev = EXV2[p];                                           // 过网成本取研究线示例测算 v2（按 114 号与 ⑧c43 新归类算）；⑧c50 尚按旧口径，不用
+      const cost = ev && ev.过网成本 != null ? ev.过网成本 / K : null;
+      return { p, r, sure, pend, spot, cost, mktLease, leaseK: mktLease ? capk : 0, pendWhy: approx ? '市场化容量补偿（已生效），金额为估算、口径近似，不作政策确定值' : unsrc ? '调节容量市场参考价（政策机制），数值出处待查' : pol === '征求意见稿' ? '征求稿·未生效' : stock ? '仅存量项目' : fut ? effDate(p) + ' 起执行' : '', tier: pgradeOf(p) };
+    }).sort((a, b) => (b.sure - a.sure) || (b.pend - a.pend) || a.p.localeCompare(b.p, 'zh'));
+    const f0 = v => v == null ? '—' : Math.round(v).toLocaleString();
+    const top = ps.filter(x => x.sure > 0);
+    const onlyMkt = ps.filter(x => !x.sure && !x.pend && x.spot);
+    // 研究线 10-14：山东为市场化容量补偿，已生效但金额无法折算（画在政策待定），标题另列；未来执行的另列
+    const MKTCAP = ['山东'], EXPIRE = { 河北: '2026-12-31', 湖北: '2027-02-01' };   // 容量电价窗口剩余不足 1 年
+    const top9 = top.filter(x => !MKTCAP.includes(x.p)), futs = ps.filter(x => !x.sure && x.pend && effDate(x.p) && capPolicy(x.p) === '已出台');   // 征求稿（如河南）不算
+    const head = `${top9.length} 个省区有已生效、新项目可拿的容量收入，${esc(top9.slice(0, 3).map(x => x.p).join('、'))} 最高`
+      + (futs.length ? `；另有${esc(futs.map(x => x.p + ' ' + effDate(x.p).slice(0, 4)).join('、'))} 年起执行` : '')
+      + (ps.some(x => MKTCAP.includes(x.p)) ? `，${MKTCAP.join('、')}为市场化容量补偿、无法折算` : '') + `；${onlyMkt.length} 个省只有市场收入。`;
+    const OPT = { rng: false, net: Object.keys(EXV2).length > 0 };
+    const tipOf = x => { const r = x.r; return `<b>${x.p}</b>　公开分级 ${esc(x.tier || '—')}<br>政策确定 ${f0(x.sure)}${x.r.useLease ? '（租赁）' : ''}${EXPIRE[x.p] ? '<br>　容量电价窗口到 ' + EXPIRE[x.p] + '（剩余不足 1 年）' : ''}${x.pend ? '<br>政策待定 ' + f0(x.pend) + '　' + esc(x.pendWhy) : ''}<br>市场 ${x.spot != null ? f0(x.spot * RZ[1]) + '（区间 ' + f0(x.spot * RZ[0]) + '—' + f0(x.spot * RZ[2]) + '）' : '—'}${x.mktLease ? '<br>　其中租赁 ' + f0(x.leaseK) + '：2025 年市场成交价（中电联报告，二手），非政策价' : ''}${NONSAME.includes(x.p) ? '<br>　* 价差口径与多数省不同源，不宜横比' : ''}<br>过网成本 ${f0(x.cost)}${EXV2[x.p] && EXV2[x.p].过网成本口径 ? '（' + esc(EXV2[x.p].过网成本口径.split('（')[0]) + '）' : ''}${x.cost != null ? '<br><b>扣过网成本后 ' + f0(x.sure + x.pend + (x.spot || 0) * RZ[1] - x.cost) + '</b>' : ''}<br><span style="color:#B9BEC7">元/千瓦·年｜项目口径 ${f0(r.total)} 万元/年｜点击看省份</span>`; };
+    const rowOf = x => { const base = x.sure + x.pend, m = x.spot != null ? x.spot * RZ[1] : 0, tot = base + m;
+      return { n: x.p + (NONSAME.includes(x.p) ? ' *' : ''), sure: x.sure, pend: x.pend, mkt: m, lo: x.spot != null ? base + x.spot * RZ[0] : null, hi: x.spot != null ? base + x.spot * RZ[2] : null,
+        tot, net: x.cost != null ? tot - x.cost : null, gray: NONSAME.includes(x.p), tip: tipOf(x), href: '#/p/' + encodeURIComponent(x.p) }; };
+    const G1 = ps.filter(x => x.sure > 0).sort((a, b) => b.sure - a.sure);
+    const G2 = ps.filter(x => !x.sure && x.pend > 0).sort((a, b) => b.pend - a.pend);
+    const G3 = ps.filter(x => !x.sure && !x.pend).sort((a, b) => (b.spot || 0) - (a.spot || 0));
+    const why2 = [...new Set(G2.map(x => /征求/.test(x.pendWhy) ? '征求稿' : /起执行/.test(x.pendWhy) ? '未来起执行' : /存量/.test(x.pendWhy) ? '仅存量项目' : /出处待查/.test(x.pendWhy) ? '参考价出处待查' : '金额仅能估算'))];
+    const groups = [
+      { id: 'a', t: '有现行容量收入', d: '容量机制已生效、新建项目可拿。<b>深色</b>＝容量收入，<b>浅色</b>＝现货套利（按七折估）；条末数字＝合计。', rows: G1.map(rowOf) },
+      { id: 'b', t: '容量收入待定', d: `有容量机制但还不能算稳：${esc(why2.join('、'))}。<b>斜纹段</b>＝待定的容量收入，悬停看原因。`, rows: G2.map(rowOf) },
+      { id: 'c', t: '只有市场收入', d: '暂无容量机制，收入只有现货套利；现货价差是研报理论值，打七折后只示量级。<b>*</b> 价差口径与多数省不同源，不宜横比。', rows: G3.map(rowOf) }
+    ];
+    const sub = [futs.length ? `另有${esc(futs.map(x => x.p).join('、'))} ${esc(futs.map(x => effDate(x.p).slice(0, 4))[0])} 年起执行` : '', ps.some(x => MKTCAP.includes(x.p)) ? `${MKTCAP.join('、')}为市场化容量补偿、无法折算` : ''].filter(Boolean).join('，');
+    $('#app').innerHTML = `
+      <section class="hero"><div><div class="eyebrow">电网侧独立储能 · 收益构成全景 · 4 小时项目</div>
+        <h1>${top9.length} 个省区有已生效、新项目可拿的容量收入；${onlyMkt.length} 个省只有市场收入</h1>
+        <p class="lede">${sub ? sub + '。' : ''}按「收入稳不稳」把各省分成三组：先看有没有政策给的容量收入，再看市场能补多少。</p></div></section>
+      ${sumCards([
+        { id: 'a', k: '有现行容量收入', v: G1.length, n: nameList(G1.map(x => x.p)), x: '容量 ' + rangeOf(G1.map(x => x.sure), ' 元/千瓦·年') },
+        { id: 'b', k: '容量收入待定', v: G2.length, n: nameList(G2.map(x => x.p)), x: esc(why2.join('、')) },
+        { id: 'c', k: '只有市场收入', v: G3.length, n: nameList(G3.map(x => x.p)), x: '现货（七折）' + rangeOf(G3.map(x => (x.spot || 0) * RZ[1]), ' 元/千瓦·年') }])}
+      <section class="card lgcard">
+        <div class="lgbar"><div class="revlegend"><span><i style="background:${C_SURE}"></i>容量收入·已生效</span><span><i class="hatch"></i>容量收入·待定</span><span><i style="background:${C_MKT}"></i>现货套利（七折）</span></div>
+          <div class="lgopts"><label><input type="checkbox" id="optRng"> 现货区间（六折—八折）</label><label><input type="checkbox" id="optNet" ${Object.keys(EXV2).length ? 'checked' : ''}> 扣过网成本后<span class="note" style="display:inline">（红色箭头后的数）</span></label></div></div>
+        <div id="lghost"></div></section>
+      <details class="fold"><summary>怎么读、为什么这样算</summary><ul class="rules">
+          <li><b>为什么现货打七折</b>：⑧表现货价差来自研报的「全知视角最优策略」，是理论上限；实际能拿到的按 60%—80% 估（库内判据 JL57）。现货只示量级，不用于跨省排序。</li>
+          <li><b>过网成本</b>：按国家 114 号文（充电视作用户、缴系统运行费和线损、单一电量制、放电对应电量退减输配电费）与 ⑧c43 各省归类计算，取研究线示例测算 v2 的数；本省旧优惠在 114 号后未见本省口径的，按国标保守计（旧优惠若继续执行，成本更低）。线损购电价按 0.30 元/千瓦时量级假设。</li>
+          <li><b>没画的</b>：调频等辅助服务尚未测算年收益。</li>
+          <li><b>标杆项目</b>：200MW／800MWh；乘以 20 万千瓦即得项目年收入（万元），悬停可见。</li></ul></details>
+      <details class="fold"><summary>逐省明细表（${ps.length} 省区，含公开分级、过网成本、调频）</summary>
+        <div class="tablewrap"><table class="t rev"><thead><tr><th>省份</th><th>公开分级</th><th>政策确定</th><th>政策待定</th><th>现货（70%）</th><th>过网成本</th><th>扣过网后</th><th>调频</th></tr></thead>
+        <tbody>${[...G1, ...G2, ...G3].map(x => `<tr><td><a href="#/p/${encodeURIComponent(x.p)}">${esc(x.p)}</a></td><td>${esc(x.tier)}</td>
+          <td class="mono">${x.sure ? f0(x.sure) + ' ' + citeHTML(sourcesOf(x.p, '⑧c4')) + (x.r.useLease ? ' <span class="st ok">租赁</span>' : '') : '—'}</td>
+          <td class="mono">${x.pend ? f0(x.pend) + ` <span class="st ${/征求/.test(x.pendWhy) ? 'draft' : 'trial'}">${esc(x.pendWhy)}</span>` : '—'}</td>
+          <td class="mono">${x.spot != null ? f0(x.spot * RZ[1]) + `<span class="note" style="display:inline">（${f0(x.spot * RZ[0])}—${f0(x.spot * RZ[2])}）</span>` : '—'}</td>
+          <td class="mono">${f0(x.cost)}</td>
+          <td class="mono"><b>${f0(x.sure + x.pend + (x.spot || 0) * RZ[1] - (x.cost || 0))}</b></td>
+          <td style="font-size:12.5px;color:var(--ink2)">${esc(x.r.fmTag)}</td></tr>`).join('')}</tbody></table></div></details>`;
+    const draw = () => layerGroups($('#lghost'), groups, OPT);
+    draw(); wireCards();
+    $('#optRng').onchange = e => { OPT.rng = e.target.checked; draw(); };
+    $('#optNet').onchange = e => { OPT.net = e.target.checked; draw(); };
   }
 
   // ---------- 省份看板：政策 － 开发 － 问题 ----------
@@ -321,13 +440,14 @@
     const one = firstSentence(f.v);
     return `<div class="item"><div class="h"><span>${esc(h)}</span>${stale}</div>
       <div class="b">${citeHTML(one)}</div>
-      ${full.length > one.length + 4 || (f.cites || []).length ? `<details><summary>展开原文摘录与依据</summary><div class="full">${citeHTML(full)}</div>${pagesLine(f)}</details>` : ''}</div>`;
+      ${PUB() ? ((f.cites || []).length ? `<details><summary>依据文件与页码</summary>${pagesLine(f)}</details>` : '')      /* 用户 10-15：对外只给结论与依据，原文摘录与过程留本地 */
+        : full.length > one.length + 4 || (f.cites || []).length ? `<details><summary>展开原文摘录与依据</summary><div class="full">${citeHTML(full)}</div>${pagesLine(f)}</details>` : ''}</div>`;
   }
   function pagesLine(f) {     // 依据页码：格内已标／自动定位（溯源/引用页码.jsonl）
     const seen = new Set(), parts = [];
     (f.cites || []).forEach(c => { const k = c.code + '|' + c.page; if (seen.has(k)) return; seen.add(k);
       parts.push(`<button type="button" class="cite ${D.docs[c.code] ? statusClass(D.docs[c.code].status) : 'none'}" data-code="${c.code}">${c.code}</button>` +
-        (c.page != null ? `<span class="mono"> p${c.page}</span>${c.how && c.how !== '格内已标' ? '<span class="note" style="display:inline"> ·' + esc(c.how) + '</span>' : ''}` : '<span class="note" style="display:inline"> 页码待定位</span>')); });
+        (c.page != null ? `<span class="mono"> p${c.page}</span>${!PUB() && c.how && c.how !== '格内已标' ? '<span class="note" style="display:inline"> ·' + esc(c.how) + '</span>' : ''}` : '<span class="note" style="display:inline"> 页码待定位</span>')); });
     return parts.length ? `<div class="pages"><b>依据页码</b>　${parts.join('　')}</div>` : '';
   }
   function cardHTML(p) {      // 研究线结论卡（研究站2.0/结论卡/）：结论句＋要点依据链＋可证伪点；内部研判只在内部版出现
@@ -354,7 +474,8 @@
     if (!D.provinces[p]) { app.innerHTML = `<p>未找到「${esc(p)}」。</p>`; return; }
     const kw = isKW(p), cap = N(p, '⑧c4'), hrs = N(p, '⑧c6');
     const c2 = gradeOf(p);
-    const chips = [...(PUB() ? [] : [['投资分级', c2], ['收益确定性', (V(p, '⑧c3') || '未评').split(/[（(]/)[0]]]), ['现货阶段', stageOf(p)], ['清单制', listOf(p)], ['充电费用', chargeOf(p)],
+    const pg = ((D.score || {}).rows || []).find(x => x.主体 === p);
+    const chips = [...(pg ? [['投资分级（公开方法）', `${pg.档位} · ${pg.总分} 分`]] : []), ...(PUB() ? [] : [['内部综合分级', c2]]), ['收益确定性', (clean(V(p, '⑧c3')) || '未评').split(/[（(〔]/)[0]], ['现货阶段', stageOf(p)], ['清单制', listOf(p)], ['充电费用', chargeOf(p)],
       ['退坡风险', (V(p, '⑧c35').match(/^[^｜|（(\s]+/) || ['—'])[0]], ['容量政策', V(p, '⑧c8') || '—']];
     const stales = [...new Set(Object.values(D.provinces[p]).flatMap(f => f.staleCites || []))];
     const jibei = D.provinces['河北·冀北'];
@@ -377,14 +498,25 @@
           ${item(p, '②c6', '容量补偿')}${item(p, '②c3', '电力现货')}${item(p, '②c4', '调频补偿')}${item(p, '②c9', '充电电费减免')}${item(p, '②c10', '容量租赁')}${item(p, '②c12', '容量电价考核')}
           ${jibei && p === '河北' ? `<div class="todo">河北分冀南、冀北两张网。上面为冀南；冀北容量补偿：${citeHTML(firstSentence((jibei['②c6'] || {}).v || '未采集'))}</div>` : ''}</div>
         <div class="card col"><h2>开发 <small>能不能做、怎么进</small></h2>
-          ${item(p, '②c17', '清单制')}${item(p, '②c16', '现货报价方式')}${item(p, '⑧c31', '现行标准生效／到期')}${item(p, '⑧c34', '下次调整窗口')}${item(p, '⑧c32', '调整机制')}${item(p, '⑧c33', '历史退坡轨迹')}
-          <div class="todo">申报窗口、门槛与股权锁定期：专题汇编中${PUB() ? '' : '（T623）'}，完成后在此显示。</div></div>
+          ${(D.dev || {})[p] ? devHTML(p) : `${item(p, '②c17', '清单制')}${item(p, '②c16', '现货报价方式')}${item(p, '⑧c31', '现行标准生效／到期')}${item(p, '⑧c34', '下次调整窗口')}${item(p, '⑧c32', '调整机制')}${item(p, '⑧c33', '历史退坡轨迹')}
+          <div class="todo">申报窗口、门槛与股权锁定期：专题汇编中${PUB() ? '' : '（T623）'}，完成后在此显示。</div>`}</div>
         <div class="card col"><h2>问题 <small>风险与待核</small></h2>
           ${PUB() ? riskFromCard(p) + item(p, '⑧c35', '退坡·并轨风险') + item(p, '⑧c53', '节点价差')
                   : item(p, '⑧c26', '风险与注意事项') + item(p, '⑧c24', '校核结论') + item(p, '⑧c30', '测算局限') + item(p, '⑧c53', '节点价差')}
           ${missingList(p)}</div>
       </section>`;
     drawCalc(p);
+  }
+  const DEVK = [['K1', '清单制'], ['K2', '申报窗口'], ['K3', '准入门槛'], ['K4', '建设时限'], ['K5', '股权与投资主体锁定'], ['K6', '调出清单情形'], ['K7', '建设规模指标']];
+  function devHTML(p) {       // 开发栏「怎么进」（补厚计划 B1；研究线取证 收件箱/开发栏取证/开发栏取证.jsonl）
+    const x = D.dev[p];
+    return DEVK.map(([k, t]) => { const e = x[k];
+      if (!e || !e.值) return `<div class="item"><div class="h"><span>${t}</span></div><div class="b" style="color:var(--mute)">未采集——不等于该省「无规定」</div></div>`;
+      if (e.核验中 || e.待补) return `<div class="item"><div class="h"><span>${t}</span><span class="st draft">核验中</span></div><div class="b" style="color:var(--mute)">${PUB() ? '依据正在补核，核实后显示' : esc(e.值)}</div></div>`;
+      const ev = (e.依据 || []).map(d => `<button type="button" class="cite ${D.docs[d.编号] ? statusClass(D.docs[d.编号].status) : 'none'}" data-code="${esc(d.编号)}" title="${esc(d.原句 || '')}">${esc(d.编号)}</button>${d.页 ? `<span class="mono"> p${d.页}</span>` : ''}`).join(' ');
+      return `<div class="item"><div class="h"><span>${t}</span></div><div class="b">${esc(e.值)}</div>
+        ${(e.例外 || []).length ? `<div class="note">例外通道：${e.例外.map(esc).join('；')}</div>` : ''}${ev ? `<div class="pages">${ev}</div>` : ''}</div>`; }).join('')
+      + (!PUB() && (x.线索 || x.备注) ? `<details class="item"><summary>线索与备注（内部）</summary><div class="full">${esc(JSON.stringify(x.线索 || '', null, 1)).slice(0, 2000)}${x.备注 ? '<br>' + esc(typeof x.备注 === 'string' ? x.备注 : JSON.stringify(x.备注)) : ''}</div></details>` : '');
   }
   function riskFromCard(p) {   // 对外版「问题」栏读研究线结论卡的风险与待核、可证伪点
     const k = (D.cards || {})[p];
@@ -444,6 +576,113 @@
     return codes.length ? codes.map(c => `【${c}】`).join('') : (extra.join('') || '格内无编号引用');
   }
 
+  // ---------- 示例测算（补厚计划 C2；研究线 示例测算/示例_v1.jsonl，数字原样读取、不另算） ----------
+  const EX = { cfg: '200MW/800MWh' };
+  function examplePage(o = {}) {
+    const REV = !!o.rev, CFG = EX.cfg;   // 用户 10-15：收益构成全景与示例测算合并为一页，全景页也可切 2h/4h
+    const all = D.example.rows || [];
+    const rows = all.filter(r => r.配置 === CFG);
+    const K = 20, f0 = v => v == null ? '—' : Math.round(v).toLocaleString(), k = v => v == null ? null : v / K;
+    const rTot = r => r.收入小计 !== undefined ? r.收入小计 : r.政策收益合计;      // v2 起合计拆成「收入小计」和「扣过网成本后」
+    const V2 = (D.example.n || 1) >= 2;
+    const layer = r => {                          // 政策确定／政策待定（征求稿、未来执行、仅存量）／市场
+      const useLease = r.二选一采用 === '容量租赁', mktLease = useLease && /市场成交/.test(r.容量租赁标注 || '');   // 宁夏租赁价为市场成交价（二手）→ 市场层
+      const capv = useLease ? (mktLease ? null : r.容量租赁) : r.容量收益;
+      const fut = !useLease && /起执行/.test(r.机制 || ''), draft = !useLease && /征求/.test(r.容量收益标注 || '');
+      const unsrc = useLease && /出处待查/.test(r.容量租赁标注 || '');   // 研究线 10-14：云南调节容量参考价——政策机制托底（【ZCYN08】p2），数值出处待查 → 政策待定
+      const sure = capv != null && !fut && !draft && !unsrc ? capv : 0;
+      const pend = capv != null && (fut || draft || unsrc) ? capv : 0;
+      const why = unsrc ? '调节容量市场参考价（政策机制），数值出处待查' : draft ? (r.容量收益标注 || '征求稿') : fut ? (r.机制 || '').replace('已出台·', '') : /仅存量/.test(r.容量收益标注 || '') ? '仅存量项目适用·新建项目不计' : '';
+      return { sure, pend, why, capv, spot: (r.现货套利 || 0) + (mktLease ? r.容量租赁 : 0) || null, rng: r.现货区间 && mktLease ? [r.现货区间[0] + r.容量租赁, r.现货区间[1] + r.容量租赁] : r.现货区间, mktLease };
+    };
+    const L = rows.map(r => ({ r, ...layer(r) })).sort((a, b) => (b.sure - a.sure) || (b.pend - a.pend) || ((rTot(b.r) || 0) - (rTot(a.r) || 0)));
+    const md = (D.example.method || '').split('\n').map(l => /^## /.test(l) ? `<h3>${esc(l.slice(3))}</h3>` : /^# /.test(l) ? '' : /^\|\s*-/.test(l) ? '' : /^\|/.test(l) ? `<div class="mdrow">${l.split('|').slice(1, -1).map(c => `<span>${esc(c.trim()).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')}</span>`).join('')}</div>` : /^\d+\. /.test(l) ? `<li>${esc(l.replace(/^\d+\. /, '')).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')}</li>` : l.trim() ? `<p>${esc(l).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')}</p>` : '').join('');
+    const EXPIRE = { 河北: '2026-12-31', 湖北: '2027-02-01' };       // 研究线 10-14：容量电价窗口剩余不足 1 年
+    const tipOf = x => { const r = x.r; return `<b>${esc(r.主体)}</b>　${esc(r.机制 || '')}${REV && pgradeOf(r.主体) && pgradeOf(r.主体) !== '未评' ? '　公开分级 ' + esc(pgradeOf(r.主体)) : ''}${EXPIRE[r.主体] ? '<br>　容量电价窗口到 ' + EXPIRE[r.主体] + '（剩余不足 1 年）' : ''}<br>政策确定 ${f0(k(x.sure))}${x.pend ? '<br>政策待定 ' + f0(k(x.pend)) + '　' + esc(x.why) : ''}<br>现货 ${f0(k(r.现货套利))}（${esc(r.现货标注 || '')}）${x.mktLease ? '<br>　含容量租赁 ' + f0(k(r.容量租赁)) + '：' + esc(r.容量租赁标注 || '') : ''}<br><b>${V2 ? '收入小计' : '政策收益合计'} ${f0(k(rTot(r)))}</b> 元/千瓦·年${V2 && r.过网成本 != null ? '<br>过网成本 −' + f0(k(r.过网成本)) + '：' + Object.entries(r.过网成本构成 || {}).filter(e => e[1]).map(e => e[0] + ' ' + f0(k(e[1]))).join('、') + '<br>　' + esc((r.过网成本口径 || '').split('（')[0]) + (r.过网成本备注 ? '<br>　' + esc(r.过网成本备注) : '') + '<br><b style="color:#FFB4AC">扣过网成本后 ' + f0(k(r.扣过网成本后)) + '</b>' : ''}<br><span style="color:#B9BEC7">项目 ${f0(rTot(r))} 万元/年｜点击看省份</span>`; };
+    const rowOf = x => { const base = k(x.sure + x.pend), m = k(x.spot || 0);
+      return { n: x.r.主体, sure: k(x.sure), pend: k(x.pend), mkt: m, lo: x.rng ? base + k(x.rng[0]) : null, hi: x.rng ? base + k(x.rng[1]) : null,
+        tot: rTot(x.r) != null ? k(rTot(x.r)) : null, net: V2 && x.r.过网成本 != null && x.r.扣过网成本后 != null ? k(x.r.扣过网成本后) : null, /* 过网成本未算的（如蒙东）不画扣后 */ tip: tipOf(x), href: '#/p/' + encodeURIComponent(x.r.主体) }; };
+    const G1 = L.filter(x => x.sure > 0), G2 = L.filter(x => !x.sure && x.pend > 0), G3 = L.filter(x => !x.sure && !x.pend && x.spot), G4 = L.filter(x => !x.sure && !x.pend && !x.spot);
+    const groups = [
+      { id: 'a', t: '有现行容量收入', d: '<b>深色</b>＝容量收益或容量租赁（二选一取采用项），<b>浅色</b>＝现货套利（实现率 0.70）；条末数字＝' + (V2 ? '收入小计，红色箭头后＝扣过网成本后。' : '政策收益合计。'), rows: G1.map(rowOf) },
+      { id: 'b', t: '容量收入待定', d: '斜纹段＝未来起执行或参考价出处待查的容量收入，悬停看原因。', rows: G2.map(rowOf) },
+      { id: 'c', t: '只有市场收入', d: '容量项未出台、征求稿未照算或无法折算，只算现货；现货为量级参考。' + (G3.some(x => x.mktLease) ? `${esc(G3.filter(x => x.mktLease).map(x => x.r.主体).join('、'))}含容量租赁的市场成交价（非政策价）。` : ''), rows: G3.map(rowOf) }
+    ];
+    const tot = xs => rangeOf(xs.map(x => k(rTot(x.r))), ' 元/千瓦·年');
+    // v2 发现（研究线 口径_v2 第四节）：系统运行费是过网成本最大项；扣完为负的省份——从数据算，不手写
+    const neg = L.filter(x => x.r.过网成本 != null && x.r.扣过网成本后 != null && x.r.扣过网成本后 < 0).sort((a, b) => a.r.扣过网成本后 - b.r.扣过网成本后).map(x => x.r.主体);
+    const big = L.filter(x => x.r.过网成本构成 && x.r.过网成本).map(x => x.r.过网成本构成.系统运行费 / x.r.过网成本).filter(v => v > 0);   // 系统运行费为 0 的（北京，待研究线核）不计
+    const insight = V2 && big.length ? `<div class="insight"><b>过网成本：</b>114 号文后，<b>系统运行费</b>是储能充电侧最大的成本项（${big.length} 省占过网成本 ${Math.round(Math.min(...big) * 100)}%—${Math.round(Math.max(...big) * 100)}%）；${neg.length ? `<b>${esc(neg.join('、'))}</b> 扣完过网成本后为负——单靠现货套利覆盖不了充电侧成本。` : ''}</div>` : '';
+    const drafts = L.filter(x => /征求/.test(x.r.容量收益标注 || '') && !x.mktLease).map(x => x.r.主体);   // 宁夏补偿为征求稿但示例采用市场租赁价，另写（研究线 10-14）
+    const mktL = L.filter(x => x.mktLease).map(x => x.r.主体);
+    const futs = G2.filter(x => /起执行/.test(x.why)).map(x => x.r.主体 + ' ' + ((x.why.match(/20\d\d/) || [''])[0]));
+    const hero = REV ? `<section class="hero"><div><div class="eyebrow">电网侧独立储能 · 收益构成全景 · ${CFG === '200MW/400MWh' ? '2' : '4'} 小时项目 · 示例测算口径 v${D.example.n}</div>
+        <h1>${G1.length} 个省区有已生效、新项目可拿的容量收入；${G3.length} 个省区只有市场收入</h1>
+        <p class="lede">${futs.length ? '另有' + esc(futs.join('、')) + ' 年起执行；' : ''}${drafts.length ? esc(drafts.join('、')) + ' 的容量补偿只有征求稿、未照算；' : ''}${mktL.length ? esc(mktL.join('、')) + ' 容量补偿为征求稿，示例采用 2025 年市场租赁价；' : ''}${L.some(x => /未能折算/.test(x.r.容量收益标注 || '')) ? esc(L.filter(x => /未能折算/.test(x.r.容量收益标注 || '')).map(x => x.r.主体).join('、')) + ' 为市场化容量补偿、无法折算；' : ''}按「收入稳不稳」分三组，红色箭头后是扣掉充电过网成本后的数。<b>示例测算·不构成投资建议</b>；线损购电价按 0.30 元/千瓦时量级假设。</p></div>
+        <div class="controls"><span class="seg" id="cfgseg"><button data-v="200MW/400MWh">2 小时</button><button data-v="200MW/800MWh">4 小时</button></span></div></section>`
+      : `<section class="hero"><div><div class="eyebrow">示例测算 · 口径 v${D.example.n || 1} · <span class="st draft">待用户过目，未对外</span></div>
+        <h1>一座 ${CFG} 储能，按现行政策一年能拿多少</h1>
+        <p class="lede"><b>示例测算·不构成投资建议。</b>只算政策收益与现货量级，不算投资回报率。${V2 ? '过网成本按 114 号文口径逐省计算（线损购电价按 0.30 元/千瓦时量级<b>假设</b>）。' : '过网成本待按 114 号文复核，本版不计入。'}</p></div>
+        <div class="controls"><span class="seg" id="cfgseg"><button data-v="200MW/400MWh">2 小时</button><button data-v="200MW/800MWh">4 小时</button></span></div></section>`;
+    $('#app').innerHTML = `${hero}
+      ${sumCards([
+        { id: 'a', k: '有现行容量收入', v: G1.length, n: nameList(G1.map(x => x.r.主体)), x: (V2 ? '收入 ' : '合计 ') + tot(G1) },
+        { id: 'b', k: '容量收入待定', v: G2.length, n: nameList(G2.map(x => x.r.主体)), x: esc([...new Set(G2.map(x => /出处待查/.test(x.why) ? '参考价出处待查' : /起执行/.test(x.why) ? '未来起执行' : /征求/.test(x.why) ? '征求稿' : '待定'))].join('、')) },
+        { id: 'c', k: '只有市场收入', v: G3.length, n: nameList(G3.map(x => x.r.主体)), x: (V2 ? '收入 ' : '合计 ') + tot(G3) }])}
+      ${insight}
+      <section class="card lgcard">
+        <div class="lgbar"><div class="revlegend"><span><i style="background:${C_SURE}"></i>容量收入·已生效</span><span><i class="hatch"></i>容量收入·待定</span><span><i style="background:${C_MKT}"></i>现货套利（量级参考）</span></div>
+          <div class="lgopts"><label><input type="checkbox" id="optRng"> 现货区间（0.60—0.80）</label>${V2 ? '<label><input type="checkbox" id="optNet" checked> 扣过网成本后</label>' : ''}</div></div>
+        <div id="lghost"></div>
+        ${G4.length ? `<p class="note" style="margin-top:12px">无可算项（${G4.length}）：${esc(G4.map(x => x.r.主体).join('、'))}——原因见明细表。</p>` : ''}</section>
+      <details class="fold"><summary>逐省明细表（容量收益、租赁、二选一、现货区间、调频）</summary>
+        <div class="tablewrap"><table class="t rev"><thead><tr><th>省份</th><th>机制</th><th>容量收益</th><th>容量租赁</th><th>二选一采用</th><th>现货（区间）</th><th>调频</th><th>${V2 ? '收入小计' : '政策收益合计'}</th>${V2 ? '<th>过网成本（系统运行／线损／输配／基金）</th><th>扣过网成本后</th>' : ''}</tr></thead>
+        <tbody>${[...G1, ...G2, ...G3, ...G4].map(x => { const r = x.r; return `<tr><td><a href="#/p/${encodeURIComponent(r.主体)}">${esc(r.主体)}</a></td><td style="font-size:13px">${esc(r.机制 || '')}</td>
+          <td class="mono">${r.容量收益 != null ? f0(k(r.容量收益)) + `<span class="note" style="display:inline">（${f0(r.容量收益)}）</span>` : '—'} <span class="st ${/可算/.test(r.容量收益标注 || '') ? 'ok' : /征求/.test(r.容量收益标注 || '') ? 'draft' : 'none'}">${esc(r.容量收益标注 || '')}</span></td>
+          <td class="mono">${r.容量租赁 != null ? f0(k(r.容量租赁)) + `<span class="note" style="display:inline">（${f0(r.容量租赁)}）</span>` : '—'} ${r.容量租赁标注 ? `<span class="st none">${esc(r.容量租赁标注)}</span>` : ''}</td>
+          <td>${esc(r.二选一采用 || '—')}</td>
+          <td class="mono">${r.现货套利 != null ? f0(k(r.现货套利)) + `<span class="note" style="display:inline">（${f0(k((r.现货区间 || [])[0]))}—${f0(k((r.现货区间 || [])[1]))}）</span>` : '—'} <span class="st none">${esc(r.现货标注 || '')}</span></td>
+          <td style="font-size:12.5px">${esc(r.调频辅助服务 || '')}</td>
+          <td class="mono"><b>${f0(k(rTot(r)))}</b><span class="note" style="display:inline">（${f0(rTot(r))}）</span></td>${V2 ? `<td class="mono">${r.过网成本 != null ? f0(k(r.过网成本)) + `<span class="note" style="display:inline">（${['系统运行费', '线损费', '输配电费', '政府性基金'].map(n => f0(k((r.过网成本构成 || {})[n]))).join('／')}）</span><div class="note" style="margin-top:2px">${esc((r.过网成本口径 || '').split('（')[0])}</div>` : '—'}</td><td class="mono"><b style="color:${(r.扣过网成本后 || 0) < 0 ? 'var(--bad)' : 'inherit'}">${r.过网成本 != null ? f0(k(r.扣过网成本后)) : '—'}</b></td>` : ''}</tr>`; }).join('')}</tbody></table></div></details>
+      <details class="fold"><summary>测算口径（研究线 口径_v${D.example.n || 1}）</summary><div class="method">${md}</div></details>`;
+    $('#cfgseg').querySelectorAll('button').forEach(b => { b.classList.toggle('on', b.dataset.v === EX.cfg); b.onclick = () => { EX.cfg = b.dataset.v; examplePage(o); }; });
+    const OPT = { rng: false, net: V2 };
+    const draw = () => layerGroups($('#lghost'), groups, OPT);
+    draw(); wireCards();
+    $('#optRng').onchange = e => { OPT.rng = e.target.checked; draw(); };
+    if ($('#optNet')) $('#optNet').onchange = e => { OPT.net = e.target.checked; draw(); };
+  }
+
+  // ---------- 与公开汇编版本的差异（补厚计划 C3；研究线 结论卡/对照_全国调研报告.jsonl） ----------
+  function diffPage() {
+    const M = D.diff.meta || {}, R = D.diff.rows || [];
+    const ev = e => `<button type="button" class="cite ${D.docs[e.编号] ? statusClass(D.docs[e.编号].status) : 'none'}" data-code="${esc(e.编号)}" title="${esc(e.原句 || '')}">${esc(e.编号)}</button>${e.页 ? `<span class="mono"> p${e.页}</span>` : ''}`;
+    $('#app').innerHTML = `<section class="hero"><div><div class="eyebrow">可信度 · 对照</div><h1>${esc(M.标题 || '与公开汇编版本的差异')}</h1>
+        <p class="lede">对照对象：${esc(M.对照对象 || '')}。${esc(M.说明 || '')}</p></div></section>
+      <section class="card"><div class="sub">共 ${R.length} 处：事实 ${R.filter(r => r.类别 === '事实').length}、测算方法 ${R.filter(r => r.类别 !== '事实').length}。判定：${esc((M.核验 || {}).判定 || '')} · ${esc((M.核验 || {}).日期 || '')} · 库 ${esc(M.库版本 || '')}</div>
+        <div class="tablewrap"><table class="t rev"><thead><tr><th>#</th><th>类别</th><th>省份</th><th>公开汇编说</th><th>我们核实的结论</th><th>依据</th><th>为什么不一致</th></tr></thead>
+        <tbody>${R.map(r => `<tr><td class="mono">${r.序}</td><td><span class="st ${r.类别 === '事实' ? 'draft' : 'ref'}">${esc(r.类别)}</span></td><td>${esc(r.主体)}</td>
+          <td style="max-width:240px">${esc(r.报告说法)}<div class="note">${esc(r.报告位置 || '')}</div></td>
+          <td style="max-width:280px"><b>${esc(r.我们的结论)}</b></td><td>${(r.依据 || []).map(ev).join('<br>')}</td><td style="max-width:240px;font-size:13px">${esc(r.为什么)}</td></tr>`).join('')}</tbody></table></div></section>`;
+  }
+
+  // ---------- 对外分级试算（补厚计划 C1，研究线方法 v1 草案；用户定前只在内部版） ----------
+  function scorePage() {
+    const R = (D.score.rows || []).slice().sort((a, b) => b.总分 - a.总分);
+    const tier = v => v >= 70 ? '第一档' : v >= 50 ? '第二档' : '第三档';
+    const mdh = t => esc(t).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+    const md = (D.score.method || '').split('\n').map(l => /^## /.test(l) ? `<h3>${mdh(l.slice(3))}</h3>` : /^# /.test(l) ? '' : /^\|\s*-/.test(l) ? '' : /^\|/.test(l) ? `<div class="mdrow">${l.split('|').slice(1, -1).map(c => `<span>${mdh(c.trim())}</span>`).join('')}</div>` : /^\s*[-*] /.test(l) ? `<li>${mdh(l.replace(/^\s*[-*] /, ''))}</li>` : l.trim() ? `<p>${mdh(l)}</p>` : '').join('');
+    const bar = (v, max) => v == null ? '<span class="note">不评</span>' : `<span class="mono">${v}</span><span class="sbar"><i style="width:${Math.round(100 * v / max)}%"></i></span>`;
+    $('#app').innerHTML = `<section class="hero"><div><div class="eyebrow">投资分级 · 公开方法 v1</div><h1>按现行政策，哪里的政策收益条件更好</h1>
+        <p class="lede">五个维度：容量收益机制 30、容量收益水平 20、现货阶段 20、现货价差 15、退坡与到期风险 15；不评的维度按其余权重折算。分档：≥70 第一档、50—69 第二档、<50 第三档。每项得分都写明依据；只反映政策收益条件，<b>不构成投资建议</b>。</p></div></section>
+      <section class="card"><div class="tablewrap"><table class="t rev"><thead><tr><th>#</th><th>省份</th><th>容量机制</th><th>D1 机制/30</th><th>D2 水平/20</th><th>D3 现货/20</th><th>D4 价差/15</th><th>D5 风险/15</th><th>总分</th><th>档位</th><th>收益确定性</th></tr></thead>
+      <tbody>${R.map((r, i) => `<tr><td class="mono">${i + 1}</td><td><a href="#/p/${encodeURIComponent(r.主体)}">${esc(r.主体)}</a></td><td style="font-size:13px">${esc(r.机制 || String(((r.依据 || {}).D1) || '').replace(/（见结论卡[^）]*）/, ''))}</td>
+        <td>${bar(r.D1, 30)}</td><td>${bar(r.D2, 20)}</td><td>${bar(r.D3, 20)}</td><td>${bar(r.D4, 15)}</td><td>${bar(r.D5, 15)}</td>
+        <td class="mono"><b>${r.总分}</b></td><td><span class="st ${r.总分 >= 70 ? 'ok' : r.总分 >= 50 ? 'trial' : 'none'}">${tier(r.总分)}</span></td><td>${esc(r.收益确定性 || '')}</td></tr>`).join('')}</tbody></table></div>
+        <div class="note" style="margin-top:10px">分数只反映政策收益条件，不构成投资建议。点省名看逐项依据。</div></section>
+      <section class="card method" style="margin-top:20px"><h2>方法说明</h2>${md}</section>`;
+  }
+
   // ---------- 口径与来源 ----------
   function about() {
     $('#app').innerHTML = `<section class="hero"><div><div class="eyebrow">口径与来源</div><h1>这些数从哪里来、怎么读</h1></div></section>
@@ -465,7 +704,7 @@
     document.querySelectorAll('.nav a').forEach(a => a.classList.toggle('on', (a.dataset.nav === 'home' && (h === '#/' || h === '')) || (a.dataset.nav === 'about' && h === '#/about') || (a.dataset.nav === 'rev' && h === '#/rev')));
     const m = h.match(/^#\/p\/(.+)$/);
     $('#provSelect').value = m ? m[1] : '';
-    if (m) province(m[1]); else if (h === '#/about') about(); else if (h === '#/rev') revenue(); else home();
+    if (m) province(m[1]); else if (h === '#/about') about(); else if (h === '#/rev') revenue(); else if (/^#\/brief/.test(h)) { briefPage(h.split('/')[2]); return; } else if (h === '#/ex') { location.replace('#/rev'); return; } /* 用户 10-15 合并：旧链接落到全景页 */ else if (h === '#/score' && D.score) scorePage(); else home();
     scrollTo(0, 0);
   }
   // ---------- 数据加载：本机预览读明文快照；发布版只有 data.enc.json，用链接 #k=口令 在浏览器里解密 ----------
@@ -498,12 +737,16 @@
   function start(d) {
     D = d;
     $('#ver').textContent = `数据：库 ${d.meta.version} · ${d.meta.exported}`;
+    if (!d.meta.public) { const nav = document.querySelector('.nav');  }
+    if (d.score) document.querySelector('.nav').insertAdjacentHTML('beforeend', '<a href="#/score" data-nav="score">投资分级</a>');
+    if ((d.briefs || []).length) document.querySelector('.nav').insertAdjacentHTML('beforeend', '<a href="#/brief" data-nav="brief">政策简析</a>');
     if (d.meta.public) { const h = document.querySelector('[data-nav="home"]'), r = document.querySelector('[data-nav="rev"]'); if (h) h.textContent = '政策地图'; if (r) r.textContent = '收益来源全景'; document.title = '储能政策地图'; }
     const sel = $('#provSelect');
     sel.innerHTML += PROVS.map(p => `<option value="${esc(p)}">${esc(p)}</option>`).join('');
     sel.onchange = () => { if (sel.value) location.hash = '#/p/' + encodeURIComponent(sel.value); };
     addEventListener('hashchange', route); route();
   }
+  if (window.__YC_DATA__) { start(window.__YC_DATA__); return; }   // 内部预览单文件：数据已内嵌，双击即开
   fetch('data/storage.json').then(r => { if (!r.ok) throw 0; return r.json(); }).then(start).catch(() =>
     fetch('data.enc.json').then(r => r.json()).then(env => {
       const m = location.hash.match(/^#k=([^&/]+)/);

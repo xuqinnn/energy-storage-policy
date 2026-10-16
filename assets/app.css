@@ -120,3 +120,48 @@ table.t tr.grp td{background:#FAF9F5;font-weight:600;font-size:13.5px;padding-to
 .cgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;font-size:13.5px;color:var(--ink2);margin-top:8px}.cgrid ul{padding-left:18px;margin:6px 0}
 @media (max-width:900px){.cgrid{grid-template-columns:1fr}}
 .cite.trial{background:var(--trialbg);color:var(--trial)}.cite.bad{background:var(--badbg);color:var(--bad)}
+.evgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:10px}.evgrid h3{font-size:14px;color:var(--ink2);margin-bottom:6px}
+.evl{list-style:none;padding:0;margin:0}.evl li{display:grid;grid-template-columns:3.4em 4.6em minmax(0,1fr);gap:8px;padding:5px 0;border-bottom:1px solid #F0EEE8;font-size:13.5px;align-items:baseline}
+.evl .pv{color:var(--mute);font-size:12.5px}
+@media (max-width:900px){.evgrid{grid-template-columns:1fr}}
+.sbar{display:inline-block;width:46px;height:6px;background:var(--soft);border-radius:3px;margin-left:6px;vertical-align:middle;overflow:hidden}.sbar i{display:block;height:100%;background:var(--accent)}
+.method h3{font-size:15px;margin:16px 0 6px}.method p,.method li{font-size:14px;color:var(--ink2)}.mdrow{display:grid;grid-template-columns:1.2fr .5fr 3fr 1.4fr;gap:8px;font-size:13px;padding:5px 0;border-bottom:1px solid #F0EEE8}
+.revlegend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:12.5px;color:var(--ink2);margin-bottom:6px}.revlegend i{display:inline-block;width:14px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.revlegend i.hatch{background:repeating-linear-gradient(135deg,#DCE4F5 0 3px,#5B78BD 3px 4.5px)}.revlegend i.dot{width:9px;height:9px;border-radius:50%;border:2px solid #A8251B;background:#fff}
+
+/* 分层分组图（10-14 v3：答案先行、三组、少颜色） */
+.sumcards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:0 0 18px}
+.sc{all:unset;box-sizing:border-box;cursor:pointer;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px 14px;display:flex;flex-direction:column;gap:4px;transition:border-color .15s,box-shadow .15s}
+.sc:hover,.sc:focus-visible{border-color:#C9CFDD;box-shadow:0 2px 10px rgba(47,75,138,.08)}
+.sc-k{font-size:13.5px;font-weight:600;color:var(--ink2);display:flex;align-items:center;gap:7px}
+.sc-v{font-family:"IBM Plex Mono",monospace;font-size:34px;font-weight:500;line-height:1.15;color:var(--ink)}.sc-v small{font-family:inherit;font-size:14px;color:var(--mute);font-weight:400}
+.sc-n{font-size:14px;color:var(--ink)}.sc-x{font-size:12.5px;color:var(--mute)}
+.sc-a .sc-v{color:#2F4B8A}
+.gk{display:inline-block;width:12px;height:12px;border-radius:3px;flex:none}
+.gk-a{background:#2F4B8A}.gk-b{background:repeating-linear-gradient(135deg,#E3E9F6 0 3px,#5B78BD 3px 4.5px)}.gk-c{background:#B7C5E6}
+.lgcard{padding-top:16px}
+.lgbar{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 20px;align-items:center;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.lgbar .revlegend{margin:0}
+.lgopts{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--ink2)}.lgopts label{cursor:pointer;display:flex;align-items:center;gap:5px}
+.lgp{padding-top:18px}.lgp+.lgp{border-top:1px solid #F0EEE8;margin-top:6px}
+.lgh h3{font-size:16px;display:flex;align-items:center;gap:8px}.lgh h3 small{font-family:inherit;font-weight:400;font-size:12.5px;color:var(--mute)}
+.lgh p{font-size:13px;color:var(--ink2);margin:2px 0 4px 20px}
+.fold{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);margin-top:14px;padding:0 22px}
+.fold>summary{cursor:pointer;padding:14px 0;font-size:14.5px;font-weight:600;color:var(--ink2);list-style:none;display:flex;align-items:center;gap:8px}
+.fold>summary::before{content:"";width:7px;height:7px;border-right:2px solid var(--mute);border-bottom:2px solid var(--mute);transform:rotate(-45deg);transition:transform .15s}
+.fold[open]>summary::before{transform:rotate(45deg)}
+.fold>summary::-webkit-details-marker{display:none}
+.fold[open]{padding-bottom:16px}.fold .rules{font-size:13.5px;color:var(--ink2);margin:0}
+@media (max-width:900px){.sumcards{grid-template-columns:1fr}.sc-v{font-size:28px}}
+.insight{background:#FBF3F1;border:1px solid #F1D5D0;color:#5A1F18;border-radius:var(--r);padding:12px 16px;font-size:14px;margin:0 0 18px}.insight b{color:#7A2017}
+
+/* 政策简析（10-15） */
+.brief{margin-bottom:14px}.brief .bh{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-size:13px}.brief .bh .pv{color:var(--mute)}
+.brief h3{font-size:17px;margin:8px 0 6px}
+.brief .bf{display:grid;grid-template-columns:8.5em minmax(0,1fr);gap:4px 12px;padding:7px 0;border-top:1px solid #F0EEE8;font-size:14px;line-height:1.7}
+.brief .bk{font-size:12.5px;color:var(--mute);padding-top:2px}
+.brief.flash{box-shadow:0 0 0 2px var(--accent)}
+.blink{font-size:12px;margin-left:4px;text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:0 6px}
+@media (max-width:640px){.brief .bf{grid-template-columns:1fr}}
+.more>summary{cursor:pointer;color:var(--accent);font-size:13px;margin-top:8px}
+#newcats button{font-size:12.5px;padding:5px 10px;min-height:30px}
