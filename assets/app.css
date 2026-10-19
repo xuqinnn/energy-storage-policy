@@ -282,3 +282,7 @@ table.t tr.grp td{background:#FAF9F5;font-weight:600;font-size:13.5px;padding-to
 .top .brand{order:0}.top .ver{order:1;margin-left:auto;text-align:right}.top .nav{order:2;flex-basis:100%}
 @media (max-width:640px){.top .ver{flex-basis:100%;text-align:left;margin-left:0;font-size:12px}}
 .mech.entries{grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr))}
+/* 央地落地时间轴 */
+.lgrid{display:grid;gap:6px;margin-top:10px}.lrow{display:grid;grid-template-columns:4em minmax(120px,1fr) 4.5em auto minmax(0,1.4fr);gap:8px;align-items:center;font-size:13px}
+.ltrack{height:10px;background:var(--soft);border-radius:5px;overflow:hidden}.lfill{height:100%;border-radius:5px}.lrow .lt{color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:640px){.lrow{grid-template-columns:3.5em 1fr 4em}.lrow .cite,.lrow .lt{display:none}}

@@ -401,6 +401,7 @@
         <tbody>${subs.map(p => `<tr><th>${PROVS.includes(base(p)) ? `<a href="#/p/${encodeURIComponent(base(p))}">${esc(p)}</a>` : esc(p)}</th>${t.cols.map(([m]) => `<td>${t.rows[p][m] ? citeHTML(clean(t.rows[p][m]).replace(/^【结论】\s*/, '')) : '<span class="note">—</span>'}</td>`).join('')}</tr>`).join('')}</tbody></table></div></section>
       ${rel.length ? `<section class="card" style="margin-top:18px"><h2>相关政策 <small class="note" style="display:inline">机制标签「${esc(TOPIC_TAGS(name).length > 1 ? '容量、现货、辅助服务、成本、准入各类' : name)}」主标签 ${v.主.length} 件，列最近 ${rel.length} 件</small></h2><ul class="evl">${rel.map(c => docRow(c)).join('')}</ul>${TOPIC_TAGS(name).length === 1 ? `<p class="sub"><a href="#/lib?tag=${encodeURIComponent(name)}">在政策库里筛选全部 →</a></p>` : ''}</section>` : ''}`;
     wireTopicMap(name, 'comp');
+    if (name === '储能') $('#tmap').closest('section').insertAdjacentHTML('afterend', landingHTML('ZCGJ03'));
     if (focus && TILES[focus]) openPanel(provTopicCard(name, focus));
   }
   // ---------- 信息架构 v2（研究线 10-16，用户定）：「政策」板块（最新政策看板＋四入口＋列表）、专题地图三图层、省份页反向链接 ----------
@@ -490,6 +491,19 @@
         <div class="block"><h4>本省本专题最近政策</h4><ul class="evl">${v.docs.slice(0, 5).map(r => docRow(r[0])).join('') || '<li class="note">无</li>'}</ul></div>
         ${rel.length ? `<div class="block"><h4>本省脉络</h4><ul class="plain">${rel.map(l => `<li>${D.docs[l.从] || X[l.从] ? `<button type="button" class="cite" data-code="${esc(l.从)}">${esc(l.从)}</button>` : esc(l.从)} ${esc(l.关系)} <button type="button" class="cite" data-code="${esc(l.到)}">${esc(l.到)}</button></li>`).join('')}</ul></div>` : ''}
         <p><a href="#/p/${encodeURIComponent(p)}">${esc(p)}全部 →</a>　<a href="#/lib?prov=${encodeURIComponent(libProv(p))}&tag=${encodeURIComponent(TOPIC_TAGS(n)[0] || '')}">在政策库里看 →</a></p></div>`;
+  }
+  /* 央地落地时间轴（研究线中观枢纽框架第 2 步）：国家件发文日为起点，各省落实件按发文日排开，标时滞天数；地方标准高于／等于／低于国家基准三色。
+     日为 1 号的占位日期时滞作废（不画），故先只画 114 号（2026-01-27）；650／1192／688 号等①表日期补齐后再开 */
+  function landingHTML(up) {
+    const X = LIBX(), u = D.docs[up] || {}, E = (D.links || []).filter(l => l.从 === up && l.关系 === '上位依据' && X[l.到] && X[l.到][5] !== '全国');
+    if (!E.length) return '';
+    const C = { 高于: '#2F4B8A', 等于: '#8299CF', 低于: '#C9553F' }, rows = E.map(l => ({ l, r: X[l.到] })).sort((a, b) => (a.l.时滞天数 ?? 1e9) - (b.l.时滞天数 ?? 1e9) || a.r[4].localeCompare(b.r[4]));
+    const max = Math.max(1, ...rows.map(x => x.l.时滞天数 || 0));
+    return `<section class="card" style="margin-bottom:18px"><h2>各省怎么落地 · 国家 114 号文 <small class="note" style="display:inline">${esc(u.date || '')} 发文 · ${rows.length} 件省级落实件</small></h2>
+      <div class="sub">条长＝本省落实件发文日距国家文件的天数；颜色＝本省标准相对国家基准。日期只到月份的件不画时滞，只列在下方。</div>
+      <div class="lgrid">${rows.filter(x => x.l.时滞天数 != null).map(({ l, r }) => `<div class="lrow"><span class="pv">${esc(r[5])}</span><div class="ltrack"><div class="lfill" style="width:${(l.时滞天数 / max * 100).toFixed(1)}%;background:${C[l.对比] || '#B8BCC4'}"></div></div><span class="mono">${l.时滞天数} 天</span><button type="button" class="cite ${statusClass(r[3])}" data-code="${esc(r[0])}">${esc(r[0])}</button><span class="lt">${esc(r[1].replace(/^\d{6}/, '').slice(0, 34))}</span></div>`).join('')}</div>
+      ${rows.some(x => x.l.时滞天数 == null) ? `<p class="sub" style="margin-top:10px">日期只到月份：${rows.filter(x => x.l.时滞天数 == null).map(({ r }) => `${esc(r[5])} <button type="button" class="cite ${statusClass(r[3])}" data-code="${esc(r[0])}">${esc(r[0])}</button>`).join('　')}</p>` : ''}
+      ${legendHTML([[C.高于, '高于国家基准'], [C.等于, '等于'], [C.低于, '低于'], ['#B8BCC4', '不适用／未比较']])}</section>`;
   }
   function openPanel(html) {
     const dlg = $('#bsheet'); bsOpener = bsOpener || document.activeElement; tip.hidden = true;
@@ -904,7 +918,7 @@
     const tipOf = x => { const r = x.r; return `<b>${esc(r.主体)}</b>　${esc(r.机制 || '')}${REV && pgradeOf(r.主体) && pgradeOf(r.主体) !== '未评' ? '　公开分级 ' + esc(pgradeOf(r.主体)) : ''}${EXPIRE[r.主体] ? '<br>　容量电价窗口到 ' + EXPIRE[r.主体] + '（剩余不足 1 年）' : ''}<br>政策确定 ${f0(k(x.sure))}${x.pend ? '<br>政策待定 ' + f0(k(x.pend)) + '　' + esc(x.why) : ''}<br>现货 ${f0(k(r.现货套利))}（${esc(r.现货标注 || '')}）${x.mktLease ? '<br>　含容量租赁 ' + f0(k(r.容量租赁)) + '：' + esc(r.容量租赁标注 || '') : ''}<br><b>${V2 ? '收入小计' : '政策收益合计'} ${f0(k(rTot(r)))}</b> 元/千瓦·年${V2 && r.过网成本 != null ? '<br>过网成本 −' + f0(k(r.过网成本)) + '：' + Object.entries(r.过网成本构成 || {}).filter(e => e[1]).map(e => e[0] + ' ' + f0(k(e[1]))).join('、') + '<br>　' + esc((r.过网成本口径 || '').split('（')[0]) + (r.过网成本备注 ? '<br>　' + esc(r.过网成本备注) : '') + '<br><b style="color:#FFB4AC">扣过网成本后 ' + f0(k(r.扣过网成本后)) + '</b>' : ''}<br><span style="color:#B9BEC7">项目 ${f0(rTot(r))} 万元/年｜点击看省份</span>`; };
     const rowOf = x => { const base = k(x.sure + x.pend), m = k(x.spot || 0);
       return { n: x.r.主体, sure: k(x.sure), pend: k(x.pend), mkt: m, lo: x.rng ? base + k(x.rng[0]) : null, hi: x.rng ? base + k(x.rng[1]) : null,
-        tot: rTot(x.r) != null ? k(rTot(x.r)) : null, net: V2 && x.r.过网成本 != null && x.r.扣过网成本后 != null ? k(x.r.扣过网成本后) : null, /* 过网成本未算的（如蒙东）不画扣后 */ tip: tipOf(x), href: '#/p/' + encodeURIComponent(x.r.主体) }; };
+        tot: rTot(x.r) != null ? k(rTot(x.r)) : null, net: V2 && !x.r.合计说明 && x.r.过网成本 != null && x.r.扣过网成本后 != null ? k(x.r.扣过网成本后) : null,   /* 6、8 小时不含现货：充电成本对应的套利收入未计，不画扣后 */ /* 过网成本未算的（如蒙东）不画扣后 */ tip: tipOf(x), href: '#/p/' + encodeURIComponent(x.r.主体) }; };
     const G1 = L.filter(x => x.sure > 0), G2 = L.filter(x => !x.sure && x.pend > 0), G3 = L.filter(x => !x.sure && !x.pend && x.spot), G4 = L.filter(x => !x.sure && !x.pend && !x.spot);
     const groups = [
       { id: 'a', t: '有现行容量收入', d: '<b>深色</b>＝容量收益或容量租赁（二选一取采用项），<b>浅色</b>＝现货套利（实现率 0.70）；条末数字＝' + (V2 ? '收入小计，红色箭头后＝扣过网成本后。' : '政策收益合计。'), rows: G1.map(rowOf) },
@@ -913,7 +927,7 @@
     ];
     const tot = xs => rangeOf(xs.map(x => k(rTot(x.r))), ' 元/千瓦·年');
     // v2 发现（研究线 口径_v2 第四节）：系统运行费是过网成本最大项；扣完为负的省份——从数据算，不手写
-    const neg = L.filter(x => x.r.过网成本 != null && x.r.扣过网成本后 != null && x.r.扣过网成本后 < 0).sort((a, b) => a.r.扣过网成本后 - b.r.扣过网成本后).map(x => x.r.主体);
+    const neg = L.filter(x => !x.r.合计说明 && x.r.过网成本 != null && x.r.扣过网成本后 != null && x.r.扣过网成本后 < 0).sort((a, b) => a.r.扣过网成本后 - b.r.扣过网成本后).map(x => x.r.主体);
     const big = L.filter(x => x.r.过网成本构成 && x.r.过网成本).map(x => x.r.过网成本构成.系统运行费 / x.r.过网成本).filter(v => v > 0);   // 系统运行费为 0 的（北京，待研究线核）不计
     const insight = V2 && big.length ? `<div class="insight"><b>过网成本：</b>114 号文后，<b>系统运行费</b>是储能充电侧最大的成本项（${big.length} 省占过网成本 ${Math.round(Math.min(...big) * 100)}%—${Math.round(Math.max(...big) * 100)}%）；${neg.length ? `<b>${esc(neg.join('、'))}</b> 扣完过网成本后为负——单靠现货套利覆盖不了充电侧成本。` : ''}</div>` : '';
     const drafts = L.filter(x => /征求/.test(x.r.容量收益标注 || '') && !x.mktLease).map(x => x.r.主体);   // 宁夏补偿为征求稿但示例采用市场租赁价，另写（研究线 10-14）
@@ -932,7 +946,7 @@
         { id: 'a', k: '有现行容量收入', v: G1.length, n: nameList(G1.map(x => x.r.主体)), x: (V2 ? '收入 ' : '合计 ') + tot(G1) },
         { id: 'b', k: '容量收入待定', v: G2.length, n: nameList(G2.map(x => x.r.主体)), x: esc([...new Set(G2.map(x => /出处待查/.test(x.why) ? '参考价出处待查' : /起执行/.test(x.why) ? '未来起执行' : /征求/.test(x.why) ? '征求稿' : '待定'))].join('、')) },
         { id: 'c', k: '只有市场收入', v: G3.length, n: nameList(G3.map(x => x.r.主体)), x: (V2 ? '收入 ' : '合计 ') + tot(G3) }])}
-      ${/1200|1600/.test(CFG) ? '<div class="insight"><b>6、8 小时档：</b>容量收入按各省折算公式照算（多数省份折算比例封顶为 1）；现货套利按同一价差、同一循环次数线性外推，长时长偏乐观，只作量级参考。</div>' : ''}
+      ${/1200|1600/.test(CFG) ? '<div class="insight"><b>6、8 小时档：</b>容量收入照各省折算公式算，折算比例封顶为 1——超过折算分母的时长不再增加容量收入（如陕西 6、8 小时都是 3135 万元）。现货套利不计：—（本站价差为 4 小时系统口径，不外推），合计只含可算项、<b>不含现货</b>；过网成本对应的套利收入未计，故不给扣过网成本后的值。</div>' : ''}
       ${insight}
       <section class="card lgcard">
         <div class="lgbar"><div class="revlegend"><span><i style="background:${C_SURE}"></i>容量收入·已生效</span><span><i class="hatch"></i>容量收入·待定</span><span><i style="background:${C_MKT}"></i>现货套利（量级参考）</span></div>
