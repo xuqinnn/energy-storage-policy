@@ -3,8 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>储能政策地图</title>
-<link rel="stylesheet" href="assets/app.css?v=58">
+<title>储能与零碳政策研究库</title>
+<link rel="stylesheet" href="assets/app.css?v=59">
+<script src="assets/vendor/echarts.min.js"></script>
 </head>
 <body>
 <header class="top">
@@ -12,8 +13,8 @@
   <nav class="nav" aria-label="主导航">
     <a href="#/" data-nav="home">首页</a>
     <a href="#/policy" data-nav="policy">政策</a>
-    <a href="#/map" data-nav="map">政策地图</a>
-    <a href="#/rev" data-nav="rev">收益来源全景</a>
+    <a href="#/map" data-nav="map">投资分级地图</a>
+    <a href="#/rev" data-nav="rev">收益构成全景</a>
     <label class="prov-pick"><span>省份看板</span>
       <select id="provSelect" aria-label="选择省份"><option value="">选择省份…</option></select>
     </label>
@@ -25,8 +26,8 @@
 <div id="tip" class="tip" role="tooltip" hidden></div>
 <dialog id="bsheet" aria-labelledby="bsH"><div class="sheet" id="bsInner"></div></dialog>
 <footer class="foot">
-  <span>本站只读本机研究库快照；每个数都能回到红头文件与页码。状态位如实显示；「未采集」不等于「无规定」。</span>
+  <span>政策与研究资料索引公开；收益测算与开发分析需口令。状态位如实显示；「未采集」不等于「无规定」。</span>
 </footer>
-<script src="assets/app.js?v=58"></script>
+<script src="assets/app.js?v=59"></script>
 </body>
 </html>

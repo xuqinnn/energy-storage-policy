@@ -103,6 +103,8 @@
     ramp: { group: '风险', label: '补偿退坡风险', cat: rampOf, order: ['高', '中高', '中', '中低', '低', '待定', '无补偿·不适用', '未采集', '待核'], note: '现行容量补偿标准下调或并轨的风险' }
   };
   const PUB = () => !!(D && D.meta && D.meta.public);     // 对外版：不含投资分级、收益测算金额与内部信息（用户 10-14）
+  const LOCKED = () => D?.meta?.access === 'section-password' && !D.meta.restrictedUnlocked;
+  const protectedLink = (p, text) => `<a class="dim" href="#/dev/${encodeURIComponent(p)}">${esc(text)} · 输入口令查看</a>`;
   const MET = () => PUB() ? Object.fromEntries(Object.entries(METRICS).filter(([k]) => k !== 'grade' && (k !== 'pgrade' || D.score))) : Object.fromEntries(Object.entries(METRICS).filter(([k]) => k !== 'pgrade' || D.score));
   const PAL = ['#2F4B8A', '#5B78BD', '#97AAD7', '#CBD5EC', '#E9C46A', '#EFE3CF', '#CBCED4', '#EFEDE6', '#EFEDE6'];
   const FIXED = { '第一档': '#2F4B8A', '第二档': '#97AAD7', '第三档': '#EFE3CF', '征求意见稿': '#E9C46A', '清单制·征求稿': '#E9C46A', '谨慎开发': '#EFE3CF', '高': '#C9553F', '中高': '#E39A7E', '中': '#EFC9A8', '中低': '#CBD5EC', '低': '#97AAD7' };
@@ -316,6 +318,14 @@
     document.querySelectorAll('[data-f]').forEach(el => { el.onchange = () => go({ [el.dataset.f]: el.value.trim(), n: '' }); });
     const more = $('#libMore'); if (more) more.onclick = () => go({ n: String(N + 240) });
   }
+
+  function researchPage(qs) {
+    const q = new URLSearchParams(qs || '').get('q') || '';
+    const rows = (D.research || []).filter(r => !q || (r.title + r.publisher + r.code).includes(q));
+    $('#app').innerHTML = `<section class="hero"><div><div class="eyebrow">研报与资料</div><h1>研究资料索引</h1><p class="lede">研报、论文、标准信息与官方统计单列；不作为全国政策，不把研究观点当政策规定。这里只显示资料索引。</p></div></section>
+      <section class="card"><label class="fc">关键词<input id="researchQ" placeholder="题名、机构或编号" value="${esc(q)}"></label><p class="sub">${rows.length} 件研究资料</p><div class="bcards">${rows.slice(0, 150).map(r => `<button class="bcard" data-code="${esc(r.code)}"><span class="meta">${esc(r.publisher)} · ${esc(r.date)}</span><span class="ttl">${esc(r.title)}</span><span class="chip">研究资料 · ${esc(r.code)}</span></button>`).join('')}</div></section>`;
+    $('#researchQ').onchange = e => { location.hash = '#/research?q=' + encodeURIComponent(e.target.value.trim()); };
+  }
   // ---------- 首页（研究线首页文案 v1）：主张、家底数字、常问问题、收益机制速览、近期新政策、怎么读本站；数字构建时实时算 ----------
   const MECH = [
     ['容量电价', '容量', ['容量电价'], '国家 114 号确立 → 各省以煤电容量电价为基础、按放电时长折算 → 纳入清单的项目按年领取 → 按月考核、未达标扣减。与容量租赁对同一块容量二选一。'],
@@ -394,7 +404,7 @@
     const v = { 主: [...new Set(TOPIC_TAGS(name).flatMap(k => ((D.tagdocs || {})[k] || { 主: [] }).主))] }, rel = v.主.slice().sort((a, b) => String((D.docs[b] || {}).date || '').localeCompare(String((D.docs[a] || {}).date || ''))).slice(0, 40);
     $('#app').innerHTML = `<section class="hero"><div><div class="eyebrow"><a href="#/topics">专题</a></div><h1>${esc(t.题 || name)}</h1></div></section>
       <section class="card mapcard" style="margin-bottom:18px"><div id="tmap"></div></section>
-      <article class="card prose-topic">${mdHTML(t.md)}</article>
+      <article class="card prose-topic">${LOCKED() ? `<a href="#/analysis/topic/${encodeURIComponent(name)}">专题分析与开发判断 · 输入口令查看</a>` : mdHTML(t.md)}</article>
       <section class="card" style="margin-top:18px"><h2>分省对照 <small class="note" style="display:inline">${subs.length} 行 · ${esc(t.sheet)}，随库更新</small></h2>
         <div class="sub">每格只给结论句；点编号看依据文件。「—」为本站未采集，不等于该省无规定。</div>
         <div class="tbl topic-tbl"><table><thead><tr><th>省份</th>${t.cols.map(([, h]) => `<th>${esc(h)}</th>`).join('')}</tr></thead>
@@ -803,26 +813,26 @@
       <section class="kpis">
         ${kpi('容量机制', cap != null && cap !== 0 ? `${cap}` : '—', esc(capUnit(p) || '无省级容量补偿或未采集'))}
         ${kpi('折算基准时长', hrs ? hrs + ' h' : '—', '本省最长净负荷高峰持续时长')}
-        ${kpi('4 小时实得单价', kw && N(p, '⑧c11') != null ? Math.round(N(p, '⑧c11')) : '—', kw ? `保守口径 ${N(p, '⑧c56') != null ? Math.round(N(p, '⑧c56')) : '—'}（扣厂用电）· 元/kW·年` : '不按千瓦·年计，见下方说明')}
+        ${LOCKED() ? kpi('项目收益参数', '需口令', protectedLink(p, '折算单价与计算器')) : kpi('4 小时实得单价', kw && N(p, '⑧c11') != null ? Math.round(N(p, '⑧c11')) : '—', kw ? `保守口径 ${N(p, '⑧c56') != null ? Math.round(N(p, '⑧c56')) : '—'}（扣厂用电）· 元/kW·年` : '不按千瓦·年计，见下方说明')}
         ${PUB() ? kpi('容量政策状态', esc(capPolicy(p) === '已出台' ? '已出台' : capPolicy(p) === '征求意见稿' ? '征求稿' : '—'), esc(first1(p, '⑧c8').slice(0, 40))) : kpi('标杆项目容量收益', N(p, '⑧c12') != null ? Math.round(N(p, '⑧c12')).toLocaleString() : '—', `万元/年（200MW/800MWh）· 保守 ${N(p, '⑧c57') != null ? Math.round(N(p, '⑧c57')).toLocaleString() : '—'}`)}
       </section>
       ${cardHTML(p)}
       <section class="card"><h2>容量收益计算器</h2><div class="sub">拖动储能时长，看折算后能拿到多少；容量电价与容量租赁只能二选一${PUB() ? '' : '（JL444）'}。</div>
-        <div class="calc" style="margin-top:14px" id="calc"></div></section>
+        <div class="calc" style="margin-top:14px" id="calc">${LOCKED() ? protectedLink(p, '容量收益测算') : ''}</div></section>
       ${stales.length ? `<div class="warn"><span>⚠</span><span>本省有 ${stales.length} 份依据文件已失效，相关格待跟改：${stales.map(c => `<button type="button" class="cite stale" data-code="${c}">${c}</button>`).join(' ')}</span></div>` : ''}
       <section class="board">
         <div class="card col"><h2>政策 <small>现在怎么规定</small></h2>
           ${item(p, '②c6', '容量补偿')}${item(p, '②c3', '电力现货')}${item(p, '②c4', '调频补偿')}${item(p, '②c9', '充电电费减免')}${item(p, '②c10', '容量租赁')}${item(p, '②c12', '容量电价考核')}
           ${jibei && p === '河北' ? `<div class="todo">河北分冀南、冀北两张网。上面为冀南；冀北容量补偿：${citeHTML(firstSentence((jibei['②c6'] || {}).v || '未采集'))}</div>` : ''}</div>
         <div class="card col"><h2>开发 <small>能不能做、怎么进</small></h2>
-          ${(D.dev || {})[p] ? devHTML(p) : `${item(p, '②c17', '清单制')}${item(p, '②c16', '现货报价方式')}${item(p, '⑧c31', '现行标准生效／到期')}${item(p, '⑧c34', '下次调整窗口')}${item(p, '⑧c32', '调整机制')}${item(p, '⑧c33', '历史退坡轨迹')}
+          ${LOCKED() ? protectedLink(p, '开发判断') : (D.dev || {})[p] ? devHTML(p) : `${item(p, '②c17', '清单制')}${item(p, '②c16', '现货报价方式')}${item(p, '⑧c31', '现行标准生效／到期')}${item(p, '⑧c34', '下次调整窗口')}${item(p, '⑧c32', '调整机制')}${item(p, '⑧c33', '历史退坡轨迹')}
           <div class="todo">申报窗口、门槛与股权锁定期：专题汇编中${PUB() ? '' : '（T623）'}，完成后在此显示。</div>`}</div>
         <div class="card col"><h2>问题 <small>风险与待核</small></h2>
           ${PUB() ? riskFromCard(p) + item(p, '⑧c35', '退坡·并轨风险') + item(p, '⑧c53', '节点价差')
                   : item(p, '⑧c26', '风险与注意事项') + item(p, '⑧c24', '校核结论') + item(p, '⑧c30', '测算局限') + item(p, '⑧c53', '节点价差')}
           ${missingList(p)}</div>
       </section>`;
-    drawCalc(p);
+    if (!LOCKED()) drawCalc(p);
   }
   const DEVK = [['K1', '清单制'], ['K2', '申报窗口'], ['K3', '准入门槛'], ['K4', '建设时限'], ['K5', '股权与投资主体锁定'], ['K6', '调出清单情形'], ['K7', '建设规模指标']];
   function devHTML(p) {       // 开发栏「怎么进」（补厚计划 B1；研究线取证 收件箱/开发栏取证/开发栏取证.jsonl）
@@ -899,9 +909,13 @@
     const REV = !!o.rev, CFG = EX.cfg;   // 用户 10-15：收益构成全景与示例测算合并为一页，全景页也可切 2h/4h
     const all = D.example.rows || [];
     const rows = all.filter(r => r.配置 === CFG);
-    const K = 20, f0 = v => v == null ? '—' : Math.round(v).toLocaleString(), k = v => v == null ? null : v / K;
+    const capacityMW = Number((CFG.match(/^(\d+(?:\.\d+)?)MW\//) || [])[1]);
+    const energyMWh = Number((CFG.match(/\/(\d+(?:\.\d+)?)MWh$/) || [])[1]);
+    const hours = capacityMW > 0 ? energyMWh / capacityMW : null;
+    const K = capacityMW / 10, f0 = v => Number.isFinite(v) ? Math.round(v).toLocaleString() : '—', k = v => Number.isFinite(v) && K > 0 ? v / K : null;
     const rTot = r => r.收入小计 !== undefined ? r.收入小计 : r.政策收益合计;      // v2 起合计拆成「收入小计」和「扣过网成本后」
     const V2 = (D.example.n || 1) >= 2;
+    const SHOW_NET = V2 && hours <= 4;
     const layer = r => {                          // 政策确定／政策待定（征求稿、未来执行、仅存量）／市场
       const useLease = r.二选一采用 === '容量租赁', mktLease = useLease && /市场成交/.test(r.容量租赁标注 || '');   // 宁夏租赁价为市场成交价（二手）→ 市场层
       const capv = useLease ? (mktLease ? null : r.容量租赁) : r.容量收益;
@@ -929,11 +943,11 @@
     // v2 发现（研究线 口径_v2 第四节）：系统运行费是过网成本最大项；扣完为负的省份——从数据算，不手写
     const neg = L.filter(x => !x.r.合计说明 && x.r.过网成本 != null && x.r.扣过网成本后 != null && x.r.扣过网成本后 < 0).sort((a, b) => a.r.扣过网成本后 - b.r.扣过网成本后).map(x => x.r.主体);
     const big = L.filter(x => x.r.过网成本构成 && x.r.过网成本).map(x => x.r.过网成本构成.系统运行费 / x.r.过网成本).filter(v => v > 0);   // 系统运行费为 0 的（北京，待研究线核）不计
-    const insight = V2 && big.length ? `<div class="insight"><b>过网成本：</b>114 号文后，<b>系统运行费</b>是储能充电侧最大的成本项（${big.length} 省占过网成本 ${Math.round(Math.min(...big) * 100)}%—${Math.round(Math.max(...big) * 100)}%）；${neg.length ? `<b>${esc(neg.join('、'))}</b> 扣完过网成本后为负——单靠现货套利覆盖不了充电侧成本。` : ''}</div>` : '';
+    const insight = SHOW_NET && big.length ? `<div class="insight"><b>过网成本：</b>114 号文后，<b>系统运行费</b>是储能充电侧最大的成本项（${big.length} 省占过网成本 ${Math.round(Math.min(...big) * 100)}%—${Math.round(Math.max(...big) * 100)}%）；${neg.length ? `<b>${esc(neg.join('、'))}</b> 扣完过网成本后为负——单靠现货套利覆盖不了充电侧成本。` : ''}</div>` : '';
     const drafts = L.filter(x => /征求/.test(x.r.容量收益标注 || '') && !x.mktLease).map(x => x.r.主体);   // 宁夏补偿为征求稿但示例采用市场租赁价，另写（研究线 10-14）
     const mktL = L.filter(x => x.mktLease).map(x => x.r.主体);
     const futs = G2.filter(x => /起执行/.test(x.why)).map(x => x.r.主体 + ' ' + ((x.why.match(/20\d\d/) || [''])[0]));
-    const hero = REV ? `<section class="hero"><div><div class="eyebrow">电网侧独立储能 · 收益构成全景 · ${parseInt(CFG.split('/')[1]) / parseInt(CFG) || 4} 小时项目 · 示例测算口径 v${D.example.n}</div>
+    const hero = REV ? `<section class="hero"><div><div class="eyebrow">电网侧独立储能 · 收益构成全景 · ${hours ?? '—'} 小时项目 · 示例测算口径 v${D.example.n}</div>
         <h1>${G1.length} 个省区有已生效、新项目可拿的容量收入；${G3.length} 个省区只有市场收入</h1>
         <p class="lede">${futs.length ? '另有' + esc(futs.join('、')) + ' 年起执行；' : ''}${drafts.length ? esc(drafts.join('、')) + ' 的容量补偿只有征求稿、未照算；' : ''}${mktL.length ? esc(mktL.join('、')) + ' 容量补偿为征求稿，示例采用 2025 年市场租赁价；' : ''}${L.some(x => /未能折算/.test(x.r.容量收益标注 || '')) ? esc(L.filter(x => /未能折算/.test(x.r.容量收益标注 || '')).map(x => x.r.主体).join('、')) + ' 为市场化容量补偿、无法折算；' : ''}按「收入稳不稳」分三组，红色箭头后是扣掉充电过网成本后的数。<b>示例测算·不构成投资建议</b>；线损购电价按 0.30 元/千瓦时量级假设。</p></div>
         <div class="controls"><span class="seg" id="cfgseg"><button data-v="200MW/400MWh">2 小时</button><button data-v="200MW/800MWh">4 小时</button><button data-v="200MW/1200MWh">6 小时</button><button data-v="200MW/1600MWh">8 小时</button></span></div></section>`
@@ -950,7 +964,7 @@
       ${insight}
       <section class="card lgcard">
         <div class="lgbar"><div class="revlegend"><span><i style="background:${C_SURE}"></i>容量收入·已生效</span><span><i class="hatch"></i>容量收入·待定</span><span><i style="background:${C_MKT}"></i>现货套利（量级参考）</span></div>
-          <div class="lgopts"><label><input type="checkbox" id="optRng"> 现货区间（0.60—0.80）</label>${V2 ? '<label><input type="checkbox" id="optNet" checked> 扣过网成本后</label>' : ''}</div></div>
+          <div class="lgopts"><label><input type="checkbox" id="optRng"> 现货区间（0.60—0.80）</label>${SHOW_NET ? '<label><input type="checkbox" id="optNet" checked> 扣过网成本后</label>' : ''}</div></div>
         <div id="lghost"></div>
         ${G4.length ? `<p class="note" style="margin-top:12px">无可算项（${G4.length}）：${esc(G4.map(x => x.r.主体).join('、'))}——原因见明细表。</p>` : ''}</section>
       <details class="fold"><summary>逐省明细表（容量收益、租赁、二选一、现货区间、调频）</summary>
@@ -964,7 +978,7 @@
           <td class="mono"><b>${f0(k(rTot(r)))}</b><span class="note" style="display:inline">（${f0(rTot(r))}）</span></td>${V2 ? `<td class="mono">${r.过网成本 != null ? f0(k(r.过网成本)) + `<span class="note" style="display:inline">（${['系统运行费', '线损费', '输配电费', '政府性基金'].map(n => f0(k((r.过网成本构成 || {})[n]))).join('／')}）</span><div class="note" style="margin-top:2px">${esc((r.过网成本口径 || '').split('（')[0])}</div>` : '—'}</td><td class="mono"><b style="color:${(r.扣过网成本后 || 0) < 0 ? 'var(--bad)' : 'inherit'}">${r.过网成本 != null ? f0(k(r.扣过网成本后)) : '—'}</b></td>` : ''}</tr>`; }).join('')}</tbody></table></div></details>
       <details class="fold"><summary>测算口径（研究线 口径_v${D.example.n || 1}）</summary><div class="method">${md}</div></details>`;
     $('#cfgseg').querySelectorAll('button').forEach(b => { b.classList.toggle('on', b.dataset.v === EX.cfg); b.onclick = () => { EX.cfg = b.dataset.v; examplePage(o); }; });
-    const OPT = { rng: false, net: V2 };
+    const OPT = { rng: false, net: SHOW_NET };
     const draw = () => layerGroups($('#lghost'), groups, OPT);
     draw(); wireCards();
     $('#optRng').onchange = e => { OPT.rng = e.target.checked; draw(); };
@@ -1019,14 +1033,21 @@
   // ---------- 路由 ----------
   function route() {
     const h = decodeURIComponent(location.hash || '#/');
+    if (LOCKED() && (/^#\/(rev|ex|score)(?:$|\?)/.test(h) || /^#\/(dev|analysis)\//.test(h))) {
+      askPass(h); return;
+    }
+    if (h.startsWith('#/analysis/')) { location.hash = '#/' + h.slice(11); return; }
     const sec = (h.match(/^#\/([a-z]+)/) || [, 'home'])[1];
     document.querySelectorAll('.nav a').forEach(a => a.classList.toggle('on', a.dataset.nav === sec || (a.dataset.nav === 'tags' && sec === 'tag') || (a.dataset.nav === 'topics' && sec === 'topic') || (a.dataset.nav === 'policy' && ['lib', 'brief'].includes(sec)) || (a.dataset.nav === 'home' && (h === '#/' || h === ''))));
     const m = h.match(/^#\/p\/(.+)$/);
+    const dev = h.match(/^#\/dev\/(.+)$/);
+    if (dev) { province(dev[1]); return; }
+    if (/^#\/research/.test(h)) { researchPage(h.split('?')[1]); return; }
     $('#provSelect').value = m ? m[1] : '';
     if (m) { province(m[1]); $('#app').insertAdjacentHTML('beforeend', provTopicsHTML(m[1])); } else if (h === '#/about' && !PUB()) about(); else if (h === '#/rev') revenue(); else if (/^#\/brief/.test(h)) { briefPage(h.split('/')[2]); return; } else if (h === '#/tags') tagIndex(); else if (h === '#/topics') topicIndex(); else if (/^#\/topic\//.test(h)) topicPage(h.slice(8)); else if (h === '#/policy/prov') policyProv(); else if (h === '#/policy/time') policyTime(); else if (/^#\/policy/.test(h)) policyPage(h.split('/')[2]); else if (/^#\/m\//.test(h)) { front(); const el = document.getElementById('mc-' + h.slice(4)); if (el) { el.scrollIntoView({ block: 'center' }); el.classList.add('flash'); } return; } else if (/^#\/lib/.test(h)) libPage(h.split('?')[1]); else if (h === '#/map') home(); else if (/^#\/methods/.test(h) && !PUB()) methodsPage(h.split('/')[2]); else if (/^#\/tag\//.test(h)) tagPage(h.slice(6)); else if (h === '#/ex') { location.replace('#/rev'); return; } /* 用户 10-15 合并：旧链接落到全景页 */ else if (h === '#/score' && D.score) scorePage(); else front();
     scrollTo(0, 0);
   }
-  // ---------- 数据加载：本机预览读明文快照；发布版只有 data.enc.json，用链接 #k=口令 在浏览器里解密 ----------
+  // ---------- 公开入口＋点击后解锁分析；明文仅公开索引，口令与解密结果只在本页内存 ----------
   const store = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } },
                   set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} }, del: k => { try { localStorage.removeItem(k); } catch (e) {} } };
   const ub64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
@@ -1043,15 +1064,36 @@
     }
     throw new Error('口令不对或已失效');
   }
-  function askPass(env, msg) {
+  let legacyPass = '', unlockBusy = false;
+  function askPass(target, msg) {
     $('#app').innerHTML = `<section class="card" style="max-width:460px;margin:40px auto"><h2>请输入访问口令</h2>
-      <div class="sub">${msg || '本站内容仅限受邀访问。请使用分享给您的完整链接打开，或在下面输入口令。'}</div>
-      <form id="pf" style="margin-top:14px;display:flex;gap:8px"><input id="pw" type="password" autocomplete="off" style="flex:1;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font:inherit" aria-label="访问口令"><button class="dim on" type="submit">进入</button></form></section>`;
-    $('#pf').onsubmit = ev => { ev.preventDefault(); const v = $('#pw').value.trim(); if (v) openWith(env, v); };
+      <div class="sub">${esc(msg || '收益测算、项目收益参数与开发判断需口令。政策和研报索引可直接浏览。')}</div>
+      <form id="pf" style="margin-top:14px;display:flex;gap:8px"><input id="pw" type="password" autocomplete="off" style="flex:1;min-width:0;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font:inherit" aria-label="访问口令"><button class="dim on" type="submit">解锁</button></form><p><a href="#/">返回公开首页</a></p></section>`;
+    if (legacyPass) $('#pw').value = legacyPass;
+    $('#pf').onsubmit = ev => { ev.preventDefault(); const v = $('#pw').value.trim(); if (v && !unlockBusy) openWith(target, v); };
   }
-  async function openWith(env, pass) {
-    try { const d = await decryptEnc(env, pass); store.set('yc_k', pass); start(d); }
-    catch (e) { store.del('yc_k'); askPass(env, '口令不对或已失效，请向分享人索取新链接。'); }
+  async function openWith(target, pass) {
+    unlockBusy = true;
+    try {
+      const response = await fetch('data.enc.json', { cache: 'no-store' });
+      if (!response.ok) throw new Error('密文未取得');
+      const env = await response.json(), privateData = await decryptEnc(env, pass);
+      for (const key of ['example', 'score', 'dev', 'cards']) D[key] = privateData[key];
+      Object.assign(D.metrics, privateData.metrics || {});
+      for (const [province, fields] of Object.entries(privateData.provinces || {})) Object.assign(D.provinces[province] || (D.provinces[province] = {}), fields);
+      for (const topic of D.topics || []) {
+        const analysis = (privateData.topics || {})[topic.名];
+        if (!analysis) continue;
+        topic.md = analysis.md; topic.cols = analysis.cols;
+        for (const [province, fields] of Object.entries(analysis.rows)) Object.assign(topic.rows[province] || (topic.rows[province] = {}), fields);
+      }
+      D.meta.restrictedUnlocked = true; legacyPass = '';
+      document.querySelector('[data-nav="lock"]').hidden = false;
+      route();
+    } catch (e) {
+      legacyPass = '';
+      if (decodeURIComponent(location.hash) === target) askPass(target, '口令不对、已失效或暂时无法读取分析内容，请重试。');
+    } finally { unlockBusy = false; }
   }
   function start(d) {
     D = d;
@@ -1063,18 +1105,22 @@
     if ((d.methods || []).length && !d.meta.public) document.querySelector('.nav').insertAdjacentHTML('beforeend', '<a href="#/methods" data-nav="methods">方法库</a>');
     if (d.meta.public) { const a = document.querySelector('[data-nav="about"]'); if (a) a.remove(); }   /* 信息架构 v2：方法库、口径与来源只在本地用 */
     if ((d.tags || []).length) document.querySelector('.nav').insertAdjacentHTML('beforeend', '<a href="#/tags" data-nav="tags">机制标签</a>');
+    if ((d.research || []).length) document.querySelector('.nav').insertAdjacentHTML('beforeend', '<a href="#/research" data-nav="research">研报与资料</a>');
     if (d.meta.public) { const h = document.querySelector('[data-nav="map"]'), r = document.querySelector('[data-nav="rev"]'); if (h) h.textContent = '政策地图'; if (r) r.textContent = '收益来源全景'; document.title = '储能与零碳政策研究库'; }
+    if (d.meta.access === 'section-password') {
+      document.querySelector('[data-nav="rev"]').textContent = '收益测算 · 口令';
+      document.querySelector('.nav').insertAdjacentHTML('beforeend', '<a href="#/score" data-nav="score">分析分级 · 口令</a><button type="button" class="dim" data-nav="lock" hidden>锁定分析</button>');
+      document.querySelector('[data-nav="lock"]').onclick = () => location.reload();
+    }
     const sel = $('#provSelect');
     sel.innerHTML += PROVS.map(p => `<option value="${esc(p)}">${esc(p)}</option>`).join('');
     sel.onchange = () => { if (sel.value) location.hash = '#/p/' + encodeURIComponent(sel.value); };
     addEventListener('hashchange', route); route();
   }
   if (window.__YC_DATA__) { start(window.__YC_DATA__); return; }   // 内部预览单文件：数据已内嵌，双击即开
-  fetch('data/storage.json').then(r => { if (!r.ok) throw 0; return r.json(); }).then(start).catch(() =>
-    fetch('data.enc.json').then(r => r.json()).then(env => {
-      const m = location.hash.match(/^#k=([^&/]+)/);
-      if (m) { store.set('yc_k', decodeURIComponent(m[1])); history.replaceState(null, '', location.pathname + location.search + '#/'); }   // 口令不留在地址栏
-      const pass = store.get('yc_k');
-      pass ? openWith(env, pass) : askPass(env);
-    })).catch(e => { $('#app').innerHTML = `<p>数据读取失败：${esc(e)}。</p>`; });
+  store.del('yc_k');  // 清除旧版可能持久化的明文口令，新版不存口令。
+  const m = location.hash.match(/^#k=([^&/]+)/);
+  if (m) { legacyPass = decodeURIComponent(m[1]); history.replaceState(null, '', location.pathname + location.search + '#/'); }
+  fetch('data/storage.json', { cache: 'no-store' }).then(r => { if (!r.ok) throw new Error('公开快照未取得'); return r.json(); }).then(start)
+    .catch(() => { $('#app').innerHTML = '<p>公开资料暂时无法读取，请稍后刷新。</p>'; });
 })();
