@@ -59,5 +59,19 @@
       "license": "未纳入本包授权",
       "decision": "exclude; retain local originals"
     }
-  ]
+  ],
+  "reviewed_public_guides": {
+    "scope": "仅五项新写方法内容及修订服务范围，旧方法卡不整体放行",
+    "ids": [
+      "read-policy",
+      "capacity-cost",
+      "services"
+    ],
+    "research_commits": [
+      "4e9cb2e",
+      "9e1db58"
+    ],
+    "independent_acceptance": "WB-QA-20261024-0650"
+  },
+  "temporarily_withheld_overviews": "16个旧概述格被专项检查提示P0/P1，待逐格实质复核；原库及索引保留，不能将提示直接当政策错误结论。"
 }

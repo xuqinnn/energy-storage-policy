@@ -4,20 +4,20 @@
   "files_sha256": {
     ".gitignore": "e8388b573d828cc4b2ba266bdc24e4c13200d33c89ef5a2e67a134984743758e",
     ".nojekyll": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "ASSETS.json": "b864647791dd4dd28af1ab40450c7fcd3c5d4cde7aa6541c42f08cc0ebacd7ae",
+    "ASSETS.json": "baa7bb2f50c24445540a15a89fde6b72efb35c368c87a7504121034107591fed",
     "CONTRIBUTING.md": "5b8d663aa8693b5a4faa9e573ee29a7f39b737a4cbedbeeceb83019702f802ac",
     "LICENSE": "0bc4c064bc214c2f049a06bf53d7effb9e56ce0cb3132555dba2722c38ecc358",
     "LICENSE-DATA.md": "83f90729363255465be7978639c491ec43df1913eac3088bb7e170b4c1cf6f93",
-    "README.md": "41673e96b0921d4d8b27429ae8cc21a491c7fc6e66d8436d7d137f6267ecc59e",
+    "README.md": "8cd36874415ccfb740c67c65be1f484e072db8df0905b4d17299466a438b1a86",
     "assets/app.css": "10e921c4d7bfcce1ed8d0136271b5443abeaf7eb3326dc320dd3de44c5422380",
-    "assets/app.js": "b3dc3126e7da11908d45bee23421f1067a32c80a50658227bbabfe643054f362",
+    "assets/app.js": "2daed48c52cd1d0a10696e6cb75012462907d6ba68a47fafb725e81d41fa361b",
     "assets/vendor/LICENSE": "634293835b43a6dd2094fa39182a3d9a6b9ca43b7fdb9ac354e8037af2a3093a",
     "assets/vendor/NOTICE": "fa99ac3af859d0e13166906dc53a73ad34a08898da7e8ae83407275496e9e30c",
     "assets/vendor/echarts.min.js": "e84270bd0cd5bdf60fefc26d00c2a391cb2e81f4d26a7a9ee16185a54773a3cf",
-    "data/storage.json": "63516971daaf8a6f44663bda7fef50a0322c6d3638617c671faa1bee1a2ce3e2",
-    "examples/synthetic.json": "9a2753f4989a171ea289246f04c964c1e7701a726b1687a40349ce2c29bb8206",
-    "index.html": "149e9f5605112aec8ff89c4b62acff7e95eaf6b7f347314616718bb8b0a5d6da",
+    "data/storage.json": "58681885c07a0046c38ae01b21eadf605cb5be9997f266acee58d24700fdab78",
+    "examples/synthetic.json": "6050732069b0350ec49724f2586f48e36ca9fd2cf5916391802971d15f2f40cc",
+    "index.html": "53630dcd3a74f290ac6e5201345417e1872755eb4991b009c9883e47f04cb202",
     "tests/test_public.py": "1b7d1a36cb97f04c8c87fb6e2e656773c24636752a5e33b1bba997eb056a4a5b",
-    "tools/build.py": "4d030baea79e6cd344e2737de29fbbe4aad2e4c83f4368e44bb8aa1b60618eaf"
+    "tools/build.py": "ed2a72bcbf64aa9e23f2bd467f7261b333644fb45195da1815d00cf1b4f777ef"
   }
 }

@@ -14,7 +14,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE if (HERE / 'index.html').is_file() else HERE.parent
 WEB_FILES = ['index.html', 'assets/app.js', 'assets/app.css', 'assets/vendor/echarts.min.js', 'assets/vendor/LICENSE', 'assets/vendor/NOTICE']
 DOC_FILES = ['README.md', 'LICENSE', 'LICENSE-DATA.md', 'CONTRIBUTING.md', 'ASSETS.json', '.gitignore', 'examples/synthetic.json', 'tests/test_public.py']
-ALLOWED_TOP = {'meta','metrics','provinces','docs','cards','events','dev','diff','score','example','briefs','links','tags','tagdocs','methods','lib','research','learning','stats','mech','topics','topicmap','synthetic_example'}
+ALLOWED_TOP = {'meta','metrics','provinces','docs','cards','events','dev','diff','score','example','briefs','links','tags','tagdocs','methods','lib','research','learning','stats','mech','topics','topicmap','synthetic_example','public_guides'}
 
 def digest(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
@@ -33,6 +33,14 @@ def validate_snapshot(data):
         if token in scan_txt: errors.append('excluded content: ' + token)
     for code, fields in data.get('provinces', {}).items():
         if any(k in fields for k in ('⑧c11', '⑧c13', '⑧c16', '⑧c44', '②c2')): errors.append('unreviewed project/market parameter: ' + code)
+    guides=data.get('public_guides', [])
+    if not isinstance(guides,list): errors.append('invalid public guides')
+    else:
+        ids=[]
+        for guide in guides:
+            if not isinstance(guide,dict) or set(guide)!={'id','title','md'} or guide.get('id') not in ('read-policy','capacity-cost','services') or not isinstance(guide.get('md'),str) or len(guide.get('md',''))<10: errors.append('unreviewed public guide schema')
+            else: ids.append(guide['id'])
+        if len(ids)!=len(set(ids)):errors.append('duplicate public guide')
     docs = data.get('docs', {})
     for row in data.get('lib', []):
         if not str(row[0]).startswith('ZC') or str(row[0]).startswith('ZCQY'): errors.append('research/company mixed into policy')

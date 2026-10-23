@@ -256,7 +256,7 @@
       blk.push(`<div class="block"><h4>横向 · 与他省</h4><p class="cap">口径：${esc(b.横向.口径)}；单位：${esc(b.横向.单位)}</p><div class="bars">${it.map(e => `<div class="bar ${e.本件 ? 'me' : ''}"><div>${esc(e.省)}<small>${esc(e.算法 || '')}</small></div><div class="track"><div class="fill" style="width:${((+e.值 || 0) / max * 100).toFixed(1)}%"></div></div><div class="v">${esc(e.值)}</div></div>`).join('')}</div>
         <p class="cap">${it.filter(e => !e.本件).map(e => `${esc(e.省)} <button type="button" class="cite ${statusClass((D.docs[e.编号] || {}).status)}" data-code="${esc(e.编号)}">${esc(e.编号)}</button> ${esc(e.年月)}${e.备注 ? '，' + esc(e.备注) : ''}`).join('；')}</p></div>`);
     } else if (b && b.横向 && typeof b.横向 === 'string' && b.脉络 && !externalSite()) blk.push(`<div class="block"><h4>横向 · 与他省</h4><p>${citeHTML(b.横向)}</p></div>`);
-    if (b && (b.依据 || []).length) blk.push(`<details><summary>依据原文（${b.依据.length} 条）</summary><div class="ev">${b.依据.map(e => `<div><span class="src">${esc(e.编号)} p${esc(e.页)}</span>${esc(e.原句)}</div>`).join('')}</div></details>`);
+    if (b && (b.依据 || []).length) blk.push(`<details><summary>依据原文（${b.依据.length} 条）</summary><div class="ev">${b.依据.map(e => `<div><span class="src">${esc(e.编号)} ${esc(e.条款 || (e.页 ? "p" + e.页 : ""))}</span>${esc(e.原句)}</div>`).join('')}</div></details>`);
 
     return head + `<div class="sbody">${blk.join('')}</div>`;
   }
@@ -407,7 +407,7 @@
   }
   // ---------- 专题页（研究线对外版正文＋自动拼：分省对照表、相关政策）：【编号】开简析卡，「方法卡 Mxx」链方法库 ----------
   function inlineMD(t) {
-    return citeHTML(t).replace(/\[([^\[\]\n]+)\]\((https:\/\/[^\s<>()]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1 ↗</a>').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/方法卡\s*(M\d{2})/g, (m, id) => PUB() ? '' : `<a href="#/methods/${id}">方法卡 ${id}</a>`);
+    return citeHTML(t).replace(/`([^`\n]+)`/g, '<code>$1</code>').replace(/\[([^\[\]\n]+)\]\((https:\/\/[^\s<>()]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1 ↗</a>').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/方法卡\s*(M\d{2})/g, (m, id) => PUB() ? '' : `<a href="#/methods/${id}">方法卡 ${id}</a>`);
   }
   function mdHTML(md) {
     const out = []; let list = null, para = [], tbl = [];
@@ -1081,13 +1081,13 @@
     if (/^#\/research/.test(h)) { researchPage(h.split('?')[1]); return; }
     if (h === '#/learning') { learningPage(); return; }
     $('#provSelect').value = m ? m[1] : '';
-    if (m) { province(m[1]); $('#app').insertAdjacentHTML('beforeend', provTopicsHTML(m[1])); } else if (h === '#/about') publicAbout(); else if (h === '#/services') servicesPage(); else if (h === '#/score' && !D.score) publicAbout(); else if (h === '#/rev') revenue(); else if (/^#\/brief/.test(h)) { briefPage(h.split('/')[2]); return; } else if (h === '#/tags') tagIndex(); else if (h === '#/topics') topicIndex(); else if (/^#\/topic\//.test(h)) topicPage(h.slice(8)); else if (h === '#/policy/prov') policyProv(); else if (h === '#/policy/time') policyTime(); else if (/^#\/policy/.test(h)) policyPage(h.split('/')[2]); else if (/^#\/m\//.test(h)) { front(); const el = document.getElementById('mc-' + h.slice(4)); if (el) { el.scrollIntoView({ block: 'center' }); el.classList.add('flash'); } return; } else if (/^#\/lib/.test(h)) libPage(h.split('?')[1]); else if (h === '#/map') home(); else if (/^#\/methods/.test(h) && !PUB()) methodsPage(h.split('/')[2]); else if (/^#\/tag\//.test(h)) tagPage(h.slice(6)); else if (h === '#/ex') { location.replace('#/rev'); return; } /* 用户 10-15 合并：旧链接落到全景页 */ else if (h === '#/score' && D.score) scorePage(); else front();
+    if (m) { province(m[1]); $('#app').insertAdjacentHTML('beforeend', provTopicsHTML(m[1])); } else if (h === '#/about') publicAbout(); else if (h === '#/services') servicesPage(); else if (h === '#/score' && !D.score) publicAbout(); else if (h === '#/rev') revenue(); else if (/^#\/brief/.test(h)) { briefPage(h.split('/')[2]); return; } else if (h === '#/tags') tagIndex(); else if (h === '#/topics') topicIndex(); else if (/^#\/topic\//.test(h)) topicPage(h.slice(8)); else if (h === '#/policy/prov') policyProv(); else if (h === '#/policy/time') policyTime(); else if (/^#\/policy/.test(h)) policyPage(h.split('/')[2]); else if (/^#\/m\//.test(h)) { front(); const el = document.getElementById('mc-' + h.slice(4)); if (el) { el.scrollIntoView({ block: 'center' }); el.classList.add('flash'); } return; } else if (/^#\/lib/.test(h)) libPage(h.split('?')[1]); else if (h === '#/map') home(); else if (/^#\/methods/.test(h)) { if (PUB()) publicGuidesPage(h.split('/')[2]); else methodsPage(h.split('/')[2]); } else if (/^#\/tag\//.test(h)) tagPage(h.slice(6)); else if (h === '#/ex') { location.replace('#/rev'); return; } /* 用户 10-15 合并：旧链接落到全景页 */ else if (h === '#/score' && D.score) scorePage(); else front();
     scrollTo(0, 0);
   }
   function syntheticRevenue() {
     const defaults = D.synthetic_example.inputs;
     const labels = {hours:'储能时长（小时）',cycles:'年循环次数',efficiency:'往返效率（0—1）',buy:'购电价（元/kWh）',sell:'售电价（元/kWh）',chargeFee:'充电附加费（元/kWh）',capacity:'容量收入（元/kW·年）',rent:'租赁收入（元/kW·年）',fixed:'其他运营成本（元/kW·年）'};
-    $('#app').innerHTML = `<section class="hero"><div class="eyebrow">免费收益工具 · 合成示例</div><h1>先看假设，再看收益</h1><p class="lede">所有默认值均为虚构教学参数，不代表任何省份、企业或真实项目。结果为每千瓦每年的运营差额，未计投资、融资、税费与折旧。</p></section><section class="card"><form id="synthetic-form" class="synthetic-grid">${Object.entries(labels).map(([k,label])=>`<label>${label}<input name="${k}" type="number" step="any" min="0" value="${defaults[k]}" required></label>`).join('')}<label>容量与租赁互斥<select name="mode"><option value="capacity">采用容量收入</option><option value="rent">采用租赁收入</option><option value="none">均不采用</option></select></label><button class="btn pri" type="submit">重新计算</button></form><output id="synthetic-result" aria-live="polite"></output><p class="sub">公式：容量或租赁收入＋[售电价−（购电价＋充电附加费）÷往返效率]×时长×循环−其他运营成本。时长按额定放电能量/功率；购电量按效率回推。同一容量的容量收入与租赁收入不叠加。</p><a href="examples/synthetic.json">下载合成样例</a> · <a href="#/services">有实际问题，可自愿联系咨询</a></section>`;
+    $('#app').innerHTML = `<section class="hero"><div class="eyebrow">免费收益工具 · 合成示例</div><h1>先看假设，再看收益</h1><p class="lede">所有默认值均为虚构教学参数，不代表任何省份、企业或真实项目。结果为每千瓦每年的运营差额，未计投资、融资、税费与折旧。</p></section><section class="card"><form id="synthetic-form" class="synthetic-grid">${Object.entries(labels).map(([k,label])=>`<label>${label}<input name="${k}" type="number" step="any" min="0" value="${defaults[k]}" required></label>`).join('')}<label>示例收入选择<select name="mode"><option value="capacity">采用容量收入</option><option value="rent">采用租赁收入</option><option value="none">均不采用</option></select></label><button class="btn pri" type="submit">重新计算</button></form><output id="synthetic-result" aria-live="polite"></output><p class="sub">公式：容量或租赁收入＋[售电价−（购电价＋充电附加费）÷往返效率]×时长×循环−其他运营成本。时长按额定放电能量/功率；购电量按效率回推。本合成场景假设同一容量的容量收入与租赁收入二选一；实际能否并存须核当地规则与合同，避免重复计算同一权益。</p><a href="examples/synthetic.json">下载合成样例</a> · <a href="#/services">有实际问题，可自愿联系咨询</a></section>`;
     const form=$('#synthetic-form');
     form.onsubmit=event=>{ event.preventDefault(); const x=Object.fromEntries(new FormData(form)), n=Object.fromEntries(Object.keys(defaults).map(k=>[k,Number(x[k])])), out=$('#synthetic-result');
       if (!Object.values(n).every(Number.isFinite)||n.efficiency<=0||n.efficiency>1||n.hours<=0||Object.values(n).some(v=>v<0)) {out.textContent='请输入有效非负数，时长大于0、效率大于0且不超过1。';return;}
@@ -1095,7 +1095,17 @@
       out.dataset.net=net.toFixed(6);out.innerHTML=`<p class="kpi"><b>${net.toFixed(2)} 元/kW·年</b><span>运营差额 · 合成情景</span></p><p>电能量差额 ${energy.toFixed(2)} ＋ 互斥收入 ${ancillary.toFixed(2)} − 其他运营成本 ${n.fixed.toFixed(2)}。</p>`;
     }; form.requestSubmit();
   }
+  function publicGuidesPage(id) {
+    const guides=(D.public_guides||[]).filter(g=>g.id!=='services'), selected=guides.find(g=>g.id===id);
+    $('#app').innerHTML=`<section class="hero"><div class="eyebrow">研究方法 · 免费阅读</div><h1>${esc(selected?.title||'先核条件，再做判断')}</h1><p class="lede">把文件状态、比较口径与收入条件分开；涉及数值时回到一手来源和具体适用范围。</p></section>${selected?`<article class="card prose-topic">${mdHTML(selected.md)}<p><a href="#/rev">用合成输入试算</a> · <a href="#/methods">所有方法</a></p></article>`:`<section class="mech">${guides.map(g=>`<a class="card" href="#/methods/${esc(g.id)}"><h2>${esc(g.title)}</h2><p>查看方法、适用边界与下一步。</p></a>`).join('')}</section>`}`;
+  }
   function servicesPage() {
+    const scope=(D.public_guides||[]).find(g=>g.id==='services');
+    if(scope){
+      const lines=scope.md.split('\n'),rows=lines.filter(l=>/^\|/.test(l)&&!/^\|[- :|]+\|$/.test(l)).map(l=>l.replace(/^\||\|$/g,'').split('|').map(v=>v.trim())),headers=rows.shift();
+      const cards=rows.map(row=>`<article class="card"><h2>${esc(row[0])}</h2>${row.slice(1).map((v,i)=>`<h3>${esc(headers[i+1])}</h3><p>${inlineMD(v)}</p>`).join('')}</article>`).join('');
+      $('#app').innerHTML=`<section class="hero"><div class="eyebrow">自愿联系 · 公共功能始终免费</div><h1>咨询与定制服务</h1><p class="lede">阅读、检索和公共工具无需注册或提交联系方式。</p></section><section class="mech service-scope">${cards}</section><section class="card prose-topic">${mdHTML(lines.filter(l=>!/^\|/.test(l)).join('\n'))}<p>有明确问题可自愿联系 <a href="mailto:xuqinnn@163.com">xuqinnn@163.com</a>。</p><a href="https://github.com/xuqinnn/energy-storage-policy/issues">反馈问题</a></section>`;return;}
+
     $('#app').innerHTML=`<section class="hero"><div class="eyebrow">自愿联系 · 公共功能始终免费</div><h1>咨询与定制服务</h1><p class="lede">独立开展研究，不代表原任职企业。阅读、检索和公共工具无需注册或提交联系方式。</p></section><section class="mech">${[['诊断与定制研究','围绕跨省选址、规则变化或项目适用条件，约定问题范围，交付带来源的判断、未知项和讲解。'],['专属研究站搭建','按团队地域、主题和品牌配置资料组织、部署、培训与维护；客户资料独立保管。'],['场景模型与证据包','根据获授权数据整理假设、敏感性、输入输出与政策依据，明确验收范围；实际项目资料不回流公共站。']].map(([t,p])=>`<article class="card"><h2>${t}</h2><p>${p}</p></article>`).join('')}</section><section class="card"><p>有明确问题可自愿联系 <a href="mailto:xuqinnn@163.com">xuqinnn@163.com</a>。根据实际范围约定交付、周期和费用，不承诺审批或投资收益。</p><a href="https://github.com/xuqinnn/energy-storage-policy/issues">反馈问题</a></section>`;
   }
   function publicAbout() {
@@ -1110,6 +1120,7 @@
     if (d.score) document.querySelector('.nav').insertAdjacentHTML('beforeend', '<a href="#/score" data-nav="score">投资分级</a>');
     /* 信息架构 v2：简析与政策库并为「政策」一个入口（#/brief、#/lib 路由保留） */
     if ((d.topics || []).length) document.querySelector('[data-nav="policy"]').insertAdjacentHTML('afterend', '<a href="#/topics" data-nav="topics">专题</a>');
+    if ((d.public_guides || []).some(g=>g.id!=='services')) document.querySelector('.nav').insertAdjacentHTML('beforeend', '<a href="#/methods" data-nav="methods">研究方法</a>');
     if ((d.methods || []).length && !d.meta.public) document.querySelector('.nav').insertAdjacentHTML('beforeend', '<a href="#/methods" data-nav="methods">方法库</a>');
     if (d.meta.public) { document.querySelector('.nav').insertAdjacentHTML('beforeend', '<a href="#/services" data-nav="services">咨询与定制</a>'); }   /* 信息架构 v2：方法库、口径与来源只在本地用 */
     if ((d.tags || []).length) document.querySelector('.nav').insertAdjacentHTML('beforeend', '<a href="#/tags" data-nav="tags">机制标签</a>');

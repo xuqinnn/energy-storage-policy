@@ -42,3 +42,7 @@ python3 -m http.server 8002 --bind 127.0.0.1 --directory /tmp/energy-synthetic
 代码MIT、合成样例CC0、自有研究解读CC BY 4.0；数据与第三方材料的范围见LICENSE-DATA.md及ASSETS.json，ECharts许可保留。此许可不覆盖历史工作库或原企业材料。
 
 问题反馈：https://github.com/xuqinnn/energy-storage-policy/issues 。请勿上传客户数据、报价、联系人或未获授权的文档。自愿咨询：xuqinnn@163.com。发布由维护者核验后手动Push，再分别验证远端与实站。
+
+## 研究方法
+
+`#/methods`提供新写且独立审定的政策阅读/比较/资格核对方法；`#/methods/capacity-cost`区分容量时长参考折算、最终标准与年度实收，并列清充电费用与输配电费退减。服务范围见`#/services`。这些页面免费阅读，不整体放行历史方法卡、项目或企业数据。
