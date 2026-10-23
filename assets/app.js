@@ -7,6 +7,37 @@
   const $ = (s, el = document) => el.querySelector(s);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+  const externalSite = () => D?.meta?.access === 'section-password' && !window.__YC_DATA__;
+  function polishPublicLabels() {
+    if (!D) return;
+    document.body.classList.toggle('external-site', externalSite());
+    if (!externalSite()) return;
+    document.querySelectorAll('.cite[data-code]').forEach(button => {
+      const doc = D.docs[button.dataset.code];
+      if (button.textContent) button.textContent = '';
+      button.classList.add('cite-dot');
+      button.setAttribute('aria-label', (doc?.title || '查看政策依据') + (doc?.status ? '，' + doc.status : ''));
+    });
+    // 编号保留在数据属性用于索引，外站正文只呈现文件名称。
+    for (const root of [$('#app'), $('#bsInner')]) {
+      if (!root) continue;
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), nodes = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+      for (const node of nodes) {
+        const value = node.nodeValue.replace(/【?(?<![A-Za-z])(?:ZC|YJC?|FG|NY)[A-Z]*\d+(?:·[^】]*)?】?/g, '');
+        const display = value.replace(/[（(][^（）()]*无(?:独立)?文号[^（）()]*[）)]/g, '').replace(/^[ ·・、]+|[ ·・、]+$/g, '');
+        if (display !== node.nodeValue) node.nodeValue = display;
+      }
+      root.querySelectorAll('.chip.mono').forEach(chip => { if (!chip.textContent.trim()) chip.remove(); });
+    }
+  }
+  let polishPending = false;
+  new MutationObserver(() => {
+    if (polishPending) return;
+    polishPending = true;
+    requestAnimationFrame(() => { polishPending = false; polishPublicLabels(); });
+  }).observe(document.body, {childList:true, subtree:true});
+
   // 省份方块图格位（列, 行）：按地理相对位置排，每省一格、等大
   const TILES = {
     '蒙东': [8, 0], '黑龙江': [9, 0], '蒙西': [6, 1], '北京': [7, 1], '吉林': [9, 1],
@@ -58,8 +89,8 @@
   document.addEventListener('mouseover', e => {
     const c = e.target.closest('[data-code]'); if (!c) return;
     const d = D.docs[c.dataset.code];
-    tip.innerHTML = d ? `<b>${esc(c.dataset.code)}</b>　<span class="st ${statusClass(d.status)}">${esc(d.status)}</span><br>${esc(d.title)}<br>${esc(d.no || '')}　${esc(d.date || '')}${d.yjc ? '<br>研究库编号：' + esc(d.yjc.join('、')) : ''}`
-      : `<b>${esc(c.dataset.code)}</b><br>非本站收录的政策文件`;
+    tip.innerHTML = d ? `${externalSite() ? '' : `<b>${esc(c.dataset.code)}</b>　`}<span class="st ${statusClass(d.status)}">${esc(d.status)}</span><br>${esc(d.title)}<br>${esc(d.no || '')}　${esc(d.date || '')}${d.yjc && !externalSite() ? '<br>研究库编号：' + esc(d.yjc.join('、')) : ''}`
+      : `${externalSite() ? '' : `<b>${esc(c.dataset.code)}</b><br>`}未收录文件`;
     tip.hidden = false; move(e);
   });
   document.addEventListener('mousemove', e => { if (!tip.hidden) move(e); });
@@ -163,9 +194,9 @@
   function eventsHTML() {      // 本月要事（补厚计划 B2）：即将执行、到期／复查、近 30 天新发布
     const ev = D.events || []; if (!ev.length) return '';
     const t0 = new Date().toISOString().slice(0, 10);
-    const li = e => `<li><span class="mono">${esc((e.date || '').slice(5))}</span><span class="pv">${esc(e.prov || '')}</span><span>${e.kind !== '新发布' ? `<span class="st ${e.kind === '征求截止' ? 'draft' : e.kind === '即将执行' ? 'ok' : 'none'}">${esc(e.kind)}</span> ` : ''}${e.code ? `<button type="button" class="cite ${statusClass(e.status)}" data-code="${esc(e.code)}">${esc(e.code)}</button> ` : ''}${esc(String(e.title || '').replace(/^\d{6}/, '').slice(0, 42))}${e.code && briefOf(e.code) ? ` <button type="button" class="blink" data-code="${esc(e.code)}">简析</button>` : ''}${(D.docs[e.code] || {}).summary ? `<p class="policy-summary">${esc(D.docs[e.code].summary)}</p>` : ''}</span></li>`;
+    const li = e => `<li><span class="mono">${esc((e.published || e.date || '').slice(5))}</span><span class="pv">${esc(e.prov || '')}</span><span>${e.kind !== '新发布' ? `<span class="st ${e.kind === '征求截止' ? 'draft' : e.kind === '即将执行' ? 'ok' : 'none'}">${esc(e.kind)}</span> ` : ''}${e.code ? `<button type="button" class="cite ${statusClass(e.status)}" data-code="${esc(e.code)}">${esc(e.code)}</button> ` : ''}${esc(String(e.title || '').replace(/^\d{6}/, ''))}${e.code && briefOf(e.code) ? ` <button type="button" class="blink" data-code="${esc(e.code)}">简析</button>` : ''}${(D.docs[e.code] || {}).summary ? `<p class="policy-summary">${esc(D.docs[e.code].summary)}</p>` : ''}</span></li>`;
     const up = ev.filter(e => e.kind !== '新发布' && e.date >= t0).slice(0, 10);
-    const nw = ev.filter(e => e.kind === '新发布').sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.landed || '').localeCompare(a.landed || ''));   /* 按发文日倒序（原按收录时间排，日期看着乱） */
+    const nw = ev.filter(e => e.kind === '新发布').sort((a, b) => (b.published || b.date || '').localeCompare(a.published || a.date || '') || (b.landed || '').localeCompare(a.landed || ''));   /* 按发文日倒序（原按收录时间排，日期看着乱） */
     const cats = [...new Set(nw.map(e => e.cat).filter(Boolean))];
     const newList = (items, n) => `<ul class="evl" style="margin-top:10px">${items.slice(0, n).map(li).join('') || '<li class="note">暂无</li>'}</ul>${items.length > n ? `<details class="more"><summary>展开全部 ${items.length} 件</summary><ul class="evl">${items.slice(n).map(li).join('')}</ul></details>` : ''}`;
     // 用户 10-16：全部分类、近 60 天发布或近 30 天新收录，按分类筛；有简析的带链接
@@ -175,11 +206,11 @@
         const k = b.dataset.cat, items = k ? nw.filter(e => e.cat === k) : nw;
         document.getElementById('newlist').innerHTML = newList(items, 15);
       }), 0);
-      return `<section class="card" style="margin-top:20px"><h2>近期新发布的政策 <small class="note" style="display:inline">${nw.length} 件 · ${nw.filter(e => briefOf(e.code)).length} 件有简析</small></h2><div class="sub">近 60 天发布或近 30 天新收录，按发文日倒序；点「简析」看要点与变化，悬停编号看文件与状态。<a href="#/policy" style="margin-left:8px">看政策看板 →</a></div>
+      return `<section class="card" style="margin-top:20px"><h2>近期新发布的政策 <small class="note" style="display:inline">${nw.length} 件 · ${nw.filter(e => briefOf(e.code)).length} 件有简析</small></h2><div class="sub">近 60 天发布或近 30 天新收录；按公开日倒序，成文日另见详情。圆点可预览，点击查看简述与关联。<a href="#/policy" style="margin-left:8px">看政策看板 →</a></div>
         <div class="seg" id="newcats" style="margin-top:10px;flex-wrap:wrap"><button class="on" data-cat="">全部</button>${cats.map(k => `<button data-cat="${esc(k)}">${esc(k)} ${nw.filter(e => e.cat === k).length}</button>`).join('')}</div>
         <div id="newlist">${newList(nw, 15)}</div></section>`;
     }
-    return `<section class="card" style="margin-top:20px"><h2>本月要事</h2><div class="sub">储能、电价、市场、辅助服务四类；悬停编号看文件与状态。</div>
+    return `<section class="card" style="margin-top:20px"><h2>本月要事</h2><div class="sub">储能、电价、市场、辅助服务四类；悬停圆点看文件与状态。</div>
       <div class="evgrid"><div><h3>接下来：即将执行 · 征求截止 · 到期或复查</h3><ul class="evl">${up.map(li).join('') || '<li class="note">半年内暂无</li>'}</ul></div>
       <div><h3>近期新发布 <a href="#/brief" style="font-size:12.5px;font-weight:400">全部简析 →</a></h3>${newList(nw, 15)}</div></div></section>`;
   }
@@ -189,7 +220,7 @@
   const BRIEF_V1 = [['政策变化', '政策变化'], ['改了什么', '改了什么'], ['对比结论', '新旧对比'], ['纵向', '本省前后'], ['横向', '与他省'], ['确定性与时间表', '确定性与时间表'], ['何时会变', '何时会变']];   /* v1、v2 旧栏目兼容显示 */
   const fieldHTML = v => Array.isArray(v) ? `<ul class="plain">${v.map(x => `<li>${citeHTML(x)}</li>`).join('')}</ul>`
     : v && typeof v === 'object' ? `<ul class="plain">${Object.entries(v).map(([k, x]) => `<li><b>${esc(k)}</b>：${citeHTML(x)}</li>`).join('')}</ul>` : `<p>${citeHTML(v)}</p>`;
-  const docName = code => { const d = D.docs[code]; return d ? (d.no && d.no !== '（无文号）' ? d.no : String(d.title || '').replace(/^\d{6}/, '').slice(0, 30)) : code; };
+  const docName = code => { const d = D.docs[code]; return d ? (externalSite() ? d.title : (d.no && d.no !== '（无文号）' ? d.no : String(d.title || '').replace(/^\d{6}/, ''))) : '相关文件'; };
   function chainOf(code, b) {
     if (b && b.脉络) return b.脉络;
     const L = D.links || [], me = D.docs[code] || {};
@@ -209,7 +240,7 @@
       <div class="chips">${stChip(b && b.状态标签 || d.status)}${sigChip(b)}${b && b.层级 ? `<span class="chip">${esc(b.层级)}级</span>` : ''}${b && (b.档 || b.级别) ? `<span class="chip tier">${esc(b.档 || b.级别 + '件')}</span>` : ''}${(b && b.省份) || d.prov ? `<span class="chip">${esc((b && b.省份) || d.prov)}</span>` : ''}<span class="chip mono">${esc(code)}</span></div>
       <h2 id="bsH">${esc((b && b.标题) || String(d.title || code).replace(/^\d{6}/, ''))}</h2>
       ${d.no || (b && b.文号) ? `<div class="docno">${esc((b && b.文号) || d.no)}</div>` : ''}
-      <div class="dates">${(b && b.发文日期) || d.date ? `<span>发文 <b>${esc((b && b.发文日期) || d.date)}</b></span>` : ''}${b && b.生效日期 ? `<span>生效 <b>${esc(b.生效日期)}</b></span>` : ''}</div>
+      <div class="dates">${(b && b.发文日期) || d.date ? `<span>成文 <b>${esc((b && b.发文日期) || d.date)}</b></span>${d.published && d.published !== d.date ? `<span>公开 <b>${esc(d.published)}</b></span>` : ''}` : ''}${b && b.生效日期 ? `<span>生效 <b>${esc(b.生效日期)}</b></span>` : ''}</div>
       ${sum ? `<p class="summary">${citeHTML(sum)}</p>` : ''}${mainTagsOf(code).length ? `<div class="chips">${mainTagsOf(code).map(tagLink).join('')}</div>` : ''}</div>`;
     const blk = [];
     if (hitAt) blk.push(`<div class="block hit"><h4>正文提及 · 第 ${esc(hitAt.pg)} 页</h4><p>「${esc(hitAt.s)}」</p></div>`);
@@ -225,9 +256,9 @@
       const it = b.横向.条目, max = Math.max(...it.map(e => +e.值 || 0)) || 1;
       blk.push(`<div class="block"><h4>横向 · 与他省</h4><p class="cap">口径：${esc(b.横向.口径)}；单位：${esc(b.横向.单位)}</p><div class="bars">${it.map(e => `<div class="bar ${e.本件 ? 'me' : ''}"><div>${esc(e.省)}<small>${esc(e.算法 || '')}</small></div><div class="track"><div class="fill" style="width:${((+e.值 || 0) / max * 100).toFixed(1)}%"></div></div><div class="v">${esc(e.值)}</div></div>`).join('')}</div>
         <p class="cap">${it.filter(e => !e.本件).map(e => `${esc(e.省)} <button type="button" class="cite ${statusClass((D.docs[e.编号] || {}).status)}" data-code="${esc(e.编号)}">${esc(e.编号)}</button> ${esc(e.年月)}${e.备注 ? '，' + esc(e.备注) : ''}`).join('；')}</p></div>`);
-    } else if (b && b.横向 && typeof b.横向 === 'string' && b.脉络) blk.push(`<div class="block"><h4>横向 · 与他省</h4><p>${citeHTML(b.横向)}</p></div>`);
+    } else if (b && b.横向 && typeof b.横向 === 'string' && b.脉络 && !externalSite()) blk.push(`<div class="block"><h4>横向 · 与他省</h4><p>${citeHTML(b.横向)}</p></div>`);
     if (b && (b.依据 || []).length) blk.push(`<details><summary>依据原文（${b.依据.length} 条）</summary><div class="ev">${b.依据.map(e => `<div><span class="src">${esc(e.编号)} p${esc(e.页)}</span>${esc(e.原句)}</div>`).join('')}</div></details>`);
-    if (!b) blk.push(`<p class="cap">${d.summary ? '以上为政策简述，详细比较分析尚未提供' : '本件暂未提供简述与详细分析'}${ml.length ? '；另列相关文件脉络' : ''}。</p>`);
+    
     return head + `<div class="sbody">${blk.join('')}</div>`;
   }
   let bsOpener = null;
@@ -265,7 +296,7 @@
   const tagLink = k => `<a class="tagc" href="#/tag/${encodeURIComponent(k)}">${esc(k)}</a>`;
   const mainTagsOf = code => (D.tags || []).filter(t => ((D.tagdocs || {})[t.标签] || { 主: [] }).主.includes(code)).map(t => t.标签);
   const tagsOfMetric = m => (D.tags || []).filter(t => (t.参数列 || []).includes(m)).map(t => t.标签);
-  const docRow = (code, extra) => { const d = D.docs[code] || {}; return `<li><span class="mono">${esc((d.date || '').slice(0, 7))}</span><span class="pv">${esc(d.prov || '')}</span><span><button type="button" class="cite ${statusClass(d.status)}" data-code="${esc(code)}">${esc(code)}</button> ${esc(String(d.title || '').replace(/^\d{6}/, '').slice(0, 46))}${extra || ''}</span></li>`; };
+  const docRow = (code, extra) => { const d = D.docs[code] || {}; return `<li><span class="mono">${esc(d.date || '')}</span><span class="pv">${esc(d.prov || '')}</span><span><button type="button" class="cite ${statusClass(d.status)}" data-code="${esc(code)}">${esc(code)}</button> ${esc(String(d.title || '').replace(/^\d{6}/, ''))}${extra || ''}</span></li>`; };
   function tagIndex() {
     const by = {}; (D.tags || []).forEach(t => (by[t.类] = by[t.类] || []).push(t));
     $('#app').innerHTML = `<section class="hero"><div><div class="eyebrow">机制标签 · ${(D.tags || []).length} 个</div><h1>按收益机制顺着找政策</h1>
@@ -308,9 +339,9 @@
     const yrs = [...new Set((D.lib || []).map(r => r[4].slice(0, 4)).filter(y => /^\d{4}$/.test(y)))].sort().reverse();
     const N = +(P.get('n') || 120);
     $('#app').innerHTML = `<section class="hero"><div><div class="eyebrow"><a href="#/policy">政策</a> · 列表 · ${(D.lib || []).length} 件</div><h1>按省份、类别、状态、机制找政策</h1>
-      <p class="lede">筛选条件写在地址里，可直接分享。点编号打开简析卡；没写简析的件显示题名、状态与文件脉络。</p></div></section>
+      <p class="lede">筛选条件写在地址里，可直接分享。点击政策名称或圆点，查看简述、状态与文件关联。</p></div></section>
       <section class="card"><div class="facets">${opt('prov', uniq(5).sort((a, b) => a.localeCompare(b, 'zh')), '省份')}${opt('cat', uniq(6).sort((a, b) => a.localeCompare(b, 'zh')), '分类')}${opt('st', ['施行中', '征求稿', '已替代', '已废止', '参考'], '状态')}${opt('tag', (D.tags || []).map(t => t.标签), '机制标签')}${opt('yr', yrs, '年份')}
-        <label class="fc grow"><span>关键词</span><input data-f="q" value="${esc(f.q)}" placeholder="题名、文号或编号"></label></div>
+        <label class="fc grow"><span>关键词</span><input data-f="q" value="${esc(f.q)}" placeholder="政策名称或文号"></label></div>
         <div class="sub" style="margin:10px 0">${f.yr && f.yr.length > 4 ? esc(f.yr) + ' · ' : ''}${rows.length} 件${Object.values(f).some(Boolean) ? ` · <a href="#/lib">清除筛选</a>` : ''}</div>
         <div class="bcards">${rows.slice(0, N).map(r => { const b = briefOf(r[0]); return b ? briefCard(b) : `<button type="button" class="bcard" data-code="${esc(r[0])}" aria-haspopup="dialog"><span class="meta"><span>${esc(r[2] || r[0])}</span><span>${esc(r[4])}</span></span><span class="ttl">${esc(r[1].replace(/^\d{6}/, ''))}</span><span class="chips"><span class="st ${statusClass(r[3])}">${esc(STG(r[3]))}</span>${r[5] ? `<span class="chip">${esc(r[5])}</span>` : ''}${impDots(r[7])}${(TM[r[0]] || []).slice(0, 3).map(k => `<span class="chip tier">${esc(k)}</span>`).join('')}</span></button>`; }).join('')}</div>
         ${rows.length > N ? `<button type="button" class="dim" id="libMore" style="margin-top:10px">再显示 ${Math.min(240, rows.length - N)} 件</button>` : ''}</section>`;
@@ -321,13 +352,13 @@
 
   function researchPage(qs) {
     const q = new URLSearchParams(qs || '').get('q') || '';
-    const rows = (D.research || []).filter(r => !q || (r.title + r.publisher + r.code).includes(q));
-    $('#app').innerHTML = `<section class="hero"><div><div class="eyebrow">研报与资料</div><h1>研究资料索引</h1><p class="lede">研报、论文、标准信息与官方统计单列；不作为全国政策，不把研究观点当政策规定。这里只显示资料索引。</p></div></section>
-      <section class="card"><label class="fc">关键词<input id="researchQ" placeholder="题名、机构或编号" value="${esc(q)}"></label><p class="sub">${rows.length} 件研究资料</p><div class="bcards">${rows.slice(0, 150).map(r => `<button class="bcard" data-code="${esc(r.code)}"><span class="meta">${esc(r.publisher)} · ${esc(r.date)}</span><span class="ttl">${esc(r.title)}</span><span class="chip">研究资料 · ${esc(r.code)}</span></button>`).join('')}</div></section>`;
+    const rows = (D.research || []).filter(r => !q || (r.title + r.publisher + r.code + (r.topic || '')).includes(q));
+    $('#app').innerHTML = `<section class="hero"><div><div class="eyebrow">研报与资料</div><h1>研究资料索引</h1><p class="lede">研报、论文、标准信息与官方统计单列；不作为全国政策，不把研究观点当政策规定。点击资料查看摘要和适用边界。</p></div></section>
+      <section class="card"><label class="fc">关键词<input id="researchQ" placeholder="题名、机构或编号" value="${esc(q)}"></label><p class="sub">${rows.length} 件研究资料</p><div class="bcards">${rows.slice(0, 150).map(r => `<button class="bcard" data-code="${esc(r.code)}"><span class="meta">${esc(r.publisher)} · ${esc(r.date)}</span><span class="ttl">${esc(r.title)}</span>${r.summary ? `<p class="policy-summary">${esc(r.summary)}</p>` : ''}<span class="chip">${esc(r.topic || r.type || '研究资料')}</span></button>`).join('')}</div></section>`;
     $('#researchQ').onchange = e => { location.hash = '#/research?q=' + encodeURIComponent(e.target.value.trim()); };
   }
   function learningPage() {
-    $('#app').innerHTML = `<section class="hero"><div><div class="eyebrow">政策学习</div><h1>学习主题与政策索引</h1><p class="lede">按学习主题汇集已收录政策，随政策状态和主题索引更新。点击编号查看政策简述与已提供的详细分析。</p></div></section>
+    $('#app').innerHTML = `<section class="hero"><div><div class="eyebrow">政策学习</div><h1>学习主题与政策索引</h1><p class="lede">按学习主题汇集已收录政策，随政策状态和主题索引更新。点击圆点查看政策简述与分析。</p></div></section>
       <div class="mech">${(D.learning || []).map(t => `<section class="card"><h2>${esc(t.title)}</h2><p class="sub">${t.codes.length} 件相关政策 · 按发文日倒序</p><ul class="evl">${t.codes.slice(0, 8).map(code => docRow(code)).join('')}</ul>${t.codes.length > 8 ? `<details><summary>查看其余 ${t.codes.length - 8} 件</summary><ul class="evl">${t.codes.slice(8).map(code => docRow(code)).join('')}</ul></details>` : ''}</section>`).join('')}</div>`;
   }
   // ---------- 首页（研究线首页文案 v1）：主张、家底数字、常问问题、收益机制速览、近期新政策、怎么读本站；数字构建时实时算 ----------
@@ -372,7 +403,7 @@
       <section style="margin-top:20px"><h2 style="margin-bottom:12px">收益机制速览</h2><div class="mech">${MECH.map(([t, item, tg, txt]) => `<a class="mc" id="mc-${esc(t)}" href="#/tag/${encodeURIComponent(tg[0])}"><div class="mh"><b>${esc(t)}</b><span class="chip tier">${esc(item)}</span></div><p>${esc(txt)}</p><small>${MECH_COUNT[t] ? MECH_COUNT[t]() : `已有规定的省份 <b class="mono">${provCount(tg)}</b>`}</small></a>`).join('')}</div>
         <p class="note" style="margin-top:6px">省份数取自分省参数表现值（冀北并入河北、蒙西蒙东计为内蒙古）。容量租赁「有租赁规则」须同时满足：挂省级政策文件编号；该句讲租赁本身（是否允许、价格、期限、交易或登记方式）；该句不是拟议、研究、「未设」或禁止类表述。</p></section>
       ${eventsHTML()}
-      <section class="card" style="margin-top:20px"><h2>怎么读本站</h2><p class="lede" style="max-width:none">先看<b>收益机制速览</b>，弄清储能靠哪几项挣钱、哪些是成本；再进<b>省份页</b>看这个省每一项的现状和出处；要核原文，点任意【编号】弹出政策简析，展开依据即见原句与页码。</p></section>`;
+      <section class="card" style="margin-top:20px"><h2>怎么读本站</h2><p class="lede" style="max-width:none">先看<b>收益机制速览</b>，弄清储能靠哪几项挣钱、哪些是成本；再进<b>省份页</b>看这个省每一项的现状和出处；要核原文，点状态圆点查看政策简述与关联，展开依据查看原句与页码。</p></section>`;
   }
   // ---------- 专题页（研究线对外版正文＋自动拼：分省对照表、相关政策）：【编号】开简析卡，「方法卡 Mxx」链方法库 ----------
   function inlineMD(t) {
@@ -409,11 +440,11 @@
     $('#app').innerHTML = `<section class="hero"><div><div class="eyebrow"><a href="#/topics">专题</a></div><h1>${esc(t.题 || name)}</h1></div></section>
       <section class="card mapcard" style="margin-bottom:18px"><div id="tmap"></div></section>
       <article class="card prose-topic">${LOCKED() ? `<a href="#/analysis/topic/${encodeURIComponent(name)}">专题分析与开发判断 · 输入口令查看</a>` : mdHTML(t.md)}</article>
-      <section class="card" style="margin-top:18px"><h2>分省对照 <small class="note" style="display:inline">${subs.length} 行 · ${esc(t.sheet)}，随库更新</small></h2>
-        <div class="sub">每格只给结论句；点编号看依据文件。「—」为本站未采集，不等于该省无规定。</div>
+      <section class="card" style="margin-top:18px"><h2>分省对照 <small class="note" style="display:inline">${subs.length} 行 · 按政策更新</small></h2>
+        <div class="sub">每格只给结论句；点圆点看依据文件。「—」为本站未采集，不等于该省无规定。</div>
         <div class="tbl topic-tbl"><table><thead><tr><th>省份</th>${t.cols.map(([, h]) => `<th>${esc(h)}</th>`).join('')}</tr></thead>
         <tbody>${subs.map(p => `<tr><th>${PROVS.includes(base(p)) ? `<a href="#/p/${encodeURIComponent(base(p))}">${esc(p)}</a>` : esc(p)}</th>${t.cols.map(([m]) => `<td>${t.rows[p][m] ? citeHTML(clean(t.rows[p][m]).replace(/^【结论】\s*/, '')) : '<span class="note">—</span>'}</td>`).join('')}</tr>`).join('')}</tbody></table></div></section>
-      ${rel.length ? `<section class="card" style="margin-top:18px"><h2>相关政策 <small class="note" style="display:inline">机制标签「${esc(TOPIC_TAGS(name).length > 1 ? '容量、现货、辅助服务、成本、准入各类' : name)}」主标签 ${v.主.length} 件，列最近 ${rel.length} 件</small></h2><ul class="evl">${rel.map(c => docRow(c)).join('')}</ul>${TOPIC_TAGS(name).length === 1 ? `<p class="sub"><a href="#/lib?tag=${encodeURIComponent(name)}">在政策库里筛选全部 →</a></p>` : ''}</section>` : ''}`;
+      ${rel.length ? `<section class="card" style="margin-top:18px"><h2>相关政策 <small class="note" style="display:inline">${v.主.length} 件，显示最近 ${rel.length} 件</small></h2><ul class="evl">${rel.map(c => docRow(c)).join('')}</ul>${TOPIC_TAGS(name).length === 1 ? `<p class="sub"><a href="#/lib?tag=${encodeURIComponent(name)}">在政策库里筛选全部 →</a></p>` : ''}</section>` : ''}`;
     wireTopicMap(name, 'comp');
     if (name === '储能') $('#tmap').closest('section').insertAdjacentHTML('afterend', landingHTML('ZCGJ03'));
     if (focus && TILES[focus]) openPanel(provTopicCard(name, focus));
@@ -453,7 +484,7 @@
         <a class="mc" href="#/policy/prov"><div class="mh"><b>按省份</b></div><p>31 省网格，看每省件数和最近更新。</p></a>
         <a class="mc" href="#/topics"><div class="mh"><b>按专题</b></div><p>${(D.topics || []).map(t => esc(t.名)).join('、')}。</p></a>
         <a class="mc" href="#/policy/time"><div class="mh"><b>按时间</b></div><p>近 24 个月每月发文件数，点月份看当月政策。</p></a>
-        <form class="mc" id="psearch"><div class="mh"><b>直接搜索</b></div><input name="q" placeholder="题名、文号或编号" aria-label="搜索政策"><button class="dim on" type="submit">搜索</button></form></div></section>`;
+        <form class="mc" id="psearch"><div class="mh"><b>直接搜索</b></div><input name="q" placeholder="政策名称或文号" aria-label="搜索政策"><button class="dim on" type="submit">搜索</button></form></div></section>`;
     $('#pTiles').onclick = e => { const t = e.target.closest('[data-tp]'); if (t) location.hash = '#/policy/' + (sel === t.dataset.tp ? '' : encodeURIComponent(t.dataset.tp)); };
     $('#psearch').onsubmit = ev => { ev.preventDefault(); const v = ev.target.q.value.trim(); location.hash = '#/lib' + (v ? '?q=' + encodeURIComponent(v) : ''); };
   }
@@ -603,7 +634,7 @@
       <section class="hero"><div><div class="eyebrow">电网侧独立储能 · 收益来源全景</div>
         <h1>一座独立储能电站，政策上能从哪几处拿收益</h1>
         <p class="lede">逐省列出容量电价（补偿）、容量租赁、现货与调频四类收益来源的政策规定，以及充电要承担哪些费用。只讲文件怎么规定、是否生效，不做收益测算。<b>容量电价与容量租赁是同一块容量，只能二选一</b>（多省明文；其余省测算也按此处理）。</p></div></section>
-      <section class="card"><h2>逐省政策一览</h2><div class="sub">悬停编号看依据文件与当前状态；点省名看完整看板。「未采集」不等于该省没有规定。</div>
+      <section class="card"><h2>逐省政策一览</h2><div class="sub">悬停圆点看依据文件与当前状态；点省名看完整看板。「未采集」不等于该省没有规定。</div>
         <div class="tablewrap"><table class="t rev"><thead><tr><th>省份</th><th>容量电价／补偿</th><th>4h 按政策折算<br><small>元/kW·年</small></th><th>清单制</th><th>容量租赁</th><th>现货市场</th><th>调频</th><th>充电费用</th></tr></thead>
         <tbody>${rows.map(p => `<tr><td><a href="#/p/${encodeURIComponent(p)}">${esc(p)}</a></td>
           <td>${esc(capLine(p))} <span class="st ${statusClass(first1(p, '⑧c8'))}">${esc(capPolicy(p) === '征求意见稿' ? '征求稿' : capPolicy(p) === '已出台' ? (effDate(p) ? effDate(p) + ' 起' : '现行') : '—')}</span>${/^格内无编号/.test(sourcesOf(p, '⑧c4')) ? '' : `<div>${citeHTML(sourcesOf(p, '⑧c4'))}</div>`}</td>
@@ -1102,7 +1133,7 @@
   }
   function start(d) {
     D = d;
-    $('#ver').textContent = `数据：库 ${d.meta.version} · ${d.meta.exported}`;
+    $('#ver').textContent = `更新 ${d.meta.exported.slice(0,10)}`;
     if (!d.meta.public) { const nav = document.querySelector('.nav');  }
     if (d.score) document.querySelector('.nav').insertAdjacentHTML('beforeend', '<a href="#/score" data-nav="score">投资分级</a>');
     /* 信息架构 v2：简析与政策库并为「政策」一个入口（#/brief、#/lib 路由保留） */

@@ -4,15 +4,18 @@
   --ok:#1B6B47;--okbg:#E2F2E9;--trial:#136C6C;--trialbg:#DDF1F1;--draft:#8A5300;--draftbg:#FFF0D3;
   --stale:#5C6370;--stalebg:#ECEDEF;--bad:#A8251B;--badbg:#FBE5E2;--ref:#1F4FBF;--refbg:#E6EDFF;
   --s0:#EEF1F7;--s1:#CBD5EC;--s2:#97AAD7;--s3:#5B78BD;--s4:#2F4B8A;
-  --r:12px;
+  --r:12px;--page-width:1320px;--gutter:32px;
 }
 *{box-sizing:border-box}
 .policy-summary{font-size:12.5px;color:var(--mute);line-height:1.7;margin:5px 0 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.external-site .cite-dot{display:inline-block;width:12px;height:12px;min-width:12px;padding:0;border:0;border-radius:50%;font-size:0;vertical-align:middle;margin:0 6px 0 0;background:var(--stale);cursor:pointer}
+.external-site .cite-dot.ok{background:var(--ok)}.external-site .cite-dot.trial{background:var(--trial)}.external-site .cite-dot.draft{background:var(--draft)}.external-site .cite-dot.ref{background:var(--ref)}.external-site .cite-dot.bad{background:var(--bad)}
+.external-site .cite-dot:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 html,body{margin:0;background:var(--ground);color:var(--ink);font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;font-size:15px;line-height:1.65}
 a{color:var(--accent)}a:hover{color:#1E3366}
 h1,h2,h3{font-family:"Noto Serif SC","Songti SC",serif;font-weight:700;margin:0;line-height:1.3}
 .mono{font-family:"IBM Plex Mono",Menlo,monospace}
-.top{position:sticky;top:0;z-index:10;display:flex;flex-wrap:wrap;align-items:center;gap:12px 28px;padding:12px 32px;background:rgba(245,244,239,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.top{position:sticky;top:0;z-index:10;display:flex;flex-wrap:wrap;align-items:center;gap:12px 28px;padding:12px max(var(--gutter),calc((100% - var(--page-width))/2 + var(--gutter)));background:rgba(245,244,239,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
 .brand{font-family:"Noto Serif SC",serif;font-weight:700;font-size:19px;color:var(--ink);text-decoration:none;letter-spacing:.04em}
 .nav{display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px}
 .nav a{text-decoration:none;color:var(--ink2);padding:6px 2px;border-bottom:2px solid transparent}
@@ -21,7 +24,7 @@ h1,h2,h3{font-family:"Noto Serif SC","Songti SC",serif;font-weight:700;margin:0;
 select,button{font:inherit}
 select{padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
 .ver{margin-left:auto;font-size:13px;color:var(--mute)}
-main{max-width:1320px;margin:0 auto;padding:28px 32px 48px}
+main{max-width:var(--page-width);margin:0 auto;padding:28px var(--gutter) 48px}
 .foot{max-width:1320px;margin:0 auto;padding:16px 32px 40px;font-size:13px;color:var(--mute);border-top:1px solid var(--line)}
 .eyebrow{font-size:13px;letter-spacing:.12em;color:var(--mute)}
 .lede{color:var(--ink2);max-width:860px;margin:10px 0 0}
@@ -122,7 +125,7 @@ table.t tr.grp td{background:#FAF9F5;font-weight:600;font-size:13.5px;padding-to
 @media (max-width:900px){.cgrid{grid-template-columns:1fr}}
 .cite.trial{background:var(--trialbg);color:var(--trial)}.cite.bad{background:var(--badbg);color:var(--bad)}
 .evgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:10px}.evgrid h3{font-size:14px;color:var(--ink2);margin-bottom:6px}
-.evl{list-style:none;padding:0;margin:0}.evl li{display:grid;grid-template-columns:3.4em 4.6em minmax(0,1fr);gap:8px;padding:5px 0;border-bottom:1px solid #F0EEE8;font-size:13.5px;align-items:baseline}
+.evl{list-style:none;padding:0;margin:0}.evl li{display:grid;grid-template-columns:6.2em 4.5em minmax(0,1fr);gap:12px;padding:10px 0;border-bottom:1px solid #F0EEE8;font-size:13.5px;align-items:baseline}.evl .mono{white-space:nowrap}.evl li>span{min-width:0}
 .evl .pv{color:var(--mute);font-size:12.5px}
 @media (max-width:900px){.evgrid{grid-template-columns:1fr}}
 .sbar{display:inline-block;width:46px;height:6px;background:var(--soft);border-radius:3px;margin-left:6px;vertical-align:middle;overflow:hidden}.sbar i{display:block;height:100%;background:var(--accent)}
@@ -255,7 +258,7 @@ table.t tr.grp td{background:#FAF9F5;font-weight:600;font-size:13.5px;padding-to
 .fc input{padding:6px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--surface);color:var(--ink)}
 @media (max-width:640px){.front-hero h1{font-size:28px}}
 /* 专题页 */
-.prose-topic{max-width:900px;line-height:1.85}.prose-topic h3{font-size:20px;margin:22px 0 8px}.prose-topic h3:first-child{margin-top:0}.prose-topic h4{font-size:16px;margin:16px 0 6px}
+.prose-topic{line-height:1.85}.prose-topic h3{font-size:20px;margin:22px 0 8px}.prose-topic h3:first-child{margin-top:0}.prose-topic h4{font-size:16px;margin:16px 0 6px}
 .prose-topic p{margin:8px 0}.prose-topic ul,.prose-topic ol{padding-left:1.3em;margin:8px 0;display:grid;gap:4px}
 .prose-topic table,.topic-tbl table{border-collapse:collapse;font-size:13.5px;width:100%}.prose-topic th,.prose-topic td,.topic-tbl th,.topic-tbl td{border-bottom:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
 .topic-tbl{overflow-x:auto;max-height:70vh;overflow-y:auto}.topic-tbl table{min-width:1200px}.topic-tbl thead th{position:sticky;top:0;background:var(--surface);font-size:12px;color:var(--mute);z-index:1}
@@ -287,3 +290,7 @@ table.t tr.grp td{background:#FAF9F5;font-weight:600;font-size:13.5px;padding-to
 .lgrid{display:grid;gap:6px;margin-top:10px}.lrow{display:grid;grid-template-columns:4em minmax(120px,1fr) 4.5em auto minmax(0,1.4fr);gap:8px;align-items:center;font-size:13px}
 .ltrack{height:10px;background:var(--soft);border-radius:5px;overflow:hidden}.lfill{height:100%;border-radius:5px}.lrow .lt{color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (max-width:640px){.lrow{grid-template-columns:3.5em 1fr 4em}.lrow .cite,.lrow .lt{display:none}}
+
+/* 列表在窄屏保留日期和引用入口，政策名称独占下一行。 */
+@media (max-width:640px){:root{--gutter:16px}.evl li{grid-template-columns:6.2em minmax(0,1fr);gap:4px 12px}.evl li>span:last-child{grid-column:1/-1}.external-site .lrow .cite{display:inline-block}.card{padding:18px 16px}}
+@media (max-width:640px){.top{gap:6px;padding-top:10px;padding-bottom:10px}.top .nav{flex-wrap:nowrap;overflow-x:auto;max-width:100%;gap:14px;padding-bottom:3px;scrollbar-width:thin}.top .nav>*{flex-shrink:0;white-space:nowrap}}
