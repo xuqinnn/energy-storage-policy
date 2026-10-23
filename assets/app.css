@@ -294,3 +294,6 @@ table.t tr.grp td{background:#FAF9F5;font-weight:600;font-size:13.5px;padding-to
 /* 列表在窄屏保留日期和引用入口，政策名称独占下一行。 */
 @media (max-width:640px){:root{--gutter:16px}.evl li{grid-template-columns:6.2em minmax(0,1fr);gap:4px 12px}.evl li>span:last-child{grid-column:1/-1}.external-site .lrow .cite{display:inline-block}.card{padding:18px 16px}}
 @media (max-width:640px){.top{gap:6px;padding-top:10px;padding-bottom:10px}.top .nav{flex-wrap:nowrap;overflow-x:auto;max-width:100%;gap:14px;padding-bottom:3px;scrollbar-width:thin}.top .nav>*{flex-shrink:0;white-space:nowrap}}
+
+/* C1: public synthetic tool */
+.synthetic-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:18px;margin:18px 0}.synthetic-grid label{display:grid;gap:6px}.synthetic-grid input,.synthetic-grid select{font:inherit;padding:9px;border:1px solid var(--line);border-radius:7px;min-width:0}#synthetic-result{display:block;margin:20px 0}#synthetic-result .kpi{display:flex;gap:18px;align-items:baseline;flex-wrap:wrap}

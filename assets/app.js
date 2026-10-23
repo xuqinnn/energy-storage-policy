@@ -7,7 +7,7 @@
   const $ = (s, el = document) => el.querySelector(s);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-  const externalSite = () => D?.meta?.access === 'section-password' && !window.__YC_DATA__;
+  const externalSite = () => !!D?.meta?.public;
   function polishPublicLabels() {
     if (!D) return;
     document.body.classList.toggle('external-site', externalSite());
@@ -134,8 +134,6 @@
     ramp: { group: '风险', label: '补偿退坡风险', cat: rampOf, order: ['高', '中高', '中', '中低', '低', '待定', '无补偿·不适用', '未采集', '待核'], note: '现行容量补偿标准下调或并轨的风险' }
   };
   const PUB = () => !!(D && D.meta && D.meta.public);     // 对外版：不含投资分级、收益测算金额与内部信息（用户 10-14）
-  const LOCKED = () => D?.meta?.access === 'section-password' && !D.meta.restrictedUnlocked;
-  const protectedLink = (p, text) => `<a class="dim" href="#/dev/${encodeURIComponent(p)}">${esc(text)} · 输入口令查看</a>`;
   const MET = () => PUB() ? Object.fromEntries(Object.entries(METRICS).filter(([k]) => k !== 'grade' && (k !== 'pgrade' || D.score))) : Object.fromEntries(Object.entries(METRICS).filter(([k]) => k !== 'pgrade' || D.score));
   const PAL = ['#2F4B8A', '#5B78BD', '#97AAD7', '#CBD5EC', '#E9C46A', '#EFE3CF', '#CBCED4', '#EFEDE6', '#EFEDE6'];
   const FIXED = { '第一档': '#2F4B8A', '第二档': '#97AAD7', '第三档': '#EFE3CF', '征求意见稿': '#E9C46A', '清单制·征求稿': '#E9C46A', '谨慎开发': '#EFE3CF', '高': '#C9553F', '中高': '#E39A7E', '中': '#EFC9A8', '中低': '#CBD5EC', '低': '#97AAD7' };
@@ -240,9 +238,10 @@
       <div class="chips">${stChip(b && b.状态标签 || d.status)}${sigChip(b)}${b && b.层级 ? `<span class="chip">${esc(b.层级)}级</span>` : ''}${b && (b.档 || b.级别) ? `<span class="chip tier">${esc(b.档 || b.级别 + '件')}</span>` : ''}${(b && b.省份) || d.prov ? `<span class="chip">${esc((b && b.省份) || d.prov)}</span>` : ''}<span class="chip mono">${esc(code)}</span></div>
       <h2 id="bsH">${esc((b && b.标题) || String(d.title || code).replace(/^\d{6}/, ''))}</h2>
       ${d.no || (b && b.文号) ? `<div class="docno">${esc((b && b.文号) || d.no)}</div>` : ''}
-      <div class="dates">${(b && b.发文日期) || d.date ? `<span>成文 <b>${esc((b && b.发文日期) || d.date)}</b></span>${d.published && d.published !== d.date ? `<span>公开 <b>${esc(d.published)}</b></span>` : ''}` : ''}${b && b.生效日期 ? `<span>生效 <b>${esc(b.生效日期)}</b></span>` : ''}</div>
+      <div class="dates">${(b && b.发文日期) || d.date ? `<span>成文 <b>${esc((b && b.发文日期) || d.date)}</b></span>` : ''}${d.published && d.published !== ((b && b.发文日期) || d.date) ? `<span>公开 <b>${esc(d.published)}</b></span>` : ''}${b && b.生效日期 ? `<span>生效 <b>${esc(b.生效日期)}</b></span>` : ''}</div>
       ${sum ? `<p class="summary">${citeHTML(sum)}</p>` : ''}${mainTagsOf(code).length ? `<div class="chips">${mainTagsOf(code).map(tagLink).join('')}</div>` : ''}</div>`;
     const blk = [];
+    if (/^https?:\/\//.test(d.url || '')) blk.push(`<div class="block"><a class="btn" href="${esc(d.url)}" target="_blank" rel="noopener noreferrer" data-source-link>查看官方发布页 ↗</a></div>`);
     if (hitAt) blk.push(`<div class="block hit"><h4>正文提及 · 第 ${esc(hitAt.pg)} 页</h4><p>「${esc(hitAt.s)}」</p></div>`);
     if (b && b.关键数字 && b.关键数字.length) blk.push(`<div class="block"><h4>关键数字</h4><div class="tbl"><table><thead><tr><th>参数</th><th>本件</th><th>前值</th></tr></thead><tbody>${b.关键数字.map(k => `<tr><td>${esc(k.参数)}</td><td class="new">${esc(k.新值)}</td><td class="old">${esc(k.前值)}</td></tr>`).join('')}</tbody></table></div></div>`);
     if (b && Array.isArray(b.影响) && b.影响.length) blk.push(`<div class="block"><h4>影响</h4><div class="impact">${b.影响.map(i => `<div class="irow"><div><div class="who">${esc(i.对象)}</div><div class="item">${esc(i.收益项)}</div></div><span class="dir ${DIRC[i.方向] || 'flat'}">${ARW[i.方向] || ''} ${esc(i.方向)}</span><p class="why">${citeHTML(i.机制)}</p></div>`).join('')}</div><p class="disclaim">${esc(b.影响说明 || '定性判断，不构成投资建议')}。</p></div>`);
@@ -258,7 +257,7 @@
         <p class="cap">${it.filter(e => !e.本件).map(e => `${esc(e.省)} <button type="button" class="cite ${statusClass((D.docs[e.编号] || {}).status)}" data-code="${esc(e.编号)}">${esc(e.编号)}</button> ${esc(e.年月)}${e.备注 ? '，' + esc(e.备注) : ''}`).join('；')}</p></div>`);
     } else if (b && b.横向 && typeof b.横向 === 'string' && b.脉络 && !externalSite()) blk.push(`<div class="block"><h4>横向 · 与他省</h4><p>${citeHTML(b.横向)}</p></div>`);
     if (b && (b.依据 || []).length) blk.push(`<details><summary>依据原文（${b.依据.length} 条）</summary><div class="ev">${b.依据.map(e => `<div><span class="src">${esc(e.编号)} p${esc(e.页)}</span>${esc(e.原句)}</div>`).join('')}</div></details>`);
-    
+
     return head + `<div class="sbody">${blk.join('')}</div>`;
   }
   let bsOpener = null;
@@ -394,11 +393,12 @@
   function front() {
     const st = D.stats || {}, nb = (D.briefs || []).length, nc = Object.keys(D.cards || {}).length, np = Object.keys(D.provinces || {}).length;
     const fig = (n, a, b) => `<div class="fig"><b class="mono">${esc(n)}</b><span>${esc(a)}</span><small>${esc(b)}</small></div>`;
-    $('#app').innerHTML = `<section class="front-hero"><div class="eyebrow">储能与零碳政策研究库</div>
-        <h1>把储能政策拆到条款，<br>把收益算到每千瓦。</h1>
-        <p class="lede">收录国家与 31 省 ${esc(st.docs)} 件政策原文、${esc(st.clauses)} 条条款，五张分省参数表逐格挂出处；每个结论都能点回原文页码。</p>
+    $('#app').innerHTML = `<section class="front-hero"><div class="eyebrow">独立能源研究站 · 免费开放</div>
+        <h1>查明政策条件，<br>复现计算过程。</h1>
+        <p class="lede">${esc(st.docs)} 件政策索引、${esc(st.research)} 份研究资料，结合专题简述与公开来源，帮助核对适用条件。收益工具采用明确标注的合成数据，所有公共页面直接阅读。</p>
         <div class="cta"><a class="btn pri" href="#/policy">进入政策库</a><a class="btn" href="#/rev">收益测算 →</a><a class="btn" href="#/map">按省份查</a></div></section>
-      <section class="figs">${fig(st.docs, '政策文件', '国家·省·区域·市，含状态')}${fig(np, '省份与区域', '31 省，蒙西蒙东、冀北冀南分列')}${fig(st.clauses, '条款', '全文可检索，引用带页码')}${fig(5, '分省参数表', '储能·绿电直连·零碳园区·零碳工厂·虚拟电厂')}${fig(nb, '政策简析', '概述·关键数字·影响·脉络')}${fig(nc, '省份结论', '每条结论附依据与可证伪点')}</section>
+      <section class="card"><h2>从一个实际问题开始</h2><div class="faq"><a href="#/topic/绿电直连">园区想做绿电直连，先核什么？ →</a><a href="#/topic/虚拟电厂">虚拟电厂容量怎样用于入市判断？ →</a><a href="#/topic/零碳园区">规划目标怎样用于项目研究？ →</a></div></section>
+      <section class="figs">${fig(st.docs, '政策文件', '国家·省·区域·市，含状态')}${fig(np, '省份与区域', '31 省，蒙西蒙东、冀北冀南分列')}${fig(st.clauses, '归档条款计数', '原件归档索引，不再分发全文')}${fig(5, '分省参数表', '储能·绿电直连·零碳园区·零碳工厂·虚拟电厂')}${fig(nb, '政策简析', '概述·关键数字·影响·脉络')}${fig(nc, '省份结论', '每条结论附依据与可证伪点')}</section>
       <section class="card" style="margin-top:20px"><h2>常问问题</h2><div class="faq">${FAQ.map(([q, h]) => `<a href="${h}">${esc(q)}<span>→</span></a>`).join('')}</div></section>
       <section style="margin-top:20px"><h2 style="margin-bottom:12px">收益机制速览</h2><div class="mech">${MECH.map(([t, item, tg, txt]) => `<a class="mc" id="mc-${esc(t)}" href="#/tag/${encodeURIComponent(tg[0])}"><div class="mh"><b>${esc(t)}</b><span class="chip tier">${esc(item)}</span></div><p>${esc(txt)}</p><small>${MECH_COUNT[t] ? MECH_COUNT[t]() : `已有规定的省份 <b class="mono">${provCount(tg)}</b>`}</small></a>`).join('')}</div>
         <p class="note" style="margin-top:6px">省份数取自分省参数表现值（冀北并入河北、蒙西蒙东计为内蒙古）。容量租赁「有租赁规则」须同时满足：挂省级政策文件编号；该句讲租赁本身（是否允许、价格、期限、交易或登记方式）；该句不是拟议、研究、「未设」或禁止类表述。</p></section>
@@ -407,7 +407,7 @@
   }
   // ---------- 专题页（研究线对外版正文＋自动拼：分省对照表、相关政策）：【编号】开简析卡，「方法卡 Mxx」链方法库 ----------
   function inlineMD(t) {
-    return citeHTML(t).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/方法卡\s*(M\d{2})/g, (m, id) => PUB() ? '' : `<a href="#/methods/${id}">方法卡 ${id}</a>`);
+    return citeHTML(t).replace(/\[([^\[\]\n]+)\]\((https:\/\/[^\s<>()]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1 ↗</a>').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/方法卡\s*(M\d{2})/g, (m, id) => PUB() ? '' : `<a href="#/methods/${id}">方法卡 ${id}</a>`);
   }
   function mdHTML(md) {
     const out = []; let list = null, para = [], tbl = [];
@@ -434,19 +434,22 @@
   }
   function topicPage(arg) {
     const [name, focus] = String(arg || '').split('/'), t = (D.topics || []).find(x => x.名 === name); if (!t) return topicIndex();
+    const hasMap = Object.keys((D.topicmap || {})[name] || {}).length > 0;
     const base = p => p.split(/[·(（]/)[0], rank = p => /^(国家|全国)/.test(p) ? 0 : PROVS.includes(base(p)) || base(p) === '内蒙古' ? 1 : 2;
     const subs = Object.keys(t.rows).filter(p => !/^研究参考/.test(p)).sort((a, b) => rank(a) - rank(b) || base(a).localeCompare(base(b), 'zh') || a.localeCompare(b, 'zh'));   /* 研究参考行不进对照表 */
     const v = { 主: [...new Set(TOPIC_TAGS(name).flatMap(k => ((D.tagdocs || {})[k] || { 主: [] }).主))] }, rel = v.主.slice().sort((a, b) => String((D.docs[b] || {}).date || '').localeCompare(String((D.docs[a] || {}).date || ''))).slice(0, 40);
     $('#app').innerHTML = `<section class="hero"><div><div class="eyebrow"><a href="#/topics">专题</a></div><h1>${esc(t.题 || name)}</h1></div></section>
-      <section class="card mapcard" style="margin-bottom:18px"><div id="tmap"></div></section>
-      <article class="card prose-topic">${LOCKED() ? `<a href="#/analysis/topic/${encodeURIComponent(name)}">专题分析与开发判断 · 输入口令查看</a>` : mdHTML(t.md)}</article>
+      ${hasMap ? '<section class="card mapcard" style="margin-bottom:18px"><div id="tmap"></div></section>' : ''}
+      <article class="card prose-topic">${mdHTML(t.md)}</article>
       <section class="card" style="margin-top:18px"><h2>分省对照 <small class="note" style="display:inline">${subs.length} 行 · 按政策更新</small></h2>
         <div class="sub">每格只给结论句；点圆点看依据文件。「—」为本站未采集，不等于该省无规定。</div>
         <div class="tbl topic-tbl"><table><thead><tr><th>省份</th>${t.cols.map(([, h]) => `<th>${esc(h)}</th>`).join('')}</tr></thead>
         <tbody>${subs.map(p => `<tr><th>${PROVS.includes(base(p)) ? `<a href="#/p/${encodeURIComponent(base(p))}">${esc(p)}</a>` : esc(p)}</th>${t.cols.map(([m]) => `<td>${t.rows[p][m] ? citeHTML(clean(t.rows[p][m]).replace(/^【结论】\s*/, '')) : '<span class="note">—</span>'}</td>`).join('')}</tr>`).join('')}</tbody></table></div></section>
       ${rel.length ? `<section class="card" style="margin-top:18px"><h2>相关政策 <small class="note" style="display:inline">${v.主.length} 件，显示最近 ${rel.length} 件</small></h2><ul class="evl">${rel.map(c => docRow(c)).join('')}</ul>${TOPIC_TAGS(name).length === 1 ? `<p class="sub"><a href="#/lib?tag=${encodeURIComponent(name)}">在政策库里筛选全部 →</a></p>` : ''}</section>` : ''}`;
-    wireTopicMap(name, 'comp');
-    if (name === '储能') $('#tmap').closest('section').insertAdjacentHTML('afterend', landingHTML('ZCGJ03'));
+    if (hasMap) {
+      wireTopicMap(name, 'comp');
+      if (name === '储能') $('#tmap').closest('section').insertAdjacentHTML('afterend', landingHTML('ZCGJ03'));
+    }
     if (focus && TILES[focus]) openPanel(provTopicCard(name, focus));
   }
   // ---------- 信息架构 v2（研究线 10-16，用户定）：「政策」板块（最新政策看板＋四入口＋列表）、专题地图三图层、省份页反向链接 ----------
@@ -714,6 +717,7 @@
   const rangeOf = (vs, unit = '') => { vs = vs.filter(v => v > 0); if (!vs.length) return ''; const a = Math.round(Math.min(...vs)), b = Math.round(Math.max(...vs)); return (a === b ? `${a}` : `${a}—${b}`) + unit; };
 
   function revenue() {
+    if (D.synthetic_example) return syntheticRevenue();
     if (PUB() && !(D.example && D.example.n >= 2)) return sources();
     // 研究线 10-14：两页统一一个数据源——有示例测算 v2 就全部读它的 4 小时档（容量、租赁、现货、过网成本），⑧只作内部底稿
     if (D.example && D.example.n >= 2) return examplePage({ rev: true });
@@ -848,26 +852,26 @@
       <section class="kpis">
         ${kpi('容量机制', cap != null && cap !== 0 ? `${cap}` : '—', esc(capUnit(p) || '无省级容量补偿或未采集'))}
         ${kpi('折算基准时长', hrs ? hrs + ' h' : '—', '本省最长净负荷高峰持续时长')}
-        ${LOCKED() ? kpi('项目收益参数', '需口令', protectedLink(p, '折算单价与计算器')) : kpi('4 小时实得单价', kw && N(p, '⑧c11') != null ? Math.round(N(p, '⑧c11')) : '—', kw ? `保守口径 ${N(p, '⑧c56') != null ? Math.round(N(p, '⑧c56')) : '—'}（扣厂用电）· 元/kW·年` : '不按千瓦·年计，见下方说明')}
+        ${kpi('4 小时实得单价', kw && N(p, '⑧c11') != null ? Math.round(N(p, '⑧c11')) : '—', kw ? `保守口径 ${N(p, '⑧c56') != null ? Math.round(N(p, '⑧c56')) : '—'}（扣厂用电）· 元/kW·年` : '不按千瓦·年计，见下方说明')}
         ${PUB() ? kpi('容量政策状态', esc(capPolicy(p) === '已出台' ? '已出台' : capPolicy(p) === '征求意见稿' ? '征求稿' : '—'), esc(first1(p, '⑧c8').slice(0, 40))) : kpi('标杆项目容量收益', N(p, '⑧c12') != null ? Math.round(N(p, '⑧c12')).toLocaleString() : '—', `万元/年（200MW/800MWh）· 保守 ${N(p, '⑧c57') != null ? Math.round(N(p, '⑧c57')).toLocaleString() : '—'}`)}
       </section>
       ${cardHTML(p)}
       <section class="card"><h2>容量收益计算器</h2><div class="sub">拖动储能时长，看折算后能拿到多少；容量电价与容量租赁只能二选一${PUB() ? '' : '（JL444）'}。</div>
-        <div class="calc" style="margin-top:14px" id="calc">${LOCKED() ? protectedLink(p, '容量收益测算') : ''}</div></section>
+        <div class="calc" style="margin-top:14px" id="calc"></div></section>
       ${stales.length ? `<div class="warn"><span>⚠</span><span>本省有 ${stales.length} 份依据文件已失效，相关格待跟改：${stales.map(c => `<button type="button" class="cite stale" data-code="${c}">${c}</button>`).join(' ')}</span></div>` : ''}
       <section class="board">
         <div class="card col"><h2>政策 <small>现在怎么规定</small></h2>
           ${item(p, '②c6', '容量补偿')}${item(p, '②c3', '电力现货')}${item(p, '②c4', '调频补偿')}${item(p, '②c9', '充电电费减免')}${item(p, '②c10', '容量租赁')}${item(p, '②c12', '容量电价考核')}
           ${jibei && p === '河北' ? `<div class="todo">河北分冀南、冀北两张网。上面为冀南；冀北容量补偿：${citeHTML(firstSentence((jibei['②c6'] || {}).v || '未采集'))}</div>` : ''}</div>
         <div class="card col"><h2>开发 <small>能不能做、怎么进</small></h2>
-          ${LOCKED() ? protectedLink(p, '开发判断') : (D.dev || {})[p] ? devHTML(p) : `${item(p, '②c17', '清单制')}${item(p, '②c16', '现货报价方式')}${item(p, '⑧c31', '现行标准生效／到期')}${item(p, '⑧c34', '下次调整窗口')}${item(p, '⑧c32', '调整机制')}${item(p, '⑧c33', '历史退坡轨迹')}
+          ${(D.dev || {})[p] ? devHTML(p) : `${item(p, '②c17', '清单制')}${item(p, '②c16', '现货报价方式')}${item(p, '⑧c31', '现行标准生效／到期')}${item(p, '⑧c34', '下次调整窗口')}${item(p, '⑧c32', '调整机制')}${item(p, '⑧c33', '历史退坡轨迹')}
           <div class="todo">申报窗口、门槛与股权锁定期：专题汇编中${PUB() ? '' : '（T623）'}，完成后在此显示。</div>`}</div>
         <div class="card col"><h2>问题 <small>风险与待核</small></h2>
           ${PUB() ? riskFromCard(p) + item(p, '⑧c35', '退坡·并轨风险') + item(p, '⑧c53', '节点价差')
                   : item(p, '⑧c26', '风险与注意事项') + item(p, '⑧c24', '校核结论') + item(p, '⑧c30', '测算局限') + item(p, '⑧c53', '节点价差')}
           ${missingList(p)}</div>
       </section>`;
-    if (!LOCKED()) drawCalc(p);
+    drawCalc(p);
   }
   const DEVK = [['K1', '清单制'], ['K2', '申报窗口'], ['K3', '准入门槛'], ['K4', '建设时限'], ['K5', '股权与投资主体锁定'], ['K6', '调出清单情形'], ['K7', '建设规模指标']];
   function devHTML(p) {       // 开发栏「怎么进」（补厚计划 B1；研究线取证 收件箱/开发栏取证/开发栏取证.jsonl）
@@ -1068,9 +1072,6 @@
   // ---------- 路由 ----------
   function route() {
     const h = decodeURIComponent(location.hash || '#/');
-    if (LOCKED() && (/^#\/(rev|ex|score)(?:$|\?)/.test(h) || /^#\/(dev|analysis)\//.test(h))) {
-      askPass(h); return;
-    }
     if (h.startsWith('#/analysis/')) { location.hash = '#/' + h.slice(11); return; }
     const sec = (h.match(/^#\/([a-z]+)/) || [, 'home'])[1];
     document.querySelectorAll('.nav a').forEach(a => a.classList.toggle('on', a.dataset.nav === sec || (a.dataset.nav === 'tags' && sec === 'tag') || (a.dataset.nav === 'topics' && sec === 'topic') || (a.dataset.nav === 'policy' && ['lib', 'brief'].includes(sec)) || (a.dataset.nav === 'home' && (h === '#/' || h === ''))));
@@ -1080,84 +1081,48 @@
     if (/^#\/research/.test(h)) { researchPage(h.split('?')[1]); return; }
     if (h === '#/learning') { learningPage(); return; }
     $('#provSelect').value = m ? m[1] : '';
-    if (m) { province(m[1]); $('#app').insertAdjacentHTML('beforeend', provTopicsHTML(m[1])); } else if (h === '#/about' && !PUB()) about(); else if (h === '#/rev') revenue(); else if (/^#\/brief/.test(h)) { briefPage(h.split('/')[2]); return; } else if (h === '#/tags') tagIndex(); else if (h === '#/topics') topicIndex(); else if (/^#\/topic\//.test(h)) topicPage(h.slice(8)); else if (h === '#/policy/prov') policyProv(); else if (h === '#/policy/time') policyTime(); else if (/^#\/policy/.test(h)) policyPage(h.split('/')[2]); else if (/^#\/m\//.test(h)) { front(); const el = document.getElementById('mc-' + h.slice(4)); if (el) { el.scrollIntoView({ block: 'center' }); el.classList.add('flash'); } return; } else if (/^#\/lib/.test(h)) libPage(h.split('?')[1]); else if (h === '#/map') home(); else if (/^#\/methods/.test(h) && !PUB()) methodsPage(h.split('/')[2]); else if (/^#\/tag\//.test(h)) tagPage(h.slice(6)); else if (h === '#/ex') { location.replace('#/rev'); return; } /* 用户 10-15 合并：旧链接落到全景页 */ else if (h === '#/score' && D.score) scorePage(); else front();
+    if (m) { province(m[1]); $('#app').insertAdjacentHTML('beforeend', provTopicsHTML(m[1])); } else if (h === '#/about') publicAbout(); else if (h === '#/services') servicesPage(); else if (h === '#/score' && !D.score) publicAbout(); else if (h === '#/rev') revenue(); else if (/^#\/brief/.test(h)) { briefPage(h.split('/')[2]); return; } else if (h === '#/tags') tagIndex(); else if (h === '#/topics') topicIndex(); else if (/^#\/topic\//.test(h)) topicPage(h.slice(8)); else if (h === '#/policy/prov') policyProv(); else if (h === '#/policy/time') policyTime(); else if (/^#\/policy/.test(h)) policyPage(h.split('/')[2]); else if (/^#\/m\//.test(h)) { front(); const el = document.getElementById('mc-' + h.slice(4)); if (el) { el.scrollIntoView({ block: 'center' }); el.classList.add('flash'); } return; } else if (/^#\/lib/.test(h)) libPage(h.split('?')[1]); else if (h === '#/map') home(); else if (/^#\/methods/.test(h) && !PUB()) methodsPage(h.split('/')[2]); else if (/^#\/tag\//.test(h)) tagPage(h.slice(6)); else if (h === '#/ex') { location.replace('#/rev'); return; } /* 用户 10-15 合并：旧链接落到全景页 */ else if (h === '#/score' && D.score) scorePage(); else front();
     scrollTo(0, 0);
   }
-  // ---------- 公开入口＋点击后解锁分析；明文仅公开索引，口令与解密结果只在本页内存 ----------
-  const store = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } },
-                  set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} }, del: k => { try { localStorage.removeItem(k); } catch (e) {} } };
-  const ub64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
-  async function decryptEnc(env, pass) {
-    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pass), 'PBKDF2', false, ['deriveKey']);
-    for (const k of env.keys) {
-      const kek = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: ub64(k.salt), iterations: env.iter, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
-      let dk;
-      try { dk = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: ub64(k.iv) }, kek, ub64(k.wk)); } catch (e) { continue; }   // 不是这把钥匙
-      const key = await crypto.subtle.importKey('raw', dk, 'AES-GCM', false, ['decrypt']);
-      const gz = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: ub64(env.iv) }, key, ub64(env.ct));
-      const txt = await new Response(new Blob([gz]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
-      return JSON.parse(txt);
-    }
-    throw new Error('口令不对或已失效');
+  function syntheticRevenue() {
+    const defaults = D.synthetic_example.inputs;
+    const labels = {hours:'储能时长（小时）',cycles:'年循环次数',efficiency:'往返效率（0—1）',buy:'购电价（元/kWh）',sell:'售电价（元/kWh）',chargeFee:'充电附加费（元/kWh）',capacity:'容量收入（元/kW·年）',rent:'租赁收入（元/kW·年）',fixed:'其他运营成本（元/kW·年）'};
+    $('#app').innerHTML = `<section class="hero"><div class="eyebrow">免费收益工具 · 合成示例</div><h1>先看假设，再看收益</h1><p class="lede">所有默认值均为虚构教学参数，不代表任何省份、企业或真实项目。结果为每千瓦每年的运营差额，未计投资、融资、税费与折旧。</p></section><section class="card"><form id="synthetic-form" class="synthetic-grid">${Object.entries(labels).map(([k,label])=>`<label>${label}<input name="${k}" type="number" step="any" min="0" value="${defaults[k]}" required></label>`).join('')}<label>容量与租赁互斥<select name="mode"><option value="capacity">采用容量收入</option><option value="rent">采用租赁收入</option><option value="none">均不采用</option></select></label><button class="btn pri" type="submit">重新计算</button></form><output id="synthetic-result" aria-live="polite"></output><p class="sub">公式：容量或租赁收入＋[售电价−（购电价＋充电附加费）÷往返效率]×时长×循环−其他运营成本。时长按额定放电能量/功率；购电量按效率回推。同一容量的容量收入与租赁收入不叠加。</p><a href="examples/synthetic.json">下载合成样例</a> · <a href="#/services">有实际问题，可自愿联系咨询</a></section>`;
+    const form=$('#synthetic-form');
+    form.onsubmit=event=>{ event.preventDefault(); const x=Object.fromEntries(new FormData(form)), n=Object.fromEntries(Object.keys(defaults).map(k=>[k,Number(x[k])])), out=$('#synthetic-result');
+      if (!Object.values(n).every(Number.isFinite)||n.efficiency<=0||n.efficiency>1||n.hours<=0||Object.values(n).some(v=>v<0)) {out.textContent='请输入有效非负数，时长大于0、效率大于0且不超过1。';return;}
+      const ancillary=x.mode==='capacity'?n.capacity:x.mode==='rent'?n.rent:0, energy=(n.sell-(n.buy+n.chargeFee)/n.efficiency)*n.hours*n.cycles, net=ancillary+energy-n.fixed;
+      out.dataset.net=net.toFixed(6);out.innerHTML=`<p class="kpi"><b>${net.toFixed(2)} 元/kW·年</b><span>运营差额 · 合成情景</span></p><p>电能量差额 ${energy.toFixed(2)} ＋ 互斥收入 ${ancillary.toFixed(2)} − 其他运营成本 ${n.fixed.toFixed(2)}。</p>`;
+    }; form.requestSubmit();
   }
-  let legacyPass = '', unlockBusy = false;
-  function askPass(target, msg) {
-    $('#app').innerHTML = `<section class="card" style="max-width:460px;margin:40px auto"><h2>请输入访问口令</h2>
-      <div class="sub">${esc(msg || '收益测算、项目收益参数与开发判断需口令。政策和研报索引可直接浏览。')}</div><p class="sub">或联系网站右上方邮箱申领。</p>
-      <form id="pf" style="margin-top:14px;display:flex;gap:8px"><input id="pw" type="password" autocomplete="off" style="flex:1;min-width:0;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font:inherit" aria-label="访问口令"><button class="dim on" type="submit">解锁</button></form><p><a href="#/">返回公开首页</a></p></section>`;
-    if (legacyPass) $('#pw').value = legacyPass;
-    $('#pf').onsubmit = ev => { ev.preventDefault(); const v = $('#pw').value.trim(); if (v && !unlockBusy) openWith(target, v); };
+  function servicesPage() {
+    $('#app').innerHTML=`<section class="hero"><div class="eyebrow">自愿联系 · 公共功能始终免费</div><h1>咨询与定制服务</h1><p class="lede">独立开展研究，不代表原任职企业。阅读、检索和公共工具无需注册或提交联系方式。</p></section><section class="mech">${[['诊断与定制研究','围绕跨省选址、规则变化或项目适用条件，约定问题范围，交付带来源的判断、未知项和讲解。'],['专属研究站搭建','按团队地域、主题和品牌配置资料组织、部署、培训与维护；客户资料独立保管。'],['场景模型与证据包','根据获授权数据整理假设、敏感性、输入输出与政策依据，明确验收范围；实际项目资料不回流公共站。']].map(([t,p])=>`<article class="card"><h2>${t}</h2><p>${p}</p></article>`).join('')}</section><section class="card"><p>有明确问题可自愿联系 <a href="mailto:xuqinnn@163.com">xuqinnn@163.com</a>。根据实际范围约定交付、周期和费用，不承诺审批或投资收益。</p><a href="https://github.com/xuqinnn/energy-storage-policy/issues">反馈问题</a></section>`;
   }
-  async function openWith(target, pass) {
-    unlockBusy = true;
-    try {
-      const response = await fetch('data.enc.json', { cache: 'no-store' });
-      if (!response.ok) throw new Error('密文未取得');
-      const env = await response.json(), privateData = await decryptEnc(env, pass);
-      for (const key of ['example', 'score', 'dev', 'cards']) D[key] = privateData[key];
-      Object.assign(D.metrics, privateData.metrics || {});
-      for (const [province, fields] of Object.entries(privateData.provinces || {})) Object.assign(D.provinces[province] || (D.provinces[province] = {}), fields);
-      for (const topic of D.topics || []) {
-        const analysis = (privateData.topics || {})[topic.名];
-        if (!analysis) continue;
-        topic.md = analysis.md; topic.cols = analysis.cols;
-        for (const [province, fields] of Object.entries(analysis.rows)) Object.assign(topic.rows[province] || (topic.rows[province] = {}), fields);
-      }
-      D.meta.restrictedUnlocked = true; legacyPass = '';
-      document.querySelector('[data-nav="lock"]').hidden = false;
-      route();
-    } catch (e) {
-      legacyPass = '';
-      if (decodeURIComponent(location.hash) === target) askPass(target, '口令不对、已失效或暂时无法读取分析内容，请重试。');
-    } finally { unlockBusy = false; }
+  function publicAbout() {
+    $('#app').innerHTML=`<section class="hero"><div class="eyebrow">开放研究 · 可复现</div><h1>来源、方法与源码</h1><p class="lede">独立能源研究站面向储能、园区能源负责人及独立顾问。公共资料与工具免费无口令；资料状态、适用条件和截至日期以条目为准。</p></section><section class="card"><h2>如何复核</h2><p>先看政策简述与状态，再核引用的原件物理页及适用条件。带“官方发布页”的条目可直接打开一手来源。研究资料只提供元数据和独立摘要，不再分发第三方报告或标准全文。</p><p>收益工具采用合成参数，提供输入与公式，不作为实际项目收益预测。旧项目测算与未完成公开审定的内容不进入当前公共包；页面不以口令或收费解锁。</p><h2>复现与许可</h2><p>前台沿用HTML、CSS、JavaScript与本地ECharts。源码、标准库构建脚本、合成样例和许可范围均在公开仓库；复现无需私有工作簿、个人路径或钥匙串。</p><a href="https://github.com/xuqinnn/energy-storage-policy">查看源码与构建说明 ↗</a> · <a href="ASSETS.json">公开资产清单</a> · <a href="#/services">自愿咨询</a></section>`;
   }
   function start(d) {
+    if (d?.meta?.access !== 'public-free') throw new Error('数据尚未完成公共资产审定');
     D = d;
+    if (d.meta.dataset === 'synthetic') document.querySelector('main').insertAdjacentHTML('beforebegin', '<aside class="card" role="note">纯合成样例：文档、地区和参数均为虚构，无政策效力。</aside>');
     $('#ver').textContent = `更新 ${d.meta.exported.slice(0,10)}`;
     if (!d.meta.public) { const nav = document.querySelector('.nav');  }
     if (d.score) document.querySelector('.nav').insertAdjacentHTML('beforeend', '<a href="#/score" data-nav="score">投资分级</a>');
     /* 信息架构 v2：简析与政策库并为「政策」一个入口（#/brief、#/lib 路由保留） */
     if ((d.topics || []).length) document.querySelector('[data-nav="policy"]').insertAdjacentHTML('afterend', '<a href="#/topics" data-nav="topics">专题</a>');
     if ((d.methods || []).length && !d.meta.public) document.querySelector('.nav').insertAdjacentHTML('beforeend', '<a href="#/methods" data-nav="methods">方法库</a>');
-    if (d.meta.public) { const a = document.querySelector('[data-nav="about"]'); if (a) a.remove(); }   /* 信息架构 v2：方法库、口径与来源只在本地用 */
+    if (d.meta.public) { document.querySelector('.nav').insertAdjacentHTML('beforeend', '<a href="#/services" data-nav="services">咨询与定制</a>'); }   /* 信息架构 v2：方法库、口径与来源只在本地用 */
     if ((d.tags || []).length) document.querySelector('.nav').insertAdjacentHTML('beforeend', '<a href="#/tags" data-nav="tags">机制标签</a>');
     if ((d.research || []).length) document.querySelector('.nav').insertAdjacentHTML('beforeend', '<a href="#/research" data-nav="research">研报与资料</a>');
     if ((d.learning || []).length) document.querySelector('.nav').insertAdjacentHTML('beforeend', '<a href="#/learning" data-nav="learning">政策学习</a>');
-    if (d.meta.public) { const h = document.querySelector('[data-nav="map"]'), r = document.querySelector('[data-nav="rev"]'); if (h) h.textContent = '政策地图'; if (r) r.textContent = '收益来源全景'; document.title = '储能与零碳政策研究库'; }
-    if (d.meta.access === 'section-password') {
-      document.querySelector('[data-nav="rev"]').textContent = '收益测算 · 口令';
-      document.querySelector('.nav').insertAdjacentHTML('beforeend', '<a href="#/score" data-nav="score">分析分级 · 口令</a><button type="button" class="dim" data-nav="lock" hidden>锁定分析</button>');
-      document.querySelector('[data-nav="lock"]').onclick = () => location.reload();
-    }
+    if (d.meta.public) { const h = document.querySelector('[data-nav="map"]'), r = document.querySelector('[data-nav="rev"]'); if (h) h.textContent = '政策地图'; if (r) r.textContent = '收益来源全景'; document.title = '独立能源研究站'; }
     const sel = $('#provSelect');
     sel.innerHTML += PROVS.map(p => `<option value="${esc(p)}">${esc(p)}</option>`).join('');
     sel.onchange = () => { if (sel.value) location.hash = '#/p/' + encodeURIComponent(sel.value); };
     addEventListener('hashchange', route); route();
   }
   if (window.__YC_DATA__) { start(window.__YC_DATA__); return; }   // 内部预览单文件：数据已内嵌，双击即开
-  store.del('yc_k');  // 清除旧版可能持久化的明文口令，新版不存口令。
-  const m = location.hash.match(/^#k=([^&/]+)/);
-  if (m) { legacyPass = decodeURIComponent(m[1]); history.replaceState(null, '', location.pathname + location.search + '#/'); }
+  if (/^#k=/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search + '#/');
   fetch('data/storage.json', { cache: 'no-store' }).then(r => { if (!r.ok) throw new Error('公开快照未取得'); return r.json(); }).then(start)
     .catch(() => { $('#app').innerHTML = '<p>公开资料暂时无法读取，请稍后刷新。</p>'; });
 })();

@@ -1,0 +1,102 @@
+{
+  "meta": {
+    "version": "C1-synthetic",
+    "exported": "2026-10-24",
+    "source": "yc.db 只读快照（⑧储能收益测算、②储能参数对照表）",
+    "public": true,
+    "rules": [
+      "状态位必须显示",
+      "「未采集」不等于「无规定」",
+      "每个数都能回到依据编号与页码"
+    ],
+    "access": "public-free",
+    "protected": [],
+    "project": "独立能源研究站",
+    "dataset": "synthetic"
+  },
+  "metrics": {},
+  "provinces": {
+    "演示地区": {}
+  },
+  "docs": {
+    "ZCDEMO01": {
+      "title": "合成政策展示样例（非真实政策）",
+      "summary": "仅演示检索、状态和简述展示，不构成实际政策规定。",
+      "status": "参考资料",
+      "date": "2026-10-24",
+      "prov": "演示地区",
+      "no": ""
+    }
+  },
+  "events": [
+    {
+      "kind": "新发布",
+      "code": "ZCDEMO01",
+      "date": "2026-10-24",
+      "title": "合成政策展示样例（非真实政策）",
+      "prov": "演示地区",
+      "summary": "虚构展示样例。"
+    }
+  ],
+  "diff": {},
+  "briefs": [],
+  "links": [],
+  "tags": [],
+  "tagdocs": {},
+  "methods": [],
+  "lib": [
+    [
+      "ZCDEMO01",
+      "合成政策展示样例（非真实政策）",
+      "",
+      "参考资料",
+      "2026-10-24",
+      "演示地区",
+      "储能"
+    ]
+  ],
+  "research": [],
+  "learning": [
+    {
+      "title": "合成学习样例",
+      "codes": [
+        "ZCDEMO01"
+      ]
+    }
+  ],
+  "stats": {
+    "docs": 1,
+    "research": 0,
+    "clauses": 0
+  },
+  "mech": [],
+  "topics": [
+    {
+      "名": "储能",
+      "md": "# 合成专题\n仅用于复现前台与教学公式，不代表真实政策或项目。",
+      "cols": [],
+      "rows": {}
+    }
+  ],
+  "topicmap": {},
+  "example": null,
+  "score": null,
+  "dev": {},
+  "cards": {},
+  "synthetic_example": {
+    "kind": "synthetic",
+    "inputs": {
+      "hours": 4,
+      "cycles": 300,
+      "efficiency": 0.85,
+      "buy": 0.3,
+      "sell": 0.6,
+      "chargeFee": 0.05,
+      "capacity": 100,
+      "rent": 80,
+      "fixed": 30
+    },
+    "unit": "元/kW·年",
+    "notice": "虚构教学参数，不对应省份、企业或项目；不计投资融资税费折旧"
+  }
+}

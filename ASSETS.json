@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "project": "独立能源研究站",
+  "rules": "公开可用不等于允许第三方全文再分发；源码、数据和第三方材料分别许可",
+  "assets": [
+    {
+      "paths": [
+        "index.html",
+        "assets/app.js",
+        "assets/app.css",
+        "tools/build.py",
+        "tests/test_public.py"
+      ],
+      "class": "B",
+      "origin": "本项目Git历史可追溯的自有前台及本轮通用实现",
+      "license": "MIT",
+      "decision": "include"
+    },
+    {
+      "paths": [
+        "data/storage.json"
+      ],
+      "class": "A/B",
+      "origin": "此前已公开索引与简述，经本轮已知残差隔离；专题正文仅消费本轮独立审定场景稿。5件旧卡覆盖为限定字段，2件来源按钮尚未确认暂不发布；不读取旧密文。",
+      "license": "见LICENSE-DATA.md，第三方引句按原来源",
+      "decision": "include-reviewed-fields"
+    },
+    {
+      "paths": [
+        "examples/synthetic.json",
+        "synthetic_example"
+      ],
+      "class": "B",
+      "origin": "本轮独立创建的虚构教学输入，无原企业项目值",
+      "license": "CC0-1.0",
+      "decision": "include"
+    },
+    {
+      "paths": [
+        "assets/vendor/echarts.min.js",
+        "assets/vendor/LICENSE",
+        "assets/vendor/NOTICE"
+      ],
+      "class": "A",
+      "origin": "Apache ECharts 5.5.1",
+      "license": "Apache-2.0",
+      "decision": "include-with-notices"
+    },
+    {
+      "paths": [
+        "legacy example/score/dev/cards",
+        "corporate originals",
+        "third-party reports/PDFs",
+        "private workbooks/database",
+        "historical encrypted payload"
+      ],
+      "class": "C/D",
+      "origin": "旧工作库或需进一步逐项审定的材料",
+      "license": "未纳入本包授权",
+      "decision": "exclude; retain local originals"
+    }
+  ]
+}
