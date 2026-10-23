@@ -163,7 +163,7 @@
   function eventsHTML() {      // 本月要事（补厚计划 B2）：即将执行、到期／复查、近 30 天新发布
     const ev = D.events || []; if (!ev.length) return '';
     const t0 = new Date().toISOString().slice(0, 10);
-    const li = e => `<li><span class="mono">${esc((e.date || '').slice(5))}</span><span class="pv">${esc(e.prov || '')}</span><span>${e.kind !== '新发布' ? `<span class="st ${e.kind === '征求截止' ? 'draft' : e.kind === '即将执行' ? 'ok' : 'none'}">${esc(e.kind)}</span> ` : ''}${e.code ? `<button type="button" class="cite ${statusClass(e.status)}" data-code="${esc(e.code)}">${esc(e.code)}</button> ` : ''}${esc(String(e.title || '').replace(/^\d{6}/, '').slice(0, 42))}${e.code && briefOf(e.code) ? ` <button type="button" class="blink" data-code="${esc(e.code)}">简析</button>` : ''}</span></li>`;
+    const li = e => `<li><span class="mono">${esc((e.date || '').slice(5))}</span><span class="pv">${esc(e.prov || '')}</span><span>${e.kind !== '新发布' ? `<span class="st ${e.kind === '征求截止' ? 'draft' : e.kind === '即将执行' ? 'ok' : 'none'}">${esc(e.kind)}</span> ` : ''}${e.code ? `<button type="button" class="cite ${statusClass(e.status)}" data-code="${esc(e.code)}">${esc(e.code)}</button> ` : ''}${esc(String(e.title || '').replace(/^\d{6}/, '').slice(0, 42))}${e.code && briefOf(e.code) ? ` <button type="button" class="blink" data-code="${esc(e.code)}">简析</button>` : ''}${(D.docs[e.code] || {}).summary ? `<p class="policy-summary">${esc(D.docs[e.code].summary)}</p>` : ''}</span></li>`;
     const up = ev.filter(e => e.kind !== '新发布' && e.date >= t0).slice(0, 10);
     const nw = ev.filter(e => e.kind === '新发布').sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.landed || '').localeCompare(a.landed || ''));   /* 按发文日倒序（原按收录时间排，日期看着乱） */
     const cats = [...new Set(nw.map(e => e.cat).filter(Boolean))];
@@ -204,7 +204,7 @@
   function stChip(st) { return st ? `<span class="st ${statusClass(st)}">${esc(st)}</span>` : ''; }
   function sheetHTML(code, hitAt) {
     const d = D.docs[code] || {}, b = briefOf(code), ml = chainOf(code, b);
-    const sum = b ? (b.概述 || b.一句话 || '') : '';
+    const sum = b ? (b.概述 || b.一句话 || d.summary || '') : (d.summary || '');
     const head = `<div class="shead"><button type="button" class="close" id="bsClose" aria-label="关闭">×</button>
       <div class="chips">${stChip(b && b.状态标签 || d.status)}${sigChip(b)}${b && b.层级 ? `<span class="chip">${esc(b.层级)}级</span>` : ''}${b && (b.档 || b.级别) ? `<span class="chip tier">${esc(b.档 || b.级别 + '件')}</span>` : ''}${(b && b.省份) || d.prov ? `<span class="chip">${esc((b && b.省份) || d.prov)}</span>` : ''}<span class="chip mono">${esc(code)}</span></div>
       <h2 id="bsH">${esc((b && b.标题) || String(d.title || code).replace(/^\d{6}/, ''))}</h2>
@@ -227,7 +227,7 @@
         <p class="cap">${it.filter(e => !e.本件).map(e => `${esc(e.省)} <button type="button" class="cite ${statusClass((D.docs[e.编号] || {}).status)}" data-code="${esc(e.编号)}">${esc(e.编号)}</button> ${esc(e.年月)}${e.备注 ? '，' + esc(e.备注) : ''}`).join('；')}</p></div>`);
     } else if (b && b.横向 && typeof b.横向 === 'string' && b.脉络) blk.push(`<div class="block"><h4>横向 · 与他省</h4><p>${citeHTML(b.横向)}</p></div>`);
     if (b && (b.依据 || []).length) blk.push(`<details><summary>依据原文（${b.依据.length} 条）</summary><div class="ev">${b.依据.map(e => `<div><span class="src">${esc(e.编号)} p${esc(e.页)}</span>${esc(e.原句)}</div>`).join('')}</div></details>`);
-    if (!b) blk.push(`<p class="cap">本件暂未写简析${ml.length ? '，上面是与本件相关的文件脉络' : ''}。</p>`);
+    if (!b) blk.push(`<p class="cap">${d.summary ? '以上为政策简述，详细比较分析尚未提供' : '本件暂未提供简述与详细分析'}${ml.length ? '；另列相关文件脉络' : ''}。</p>`);
     return head + `<div class="sbody">${blk.join('')}</div>`;
   }
   let bsOpener = null;
@@ -325,6 +325,10 @@
     $('#app').innerHTML = `<section class="hero"><div><div class="eyebrow">研报与资料</div><h1>研究资料索引</h1><p class="lede">研报、论文、标准信息与官方统计单列；不作为全国政策，不把研究观点当政策规定。这里只显示资料索引。</p></div></section>
       <section class="card"><label class="fc">关键词<input id="researchQ" placeholder="题名、机构或编号" value="${esc(q)}"></label><p class="sub">${rows.length} 件研究资料</p><div class="bcards">${rows.slice(0, 150).map(r => `<button class="bcard" data-code="${esc(r.code)}"><span class="meta">${esc(r.publisher)} · ${esc(r.date)}</span><span class="ttl">${esc(r.title)}</span><span class="chip">研究资料 · ${esc(r.code)}</span></button>`).join('')}</div></section>`;
     $('#researchQ').onchange = e => { location.hash = '#/research?q=' + encodeURIComponent(e.target.value.trim()); };
+  }
+  function learningPage() {
+    $('#app').innerHTML = `<section class="hero"><div><div class="eyebrow">政策学习</div><h1>学习主题与政策索引</h1><p class="lede">按学习主题汇集已收录政策，随政策状态和主题索引更新。点击编号查看政策简述与已提供的详细分析。</p></div></section>
+      <div class="mech">${(D.learning || []).map(t => `<section class="card"><h2>${esc(t.title)}</h2><p class="sub">${t.codes.length} 件相关政策 · 按发文日倒序</p><ul class="evl">${t.codes.slice(0, 8).map(code => docRow(code)).join('')}</ul>${t.codes.length > 8 ? `<details><summary>查看其余 ${t.codes.length - 8} 件</summary><ul class="evl">${t.codes.slice(8).map(code => docRow(code)).join('')}</ul></details>` : ''}</section>`).join('')}</div>`;
   }
   // ---------- 首页（研究线首页文案 v1）：主张、家底数字、常问问题、收益机制速览、近期新政策、怎么读本站；数字构建时实时算 ----------
   const MECH = [
@@ -1043,6 +1047,7 @@
     const dev = h.match(/^#\/dev\/(.+)$/);
     if (dev) { province(dev[1]); return; }
     if (/^#\/research/.test(h)) { researchPage(h.split('?')[1]); return; }
+    if (h === '#/learning') { learningPage(); return; }
     $('#provSelect').value = m ? m[1] : '';
     if (m) { province(m[1]); $('#app').insertAdjacentHTML('beforeend', provTopicsHTML(m[1])); } else if (h === '#/about' && !PUB()) about(); else if (h === '#/rev') revenue(); else if (/^#\/brief/.test(h)) { briefPage(h.split('/')[2]); return; } else if (h === '#/tags') tagIndex(); else if (h === '#/topics') topicIndex(); else if (/^#\/topic\//.test(h)) topicPage(h.slice(8)); else if (h === '#/policy/prov') policyProv(); else if (h === '#/policy/time') policyTime(); else if (/^#\/policy/.test(h)) policyPage(h.split('/')[2]); else if (/^#\/m\//.test(h)) { front(); const el = document.getElementById('mc-' + h.slice(4)); if (el) { el.scrollIntoView({ block: 'center' }); el.classList.add('flash'); } return; } else if (/^#\/lib/.test(h)) libPage(h.split('?')[1]); else if (h === '#/map') home(); else if (/^#\/methods/.test(h) && !PUB()) methodsPage(h.split('/')[2]); else if (/^#\/tag\//.test(h)) tagPage(h.slice(6)); else if (h === '#/ex') { location.replace('#/rev'); return; } /* 用户 10-15 合并：旧链接落到全景页 */ else if (h === '#/score' && D.score) scorePage(); else front();
     scrollTo(0, 0);
@@ -1067,7 +1072,7 @@
   let legacyPass = '', unlockBusy = false;
   function askPass(target, msg) {
     $('#app').innerHTML = `<section class="card" style="max-width:460px;margin:40px auto"><h2>请输入访问口令</h2>
-      <div class="sub">${esc(msg || '收益测算、项目收益参数与开发判断需口令。政策和研报索引可直接浏览。')}</div>
+      <div class="sub">${esc(msg || '收益测算、项目收益参数与开发判断需口令。政策和研报索引可直接浏览。')}</div><p class="sub">或联系网站右上方邮箱申领。</p>
       <form id="pf" style="margin-top:14px;display:flex;gap:8px"><input id="pw" type="password" autocomplete="off" style="flex:1;min-width:0;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font:inherit" aria-label="访问口令"><button class="dim on" type="submit">解锁</button></form><p><a href="#/">返回公开首页</a></p></section>`;
     if (legacyPass) $('#pw').value = legacyPass;
     $('#pf').onsubmit = ev => { ev.preventDefault(); const v = $('#pw').value.trim(); if (v && !unlockBusy) openWith(target, v); };
@@ -1106,6 +1111,7 @@
     if (d.meta.public) { const a = document.querySelector('[data-nav="about"]'); if (a) a.remove(); }   /* 信息架构 v2：方法库、口径与来源只在本地用 */
     if ((d.tags || []).length) document.querySelector('.nav').insertAdjacentHTML('beforeend', '<a href="#/tags" data-nav="tags">机制标签</a>');
     if ((d.research || []).length) document.querySelector('.nav').insertAdjacentHTML('beforeend', '<a href="#/research" data-nav="research">研报与资料</a>');
+    if ((d.learning || []).length) document.querySelector('.nav').insertAdjacentHTML('beforeend', '<a href="#/learning" data-nav="learning">政策学习</a>');
     if (d.meta.public) { const h = document.querySelector('[data-nav="map"]'), r = document.querySelector('[data-nav="rev"]'); if (h) h.textContent = '政策地图'; if (r) r.textContent = '收益来源全景'; document.title = '储能与零碳政策研究库'; }
     if (d.meta.access === 'section-password') {
       document.querySelector('[data-nav="rev"]').textContent = '收益测算 · 口令';
