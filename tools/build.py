@@ -13,7 +13,7 @@ import shutil
 HERE = Path(__file__).resolve().parent
 ROOT = HERE if (HERE / 'index.html').is_file() else HERE.parent
 WEB_FILES = ['index.html', 'assets/app.js', 'assets/storage-math.js', 'assets/app.css', 'assets/vendor/echarts.min.js', 'assets/vendor/LICENSE', 'assets/vendor/NOTICE']
-DOC_FILES = ['README.md', 'LICENSE', 'LICENSE-DATA.md', 'CONTRIBUTING.md', 'ASSETS.json', '.gitignore', 'examples/synthetic.json', 'tests/test_public.py', 'tests/test_storage_math.js', 'examples/method-arithmetic.json']
+DOC_FILES = ['README.md', 'LICENSE', 'LICENSE-DATA.md', 'CONTRIBUTING.md', 'ASSETS.json', '.gitignore', 'examples/synthetic.json', 'tests/test_public.py', 'tests/test_storage_math.js', 'examples/method-arithmetic.json', 'tools/park_examples.py', 'examples/park-scenarios.json', 'tests/test_park_examples.py']
 ALLOWED_TOP = {'meta','metrics','provinces','docs','cards','events','dev','diff','score','example','briefs','links','tags','tagdocs','methods','lib','research','learning','stats','mech','topics','topicmap','synthetic_example','public_guides'}
 
 def digest(path):
@@ -59,12 +59,18 @@ def validate_method_examples(path):
     return json.loads(Path(path).read_text(encoding='utf-8'))
 
 
+def validate_park_examples(path):
+    if digest(path) != '47e55be8e1d5ca2e025a5ed79184c282b2d1e55c94310698f1b4d0d1b23cb5ef':raise ValueError('unreviewed park examples; fixture SHA changed')
+    return json.loads(Path(path).read_text(encoding='utf-8'))
+
+
 def build_package(snapshot, dist, source=ROOT):
     data = validate_snapshot(snapshot); dist = Path(dist); source = Path(source)
     if dist.exists() and any(dist.iterdir()): raise ValueError('output directory must be empty; old files are never deleted')
     dist.mkdir(parents=True, exist_ok=True)
     docs = source / 'open_source' if (source / 'open_source').is_dir() else source
     validate_method_examples(docs/'examples/method-arithmetic.json')
+    validate_park_examples(docs/'examples/park-scenarios.json')
     for f in WEB_FILES + DOC_FILES:
         src = (source if f in WEB_FILES else docs) / f
         dst = dist / f; dst.parent.mkdir(parents=True, exist_ok=True); shutil.copyfile(src, dst)

@@ -11,7 +11,9 @@
         "tools/build.py",
         "tests/test_public.py",
         "assets/storage-math.js",
-        "tests/test_storage_math.js"
+        "tests/test_storage_math.js",
+        "tools/park_examples.py",
+        "tests/test_park_examples.py"
       ],
       "class": "B",
       "origin": "本项目Git历史可追溯的自有前台及本轮通用实现",
@@ -31,7 +33,8 @@
       "paths": [
         "examples/synthetic.json",
         "synthetic_example",
-        "examples/method-arithmetic.json"
+        "examples/method-arithmetic.json",
+        "examples/park-scenarios.json"
       ],
       "class": "B",
       "origin": "本轮独立创建的虚构教学输入，无原企业项目值",
@@ -83,5 +86,12 @@
     "outputs": "参考折算部分、4项费用与声明退减；资格/结算未验证，最终容量标准/年度实收为空",
     "cases": 8,
     "fixture_sha256": "1973fc2ea58a578f13f229d142a27291f1c24c969fd4b16084190fe2dfcf236d"
+  },
+  "synthetic_park_examples": {
+    "scope": "8组24小时构造案例，独立标准库闭式重建及可行调度；未复制候选LP/SciPy代码、真实项目资料或参数",
+    "outputs": "输入/逐时调度/费用/能量核对；仅固定场景展示，非任意在线优化或政策自用率",
+    "fixture_sha256": "47e55be8e1d5ca2e025a5ed79184c282b2d1e55c94310698f1b4d0d1b23cb5ef",
+    "code_license": "MIT",
+    "synthetic_data_license": "CC0-1.0"
   }
 }

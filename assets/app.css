@@ -300,3 +300,8 @@ table.t tr.grp td{background:#FAF9F5;font-weight:600;font-size:13.5px;padding-to
 
 /* Align the action with the input baseline on multi-column teaching forms. */
 .synthetic-grid button{align-self:end;min-height:44px}
+.kpi .park-value{font-size:21px;overflow-wrap:anywhere}.synthetic-grid select{max-width:100%;width:100%}
+
+.park-detail-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start;margin:18px 0}.park-fees table{width:100%}.park-fees td:last-child,.park-fees th:last-child{text-align:right;white-space:nowrap}@media(max-width:640px){.park-detail-grid{grid-template-columns:minmax(0,1fr);gap:12px}}
+
+.park-comparison table,.park-hourly table{width:100%;min-width:720px;border-collapse:collapse}.park-hourly table{min-width:900px}.park-comparison th,.park-comparison td,.park-hourly th,.park-hourly td{padding:10px 12px;text-align:right;white-space:nowrap}.park-fees th:first-child,.park-comparison th:first-child,.park-comparison td:first-child,.park-hourly th:first-child,.park-hourly td:first-child{text-align:left}

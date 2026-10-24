@@ -52,3 +52,7 @@ python3 -m http.server 8002 --bind 127.0.0.1 --directory /tmp/energy-synthetic
 `#/tools`可修改容量时长与四项充电费用的纯合成输入，浏览器本地计算。容量结果仅是参考折算部分，最终核价与年度实收不自动确认；退减为调用者声明，不自动决定资格。负电价、超当期输配金额的跨期退减不在简化接口内。可下载`examples/method-arithmetic.json`复核8组构造样例。
 
 安装Node.js的环境可运行`node tests/test_storage_math.js`；测试只用Node标准库，与园区提供的独立8组构造结果逐例对拍，并验证分母0、非法数、缺项、超额退减等边界。网页使用不依赖Node、Python、数据库或求解服务。
+
+园区固定合成演示见`#/park-demo`：8组24小时输入、可行调度、费用分项和守恒核对。仅切换预计算场景，不支持任意项目输入或在线LP。无发电时利用率为“不适用”；绿电利用率包含损耗，不等同政策自用比例。容量目标权重按整个24小时构造时段计，不是实际日价；运行费不是利润。
+
+用Python标准库复现：`python tools/park_examples.py > /tmp/park-scenarios.json`。该脚本只构造8个固定算例；与JSON逐项对拍及物理约束核对见`python -m unittest discover -s tests`。无NumPy/SciPy、私有库或网络依赖。源代码MIT、构造数据CC0的范围见ASSETS.json和LICENSE-DATA.md，不给上游园区候选LP或历史资料整体授权。
