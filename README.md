@@ -46,3 +46,9 @@ python3 -m http.server 8002 --bind 127.0.0.1 --directory /tmp/energy-synthetic
 ## 研究方法
 
 `#/methods`提供新写且独立审定的政策阅读/比较/资格核对方法；`#/methods/capacity-cost`区分容量时长参考折算、最终标准与年度实收，并列清充电费用与输配电费退减。服务范围见`#/services`。这些页面免费阅读，不整体放行历史方法卡、项目或企业数据。
+
+## 容量与费用算术工具
+
+`#/tools`可修改容量时长与四项充电费用的纯合成输入，浏览器本地计算。容量结果仅是参考折算部分，最终核价与年度实收不自动确认；退减为调用者声明，不自动决定资格。负电价、超当期输配金额的跨期退减不在简化接口内。可下载`examples/method-arithmetic.json`复核8组构造样例。
+
+安装Node.js的环境可运行`node tests/test_storage_math.js`；测试只用Node标准库，与园区提供的独立8组构造结果逐例对拍，并验证分母0、非法数、缺项、超额退减等边界。网页使用不依赖Node、Python、数据库或求解服务。

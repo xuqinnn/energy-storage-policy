@@ -9,7 +9,9 @@
         "assets/app.js",
         "assets/app.css",
         "tools/build.py",
-        "tests/test_public.py"
+        "tests/test_public.py",
+        "assets/storage-math.js",
+        "tests/test_storage_math.js"
       ],
       "class": "B",
       "origin": "本项目Git历史可追溯的自有前台及本轮通用实现",
@@ -28,7 +30,8 @@
     {
       "paths": [
         "examples/synthetic.json",
-        "synthetic_example"
+        "synthetic_example",
+        "examples/method-arithmetic.json"
       ],
       "class": "B",
       "origin": "本轮独立创建的虚构教学输入，无原企业项目值",
@@ -73,5 +76,11 @@
     ],
     "independent_acceptance": "WB-QA-20261024-0650"
   },
-  "temporarily_withheld_overviews": "16个旧概述格被专项检查提示P0/P1，待逐格实质复核；原库及索引保留，不能将提示直接当政策错误结论。"
+  "temporarily_withheld_overviews": "16个旧概述格被专项检查提示P0/P1，待逐格实质复核；原库及索引保留，不能将提示直接当政策错误结论。",
+  "synthetic_method_arithmetic": {
+    "scope": "8组构造容量/费用输入及结果，独立实现浏览器算术，未复制园区候选Python或私有模型",
+    "outputs": "参考折算部分、4项费用与声明退减；资格/结算未验证，最终容量标准/年度实收为空",
+    "cases": 8,
+    "fixture_sha256": "1973fc2ea58a578f13f229d142a27291f1c24c969fd4b16084190fe2dfcf236d"
+  }
 }

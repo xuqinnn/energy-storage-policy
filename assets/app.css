@@ -297,3 +297,6 @@ table.t tr.grp td{background:#FAF9F5;font-weight:600;font-size:13.5px;padding-to
 
 /* C1: public synthetic tool */
 .synthetic-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:18px;margin:18px 0}.synthetic-grid label{display:grid;gap:6px}.synthetic-grid input,.synthetic-grid select{font:inherit;padding:9px;border:1px solid var(--line);border-radius:7px;min-width:0}#synthetic-result{display:block;margin:20px 0}#synthetic-result .kpi{display:flex;gap:18px;align-items:baseline;flex-wrap:wrap}
+
+/* Align the action with the input baseline on multi-column teaching forms. */
+.synthetic-grid button{align-self:end;min-height:44px}

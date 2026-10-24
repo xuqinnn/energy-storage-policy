@@ -1,0 +1,238 @@
+{
+  "kind": "synthetic",
+  "schema": 1,
+  "notice": "构造算术输入，不对应实际地区或项目；未验证项目资格、最终核价及结算。",
+  "cases": [
+    {
+      "id": "capacity_zero",
+      "kind": "capacity",
+      "input": {
+        "base_yuan_per_kw_year": 100,
+        "full_power_discharge_hours": 0,
+        "peak_duration_hours": 8
+      },
+      "expected": {
+        "duration_fraction": 0.0,
+        "reference_component_yuan_per_kw_year": 0.0,
+        "final_capacity_rate_yuan_per_kw_year": null,
+        "annual_receipt_yuan": null,
+        "meaning": "duration-scaled reference component only",
+        "eligibility_verified": false,
+        "settlement_verified": false
+      }
+    },
+    {
+      "id": "capacity_half",
+      "kind": "capacity",
+      "input": {
+        "base_yuan_per_kw_year": 100,
+        "full_power_discharge_hours": 4,
+        "peak_duration_hours": 8
+      },
+      "expected": {
+        "duration_fraction": 0.5,
+        "reference_component_yuan_per_kw_year": 50.0,
+        "final_capacity_rate_yuan_per_kw_year": null,
+        "annual_receipt_yuan": null,
+        "meaning": "duration-scaled reference component only",
+        "eligibility_verified": false,
+        "settlement_verified": false
+      }
+    },
+    {
+      "id": "capacity_full",
+      "kind": "capacity",
+      "input": {
+        "base_yuan_per_kw_year": 100,
+        "full_power_discharge_hours": 8,
+        "peak_duration_hours": 8
+      },
+      "expected": {
+        "duration_fraction": 1.0,
+        "reference_component_yuan_per_kw_year": 100.0,
+        "final_capacity_rate_yuan_per_kw_year": null,
+        "annual_receipt_yuan": null,
+        "meaning": "duration-scaled reference component only",
+        "eligibility_verified": false,
+        "settlement_verified": false
+      }
+    },
+    {
+      "id": "capacity_capped",
+      "kind": "capacity",
+      "input": {
+        "base_yuan_per_kw_year": 100,
+        "full_power_discharge_hours": 12,
+        "peak_duration_hours": 8
+      },
+      "expected": {
+        "duration_fraction": 1.0,
+        "reference_component_yuan_per_kw_year": 100.0,
+        "final_capacity_rate_yuan_per_kw_year": null,
+        "annual_receipt_yuan": null,
+        "meaning": "duration-scaled reference component only",
+        "eligibility_verified": false,
+        "settlement_verified": false
+      }
+    },
+    {
+      "id": "capacity_short_peak",
+      "kind": "capacity",
+      "input": {
+        "base_yuan_per_kw_year": 100,
+        "full_power_discharge_hours": 4,
+        "peak_duration_hours": 4
+      },
+      "expected": {
+        "duration_fraction": 1.0,
+        "reference_component_yuan_per_kw_year": 100.0,
+        "final_capacity_rate_yuan_per_kw_year": null,
+        "annual_receipt_yuan": null,
+        "meaning": "duration-scaled reference component only",
+        "eligibility_verified": false,
+        "settlement_verified": false
+      }
+    },
+    {
+      "id": "charging_refund_0",
+      "kind": "charging",
+      "input": {
+        "charge_mwh": 100,
+        "energy_yuan_per_mwh": 200,
+        "line_loss_yuan_per_mwh": 10,
+        "system_yuan_per_mwh": 20,
+        "transmission_yuan_per_mwh": 30,
+        "declared_transmission_refund_yuan": 0
+      },
+      "expected": {
+        "fee_lines": [
+          {
+            "item": "energy",
+            "quantity_mwh": 100.0,
+            "rate_yuan_per_mwh": 200.0,
+            "amount_yuan": 20000.0
+          },
+          {
+            "item": "line_loss",
+            "quantity_mwh": 100.0,
+            "rate_yuan_per_mwh": 10.0,
+            "amount_yuan": 1000.0
+          },
+          {
+            "item": "system",
+            "quantity_mwh": 100.0,
+            "rate_yuan_per_mwh": 20.0,
+            "amount_yuan": 2000.0
+          },
+          {
+            "item": "transmission",
+            "quantity_mwh": 100.0,
+            "rate_yuan_per_mwh": 30.0,
+            "amount_yuan": 3000.0
+          }
+        ],
+        "gross_charge_yuan": 26000.0,
+        "declared_transmission_refund_yuan": 0.0,
+        "transmission_after_declared_refund_yuan": 3000.0,
+        "arithmetic_net_yuan": 26000.0,
+        "refund_basis": "caller-declared, not inferred from discharge or approved here",
+        "settlement_verified": false,
+        "scope": "four declared items only; not an exhaustive project bill"
+      }
+    },
+    {
+      "id": "charging_refund_1500",
+      "kind": "charging",
+      "input": {
+        "charge_mwh": 100,
+        "energy_yuan_per_mwh": 200,
+        "line_loss_yuan_per_mwh": 10,
+        "system_yuan_per_mwh": 20,
+        "transmission_yuan_per_mwh": 30,
+        "declared_transmission_refund_yuan": 1500
+      },
+      "expected": {
+        "fee_lines": [
+          {
+            "item": "energy",
+            "quantity_mwh": 100.0,
+            "rate_yuan_per_mwh": 200.0,
+            "amount_yuan": 20000.0
+          },
+          {
+            "item": "line_loss",
+            "quantity_mwh": 100.0,
+            "rate_yuan_per_mwh": 10.0,
+            "amount_yuan": 1000.0
+          },
+          {
+            "item": "system",
+            "quantity_mwh": 100.0,
+            "rate_yuan_per_mwh": 20.0,
+            "amount_yuan": 2000.0
+          },
+          {
+            "item": "transmission",
+            "quantity_mwh": 100.0,
+            "rate_yuan_per_mwh": 30.0,
+            "amount_yuan": 3000.0
+          }
+        ],
+        "gross_charge_yuan": 26000.0,
+        "declared_transmission_refund_yuan": 1500.0,
+        "transmission_after_declared_refund_yuan": 1500.0,
+        "arithmetic_net_yuan": 24500.0,
+        "refund_basis": "caller-declared, not inferred from discharge or approved here",
+        "settlement_verified": false,
+        "scope": "four declared items only; not an exhaustive project bill"
+      }
+    },
+    {
+      "id": "charging_refund_3000",
+      "kind": "charging",
+      "input": {
+        "charge_mwh": 100,
+        "energy_yuan_per_mwh": 200,
+        "line_loss_yuan_per_mwh": 10,
+        "system_yuan_per_mwh": 20,
+        "transmission_yuan_per_mwh": 30,
+        "declared_transmission_refund_yuan": 3000
+      },
+      "expected": {
+        "fee_lines": [
+          {
+            "item": "energy",
+            "quantity_mwh": 100.0,
+            "rate_yuan_per_mwh": 200.0,
+            "amount_yuan": 20000.0
+          },
+          {
+            "item": "line_loss",
+            "quantity_mwh": 100.0,
+            "rate_yuan_per_mwh": 10.0,
+            "amount_yuan": 1000.0
+          },
+          {
+            "item": "system",
+            "quantity_mwh": 100.0,
+            "rate_yuan_per_mwh": 20.0,
+            "amount_yuan": 2000.0
+          },
+          {
+            "item": "transmission",
+            "quantity_mwh": 100.0,
+            "rate_yuan_per_mwh": 30.0,
+            "amount_yuan": 3000.0
+          }
+        ],
+        "gross_charge_yuan": 26000.0,
+        "declared_transmission_refund_yuan": 3000.0,
+        "transmission_after_declared_refund_yuan": 0.0,
+        "arithmetic_net_yuan": 23000.0,
+        "refund_basis": "caller-declared, not inferred from discharge or approved here",
+        "settlement_verified": false,
+        "scope": "four declared items only; not an exhaustive project bill"
+      }
+    }
+  ]
+}

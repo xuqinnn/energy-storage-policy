@@ -1,8 +1,8 @@
 # 数据与第三方材料
 
-根MIT许可仅覆盖本公开包的index.html、assets/app.js、assets/app.css、tools/build.py、tests/test_public.py及自有构建文档；不覆盖历史私有工作库、企业材料、第三方文件或数据中的他人表达。
+根MIT许可仅覆盖本公开包的index.html、assets/app.js、assets/storage-math.js、assets/app.css、tools/build.py、tests/test_public.py、tests/test_storage_math.js及自有构建文档；不覆盖历史私有工作库、企业材料、第三方文件或数据中的他人表达。
 
-examples/synthetic.json及synthetic_example的虚构示例由本项目创建，采用CC0-1.0：https://creativecommons.org/publicdomain/zero/1.0/ 。示例不代表任何省份政策或真实项目。
+examples/synthetic.json、examples/method-arithmetic.json及synthetic_example的虚构示例由本项目创建，采用CC0-1.0：https://creativecommons.org/publicdomain/zero/1.0/ 。示例不代表任何省份政策或真实项目。
 
 data/storage.json中的政策题名、文号、日期、状态及引用依原来源使用；事实元数据不被包装成项目独占著作权。独立摘要和自有专题解读按CC BY 4.0提供，署名“独立能源研究站”，保留条目来源与日期并标注改动：https://creativecommons.org/licenses/by/4.0/ 。该授权限于本项目可授权的独立表达，不延伸到引句、原始政策、研报、标准或图片等第三方材料；其权利及许可仍归相应来源。
 

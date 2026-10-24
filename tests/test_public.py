@@ -21,6 +21,10 @@ class PublicBuildTest(unittest.TestCase):
   with self.assertRaises(ValueError):builder.validate_snapshot(d)
   d=self.example();d['unexpected_private_blob']='test'
   with self.assertRaises(ValueError):builder.validate_snapshot(d)
+ def test_method_fixture_cannot_silently_change(self):
+  with tempfile.TemporaryDirectory() as temp:
+   path=Path(temp)/'examples.json';path.write_text('{"private_project":"/Users/person/private.xlsx"}')
+   with self.assertRaisesRegex(ValueError,'unreviewed method examples'):builder.validate_method_examples(path)
  def test_production_input_is_public_and_manifest_matches(self):
   d=json.loads((ROOT/'data/storage.json').read_text());builder.validate_snapshot(d)
   manifest=json.loads((ROOT/'BUILD.json').read_text())
