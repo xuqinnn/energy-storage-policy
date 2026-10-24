@@ -25,7 +25,7 @@
         "data/storage.json"
       ],
       "class": "A/B",
-      "origin": "此前已公开索引与简述，经本轮已知残差隔离；专题正文仅消费本轮独立审定场景稿。5件旧卡覆盖为限定字段，2件来源按钮尚未确认暂不发布；不读取旧密文。",
+      "origin": "已公开索引/简述及独立审定场景。江西仅恢复新审定片段、摘要与已核来源；其旧文号/备注不出弹层。广东旧卡及参数保持隔离。",
       "license": "见LICENSE-DATA.md，第三方引句按原来源",
       "decision": "include-reviewed-fields"
     },
@@ -93,5 +93,10 @@
     "fixture_sha256": "47e55be8e1d5ca2e025a5ed79184c282b2d1e55c94310698f1b4d0d1b23cb5ef",
     "code_license": "MIT",
     "synthetic_data_license": "CC0-1.0"
+  },
+  "controlled_source_restoration": {
+    "research_commit": "b581c3a",
+    "scope": "江西新场景片段、摘要与官方链接；PDF/XLS及内部记录不纳入",
+    "isolated": "江西旧c12/c13不出弹层；广东原发布页及同级备用页未通过浏览器访问，旧卡/c11/1206及历史混合参数不恢复"
   }
 }
