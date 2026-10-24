@@ -64,7 +64,7 @@
     }
   ],
   "reviewed_public_guides": {
-    "scope": "仅五项新写方法内容及修订服务范围，旧方法卡不整体放行",
+    "scope": "五项新写方法、N1通用收益并计核对方法及修订服务范围；两省征求稿案例/内部审定记录不纳入，旧方法卡不整体放行",
     "ids": [
       "read-policy",
       "capacity-cost",
@@ -72,7 +72,8 @@
     ],
     "research_commits": [
       "4e9cb2e",
-      "9e1db58"
+      "9e1db58",
+      "9312a4b"
     ],
     "independent_acceptance": "WB-QA-20261024-0650"
   },

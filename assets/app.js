@@ -407,7 +407,7 @@
   }
   // ---------- 专题页（研究线对外版正文＋自动拼：分省对照表、相关政策）：【编号】开简析卡，「方法卡 Mxx」链方法库 ----------
   function inlineMD(t) {
-    return citeHTML(t).replace(/`([^`\n]+)`/g, '<code>$1</code>').replace(/\[([^\[\]\n]+)\]\((https:\/\/[^\s<>()]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1 ↗</a>').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/方法卡\s*(M\d{2})/g, (m, id) => PUB() ? '' : `<a href="#/methods/${id}">方法卡 ${id}</a>`);
+    return citeHTML(t).replace(/`([^`\n]+)`/g, '<code>$1</code>').replace(/\[([^\[\]\n]+)\]\((https:\/\/[^\s<>()]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1 ↗</a>').replace(/\[([^\[\]\n]+)\]\((#\/[A-Za-z0-9_/%\u3400-\u9fff-]+)\)/g, '<a href="$2">$1</a>').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/方法卡\s*(M\d{2})/g, (m, id) => PUB() ? '' : `<a href="#/methods/${id}">方法卡 ${id}</a>`);
   }
   function mdHTML(md) {
     const out = []; let list = null, para = [], tbl = [];
