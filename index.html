@@ -4,31 +4,36 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>独立能源研究站</title>
-<link rel="stylesheet" href="assets/app.css?v=66">
+<link rel="stylesheet" href="assets/app.css?v=67">
 <script src="assets/vendor/echarts.min.js"></script>
 </head>
 <body>
+<a class="skip-link" href="#app">跳到内容 / Skip to content</a>
 <header class="top">
   <a class="brand" href="#/">独立能源研究站</a>
-  <nav class="nav" aria-label="主导航">
-    <a href="#/" data-nav="home">首页</a>
-    <a href="#/policy" data-nav="policy">政策</a>
-    <a href="#/map" data-nav="map">投资分级地图</a>
-    <a href="#/rev" data-nav="rev">收益构成全景</a>
-    <label class="prov-pick"><span>省份看板</span>
-      <select id="provSelect" aria-label="选择省份"><option value="">选择省份…</option></select>
-    </label>
-    <a href="#/about" data-nav="about">口径与来源</a>
+  <button class="menu-toggle" type="button" aria-controls="primary-nav" aria-expanded="false">菜单</button>
+  <nav class="nav" id="primary-nav" aria-label="主导航">
+    <a href="#/policy" data-nav="policy" data-zh="政策动态" data-en="Policies">政策动态</a>
+    <a href="#/topics" data-nav="topics" data-zh="重点专题" data-en="Research">重点专题</a>
+    <a href="#/explore" data-nav="tools" data-zh="试用工具" data-en="Tools">试用工具</a>
+    <a href="#/services" data-nav="services" data-zh="咨询与定制" data-en="Services">咨询与定制</a>
+    <details class="nav-more"><summary data-zh="更多" data-en="More">更多</summary><div>
+      <a href="#/methods" data-zh="研究方法" data-en="Methodology">研究方法</a>
+      <a href="#/map" data-zh="政策地图" data-en="Policy map">政策地图</a>
+      <a href="#/research" data-zh="研究资料" data-en="Research library">研究资料</a>
+      <a href="#/learning" data-zh="政策学习" data-en="Learning">政策学习</a>
+      <a href="#/about" data-zh="来源与开源" data-en="Sources & open source">来源与开源</a>
+      <label class="prov-pick"><span data-zh="省份" data-en="Province">省份</span><select id="provSelect" aria-label="选择省份"><option value="">选择省份…</option></select></label>
+    </div></details>
   </nav>
-  <div class="ver"><span id="ver"></span><span class="contact"> · 联系：<a href="mailto:xuqinnn@163.com">xuqinnn@163.com</a></span></div>
+  <div class="header-actions"><button type="button" id="language-switch" aria-label="Switch to English">EN</button><a class="header-cta" href="#/start" data-zh="开始体验 ↗" data-en="Start here ↗">开始体验 ↗</a></div>
+  <div class="ver" hidden><span id="ver"></span></div>
 </header>
-<main id="app" aria-live="polite"></main>
+<main id="app" aria-live="polite" tabindex="-1"></main>
 <div id="tip" class="tip" role="tooltip" hidden></div>
 <dialog id="bsheet" aria-labelledby="bsH"><div class="sheet" id="bsInner"></div></dialog>
-<footer class="foot">
-  <span>公共内容与工具全部免费。独立研究，不代表原任职企业；状态与适用条件以来源为准。<a href="#/about">源码与许可</a></span>
-</footer>
+<footer class="foot product-footer"><div><b data-zh="独立能源研究站" data-en="Independent Energy Research">独立能源研究站</b><p data-zh="公共研究与工具免费开放。以来源和条件，支持更清楚的判断。" data-en="Free public research and tools. Clear sources, explicit assumptions.">公共研究与工具免费开放。以来源和条件，支持更清楚的判断。</p></div><div><a href="#/about" data-zh="方法与来源" data-en="Sources & methodology">方法与来源</a><a href="https://github.com/xuqinnn/energy-storage-policy" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="#/subscribe" data-zh="关注后续更新" data-en="Follow updates">关注后续更新</a><a href="mailto:xuqinnn@163.com">xuqinnn@163.com ↗</a></div><small data-zh="独立研究；适用条件以原文件为准。公开内容不构成项目收益保证。" data-en="Independent research. Consult original documents for applicability; no project outcome is guaranteed.">独立研究；适用条件以原文件为准。公开内容不构成项目收益保证。</small></footer>
 <script src="assets/storage-math.js?v=64"></script>
-<script src="assets/app.js?v=66"></script>
+<script src="assets/app.js?v=67"></script>
 </body>
 </html>
