@@ -1215,6 +1215,21 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
       out.dataset.net=net.toFixed(6);out.innerHTML=`<p class="kpi"><b>${net.toFixed(2)} 元/kW·年</b><span>运营差额 · 合成情景</span></p><p>电能量差额 ${energy.toFixed(2)} ＋ 互斥收入 ${ancillary.toFixed(2)} − 其他运营成本 ${n.fixed.toFixed(2)}。</p>`;
     }; form.requestSubmit();
   }
+  let readingNotes;
+  async function mountReadingNotes(group) {
+    const expected=location.hash;
+    try {
+      readingNotes=readingNotes||window.__READING_NOTES__||await(await fetch('content/reading-notes.json')).json();
+      if(location.hash!==expected||document.querySelector('[data-reading-notes]'))return;
+      const ids=group==='arithmetic'?['capacity-rate','reference-component','actual-receipt','grid-agent-purchase','market-purchase']:
+        ['billing-demand','transformer-capacity','grid-capacity','one-way-efficiency','roundtrip-efficiency','renewable-utilization','policy-self-use'];
+      const terms=readingNotes.terms.filter(t=>ids.includes(t.id));
+      const html=`<details class="reading-notes work-evidence" data-reading-notes="${group}"><summary>${tx('读工具前，先分清这些量','Reading notes · Chinese explanations')}</summary><p class="note">${esc(readingNotes.notice)}</p><div class="reading-note-grid">${terms.map(t=>`<details class="reading-term" data-term="${esc(t.id)}"><summary>${esc(t.term)}</summary><p>${esc(t.definition)}</p><p class="note">${esc(t.common_confusion)}</p><p>${esc(t.example)}</p><p class="note">${esc(t.scope)}</p><a href="${esc(t.next_route)}">${tx('继续核对方法与条件','Review method & conditions')} ↗</a></details>`).join('')}</div></details>`;
+      document.querySelector('#app>.hero')?.insertAdjacentHTML('afterend',html);
+    } catch(error) {
+      if(location.hash===expected){const note=document.createElement('p');note.className='note';note.textContent=tx('阅读提示暂未加载，可在方法页核对单位和适用条件。','Reading notes are unavailable. Check units and conditions on the methods page.');document.querySelector('#app>.hero')?.after(note);}
+    }
+  }
   async function parkDemoPage() {
     try {
       const demo=window.__PARK_EXAMPLES__||await(await fetch('examples/park-scenarios.json')).json();
@@ -1232,6 +1247,7 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
         const selected=$('#park-selected');selected.dataset.case=c.id;selected.dataset.utilization=r.renewable_utilization_fraction===null?'not-applicable':String(r.renewable_utilization_fraction);
         selected.innerHTML=`<div class="kpis">${[['该调度峰值',num(r.grid_capacity_mw)+' MW'],['下网电量',num(r.grid_import_mwh)+' MWh'],['弃电量',num(r.curtailment_mwh)+' MWh'],['绿电利用率',utilization]].map(([k,v])=>`<div class="kpi"><div class="k">${k}</div><div class="v park-value">${v}</div></div>`).join('')}</div><p>储能 ${num(x.storage_energy_mwh)} MWh / ${num(x.storage_power_mw)} MW；步长1小时，共24小时。充/放电效率 ${num(x.charge_efficiency)} / ${num(x.discharge_efficiency)}；往返效率 ${num(x.charge_efficiency*x.discharge_efficiency)}。</p><div class="park-detail-grid"><div class="tbl park-fees"><table><thead><tr><th>费用分项（元/本24小时时段）</th><th>金额</th></tr></thead><tbody>${feeRows.map(([k,v])=>`<tr><td>${k}</td><td>${num(v)}</td></tr>`).join('')}</tbody></table></div><p>能量核对：下网 ${num(r.grid_import_mwh)} ＋可用绿电 ${num(r.renewable_mwh)} −弃电 ${num(r.curtailment_mwh)} ＝负荷 ${num(r.load_mwh)} ＋储能损耗 ${num(r.storage_loss_mwh)} MWh；残差 ${num(r.energy_balance_residual_mwh)} MWh。循环首末SOC为0。</p></div><details><summary>展开24小时输入与调度</summary><div class="tbl park-hourly"><table><thead><tr><th>小时</th><th>负荷 MW</th><th>绿电 MW</th><th>购电价 元/MWh</th><th>下网 MW</th><th>充电 MW</th><th>放电 MW</th><th>弃电 MW</th><th>期末SOC MWh</th></tr></thead><tbody>${x.load_mw.map((_,h)=>`<tr><td>${h}—${h+1}</td>${[x.load_mw[h],x.renewable_mw[h],x.import_price_yuan_per_mwh[h],d.grid_import_mw[h],d.charge_mw[h],d.discharge_mw[h],d.curtailment_mw[h],d.soc_end_mwh[h]].map(v=>`<td>${num(v)}</td>`).join('')}</tr>`).join('')}</tbody></table></div></details>`;
       };select.addEventListener('change',render);render();
+      mountReadingNotes('park');
     } catch(error) {if(location.hash==='#/park-demo')$('#app').innerHTML=`<section class="card"><h1>园区样例暂未加载</h1><p>${esc(error.message)}</p><a href="#/tools">返回算术工具</a></section>`;}
   }
 
@@ -1252,6 +1268,7 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
       wire('capacity-form','capacity-result',StorageMath.capacity,r=>`<p class="kpi"><strong>${number(r.reference_component_yuan_per_kw_year)} 元/kW·年</strong> · 参考折算部分</p><p>折算比例 ${number(r.duration_fraction*100)}%。最终容量标准：未核定；年度实收：未确认。资格与结算未验证。</p>`);
       const feeNames={energy:'电能量',line_loss:'线损',system:'系统运行费',transmission:'输配'};
       wire('charging-form','charging-result',StorageMath.charging,r=>`<div class="tbl"><table><thead><tr><th>本账期声明费项</th><th>金额（元）</th></tr></thead><tbody>${r.fee_lines.map(f=>`<tr><td>${feeNames[f.item]}</td><td>${number(f.amount_yuan)}</td></tr>`).join('')}<tr><td>四项合计（退减前）</td><td>${number(r.gross_charge_yuan)}</td></tr><tr><td>声明输配退减</td><td>−${number(r.declared_transmission_refund_yuan)}</td></tr><tr><td>算术净额</td><td><strong>${number(r.arithmetic_net_yuan)}</strong></td></tr></tbody></table></div><p>输配项退减后 ${number(r.transmission_after_declared_refund_yuan)} 元；其他三项保留。结算未验证。</p>`);
+      mountReadingNotes('arithmetic');
     } catch(error) { $('#app').innerHTML=`<section class="card"><h1>算术工具暂未加载</h1><p>${esc(error.message)}</p><a href="#/methods/capacity-cost">阅读方法</a></section>`; }
   }
 

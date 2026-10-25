@@ -60,3 +60,5 @@ python3 -m http.server 8002 --bind 127.0.0.1 --directory /tmp/energy-synthetic
 ### Work samples and evidence notes
 
 Open `#/work` for three project samples. Each has a keyboard-accessible verification checklist, source/material links, limits and a Markdown download with its data version and snapshot time. The research note preserves the reviewed Chinese article; English framing does not translate the original policy. Synthetic examples link to the public reconstruction script and inputs. These notes contain no private originals and work in the offline single-file preview as well. Use code and data from the same snapshot when reproducing results; source availability may change.
+
+The arithmetic and park-demo pages include twelve reviewed Chinese reading notes, collapsed by default. They distinguish quantities, tariffs, model boundaries and synthetic examples. `content/reading-notes.json` is pinned by SHA in the portable builder and licensed separately under CC BY 4.0.

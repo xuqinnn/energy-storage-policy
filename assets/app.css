@@ -346,3 +346,8 @@ body[data-purpose=international-services] .service-offers{grid-template-columns:
 .evidence-sources a{display:inline-block;padding:10px 0;overflow-wrap:anywhere}
 .work-evidence-actions{display:flex;flex-wrap:wrap;gap:12px}.work-evidence-actions button{font:inherit;cursor:pointer}
 @media(max-width:760px){.work-evidence-actions{flex-direction:column;align-items:stretch}.work-evidence-actions .btn{justify-content:center;text-align:center;white-space:normal}}
+
+.reading-notes{margin:0 0 24px;padding:10px 0;border-bottom:1px solid var(--line)}
+.reading-note-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 28px}
+.reading-term{min-width:0;border-top:1px solid var(--line);padding:6px 0 14px}.reading-term p{font-size:14px;line-height:1.85}.reading-term a{display:inline-block;min-height:44px;padding:12px 0;font-size:13px}
+@media(max-width:760px){.reading-note-grid{grid-template-columns:1fr}}

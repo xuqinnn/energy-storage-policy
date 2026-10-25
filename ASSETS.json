@@ -64,6 +64,16 @@
       "origin": "旧工作库或需进一步逐项审定的材料",
       "license": "未纳入本包授权",
       "decision": "exclude; retain local originals"
+    },
+    {
+      "paths": [
+        "content/reading-notes.json"
+      ],
+      "class": "B",
+      "origin": "R3-C十二条独立修订阅读提示及构造算例；仅公开正文，不含WB原稿、内部证据、真实项目参数",
+      "license": "CC-BY-4.0",
+      "decision": "include-reviewed-content",
+      "sha256": "b263935471dfb51749d4cc608d6206095eb20fb5b1e45fa6a2f835a3eb2bd317"
     }
   ],
   "reviewed_public_guides": {

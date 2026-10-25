@@ -1,0 +1,116 @@
+{
+  "schema": 1,
+  "review_date": "2026-10-25",
+  "title": "读工具前，先分清这些量",
+  "notice": "这些是阅读提示与合成例，不是法规定义或实际项目参数。具体计费与合规仍按适用原件、期间和对象核验。",
+  "terms": [
+    {
+      "id": "capacity-rate",
+      "term": "容量标准",
+      "definition": "此处指容量电价的单位容量价格；须注明地区、对象和期间，不能直接当项目实收。",
+      "common_confusion": "别和变压器容量、用户基本电费单价混为一项。",
+      "example": "合成例：50元/kW·年是单位容量价格，不能与20元/kVA·月直接比大小。",
+      "scope": "本页容量电价方法",
+      "next_route": "#/methods/capacity-cost"
+    },
+    {
+      "id": "reference-component",
+      "term": "参考折算",
+      "definition": "按时长比计算的价格参考部分：基准×min(放电时长÷高峰持续时长,1)，分母须为正。",
+      "common_confusion": "时长比最高为1；参考部分不自动等于最终核价。",
+      "example": "合成例：100×min(4÷8,1)=50元/kW·年；还须另核资格、地方规则及考核。",
+      "scope": "本页时长折算示例",
+      "next_route": "#/tools"
+    },
+    {
+      "id": "actual-receipt",
+      "term": "项目实收",
+      "definition": "由实际结算与收款证据确认的金额；不能仅用参考单价乘额定容量就确认。",
+      "common_confusion": "参考乘积、应结算金额、到账金额和利润是不同概念。",
+      "example": "合成例：参考50元/kW·年×1000kW=5万元/年，只是参考乘积，实际收款仍未确认。",
+      "scope": "仅解释证据层次，不提供真实项目实收",
+      "next_route": "#/methods/capacity-cost"
+    },
+    {
+      "id": "billing-demand",
+      "term": "最大需量",
+      "definition": "用电需量的功率量，以kW表示；计费值、计量间隔和期间须按适用规则核定。",
+      "common_confusion": "需量是kW；需量电价单价是元/kW·月，两者不是同一物理量。",
+      "example": "合成例：假设计费需量已核为1000kW、单价30元/kW·月，月费3万元；不能把模型峰值直接代入。",
+      "scope": "读表提示；本批不认定实际计量/计费需量",
+      "next_route": "#/methods/capacity-cost"
+    },
+    {
+      "id": "transformer-capacity",
+      "term": "变压器容量",
+      "definition": "变压器的额定容量，常以kVA计；实际计费容量仍须按适用规则核定。",
+      "common_confusion": "kVA不是kW；容量本身也不是元/kVA·月的价格。",
+      "example": "合成例：假设计费容量1000kVA、单价20元/kVA·月，月费2万元；不凭经验功率因数转换计费方案。",
+      "scope": "单位区分；不签认真实计费容量",
+      "next_route": "#/methods/capacity-cost"
+    },
+    {
+      "id": "grid-capacity",
+      "term": "接网容量",
+      "definition": "在本演示中指下网功率上限，单位MW；充电计入下网，不能自动当作结算需量。",
+      "common_confusion": "模型允许的功率上限、实际调度峰值与计费需量分别核对。",
+      "example": "合成例：若模型固定接网20MW、实际峰值13.33MW，模型容量成本仍按输入20MW计算；这不是现实电费认定。",
+      "scope": "仅本合成模型与其费用假设",
+      "next_route": "#/park-demo"
+    },
+    {
+      "id": "one-way-efficiency",
+      "term": "单程效率",
+      "definition": "电能经一个方向转换后保留下来的比例；充电和放电各有一个效率。",
+      "common_confusion": "充电效率和放电效率分别作用于储能内部能量变化。",
+      "example": "合成例：充入10MWh、充电效率0.9，内部增加9MWh；再按放电效率0.9送出8.1MWh。",
+      "scope": "本演示的交流侧与内部能量边界",
+      "next_route": "#/park-demo"
+    },
+    {
+      "id": "roundtrip-efficiency",
+      "term": "往返效率",
+      "definition": "在本演示只计两次转换时，为充电效率×放电效率；它是能量保留比例。",
+      "common_confusion": "0.81表示保留81%，不是损失81%；不要把单程效率当往返效率。",
+      "example": "合成例：单程各0.9，10MWh充入后送出8.1MWh，损失1.9MWh；未另计待机、辅助耗电。",
+      "scope": "仅本模型两次转换，不代替设备完整实测效率",
+      "next_route": "#/park-demo"
+    },
+    {
+      "id": "renewable-utilization",
+      "term": "绿电利用率",
+      "definition": "本模型按(可用绿电量−弃电量)÷可用绿电量计算；含储能损耗且不追踪来源。",
+      "common_confusion": "分母是可用绿电量，不是负荷；不能直接当政策合规比例。",
+      "example": "合成例：可用80MWh、弃20MWh，利用率75%；无可用绿电时显示“不适用”，不补0%或100%。",
+      "scope": "仅本模型统计指标",
+      "next_route": "#/park-demo"
+    },
+    {
+      "id": "policy-self-use",
+      "term": "政策自用比例",
+      "definition": "具体文件规定的自用电量占比；分母、统计期间和适用对象须逐项核对。",
+      "common_confusion": "湖南多用户直连分别核自用电量占总可用发电量、占总用电量的比例。",
+      "example": "合成年度电量：自用60MWh、总可用发电100MWh、总用电200MWh，两个比例是60%和30%；不能仅据此确认项目合规。",
+      "scope": "按已审湖南场景说明两个分母，不概括所有地区",
+      "next_route": "#/topic/绿电直连"
+    },
+    {
+      "id": "grid-agent-purchase",
+      "term": "代理购电",
+      "definition": "按适用安排由电网企业代理采购电能的方式；先核用户类别、地区和执行期。",
+      "common_confusion": "普通代理档、特殊档和市场化用户不能直接套同一价格表。",
+      "example": "反例：把某月普通代理表的分时价格直接套给市场化用户，缺少适用依据；无法据此确定误差方向。",
+      "scope": "具体价格、类别和执行期另核；没有通用峰谷价表",
+      "next_route": "#/policy"
+    },
+    {
+      "id": "market-purchase",
+      "term": "市场化购电",
+      "definition": "用户通过批发市场或零售合同购买电能；取价须回相应合同和结算规则。",
+      "common_confusion": "不执行某种固定峰谷浮动，不等于没有分时价差。",
+      "example": "合成例：零售合同按小时结算，应取相应结算序列，不能把代理表中500元/MWh的价差当作实际市场价差。",
+      "scope": "概念与适用边界；本批未提供市场化成交价格",
+      "next_route": "#/policy"
+    }
+  ]
+}

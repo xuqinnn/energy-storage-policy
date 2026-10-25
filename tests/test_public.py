@@ -26,6 +26,7 @@ class PublicBuildTest(unittest.TestCase):
    path=Path(temp)/'examples.json';path.write_text('{"private_project":"/Users/person/private.xlsx"}')
    with self.assertRaisesRegex(ValueError,'unreviewed method examples'):builder.validate_method_examples(path)
    with self.assertRaisesRegex(ValueError,'unreviewed park examples'):builder.validate_park_examples(path)
+   with self.assertRaisesRegex(ValueError,'unreviewed reading notes'):builder.validate_reading_notes(path)
  def test_production_input_is_public_and_manifest_matches(self):
   d=json.loads((ROOT/'data/storage.json').read_text());builder.validate_snapshot(d)
   manifest=json.loads((ROOT/'BUILD.json').read_text())

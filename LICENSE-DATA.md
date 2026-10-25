@@ -7,3 +7,5 @@ examples/synthetic.json、examples/method-arithmetic.json、examples/park-scenar
 data/storage.json中的政策题名、文号、日期、状态及引用依原来源使用；事实元数据不被包装成项目独占著作权。独立摘要和自有专题解读按CC BY 4.0提供，署名“独立能源研究站”，保留条目来源与日期并标注改动：https://creativecommons.org/licenses/by/4.0/ 。该授权限于本项目可授权的独立表达，不延伸到引句、原始政策、研报、标准或图片等第三方材料；其权利及许可仍归相应来源。
 
 Apache ECharts 5.5.1使用Apache-2.0，完整许可及NOTICE保留在assets/vendor/。本包不提供第三方研报/PDF/标准原文的再分发授权，不包含这些原件。ASSETS.json逐类列明去向；来源不明或原企业项目数据不在本包中。
+
+`content/reading-notes.json`: twelve independently revised general reading notes and synthetic examples, CC BY 4.0. Attribution: 独立能源研究站, 2026-10-25. These are explanatory notes, not statutory definitions, verified billing parameters or full translations.
