@@ -337,3 +337,12 @@ body[data-purpose=international-services] .service-offers{grid-template-columns:
 @media(max-width:1050px){.editorial-hero{gap:35px;grid-template-columns:1.2fr 1fr}.editorial-columns{gap:30px;grid-template-columns:1.5fr 1fr}.work-case dl{gap:20px}.work-provenance{flex-wrap:wrap}.work-provenance>div{max-width:100%;flex-basis:100%}}
 @media(max-width:760px){.editorial-hero{grid-template-columns:1fr;padding:34px 0 25px;gap:25px}.editorial-intro h1{font-size:38px}.editorial-lede{font-size:15px}.editorial-index>a{padding:18px 0}.editorial-index h2{font-size:17px}.research-search{grid-template-columns:1fr;gap:10px}.editorial-columns{grid-template-columns:1fr;gap:38px;padding-top:32px}.editorial-columns h2{font-size:23px}.work-row h3{font-size:21px}.work-row{grid-template-columns:24px 1fr;gap:10px}.editorial-closing{flex-direction:column;align-items:start;padding:24px;gap:20px}.editorial-closing h2{font-size:25px}.work-case dl{grid-template-columns:1fr;gap:18px}.work-case h2{font-size:23px}.work-provenance{gap:15px}body[data-purpose=international-services] .service-offers{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+/* Evidence notes remain usable in both the hosted and offline work samples. */
+.work-evidence{border-top:1px solid var(--line);margin:24px 0 16px;padding-top:12px;min-width:0}
+.work-evidence summary{cursor:pointer;min-height:44px;padding:10px 0;font-size:14px;font-weight:600}
+.work-evidence ol{padding-left:22px;max-width:850px;line-height:1.85;font-size:14px}
+.work-evidence .note{max-width:850px;line-height:1.8}.evidence-sources{padding-left:22px;font-size:13px;line-height:1.8}
+.evidence-sources a{display:inline-block;padding:10px 0;overflow-wrap:anywhere}
+.work-evidence-actions{display:flex;flex-wrap:wrap;gap:12px}.work-evidence-actions button{font:inherit;cursor:pointer}
+@media(max-width:760px){.work-evidence-actions{flex-direction:column;align-items:stretch}.work-evidence-actions .btn{justify-content:center;text-align:center;white-space:normal}}

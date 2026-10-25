@@ -416,7 +416,7 @@
   function workItems() {return [
     {n:'01',tag:tx('数据与证据','DATA & EVIDENCE'),title:tx('政策数据库：从资料到可用数据','A traceable policy library'),problem:tx('政策分散，时间、状态与适用对象容易混淆。','Find the relevant instrument and distinguish its timing, status and scope.'),method:tx('用结构化目录、来源与审定边界支持检索，保留中文原名和文号。','Use structured records, original Chinese names, document numbers and source links.'),proof:tx('检索结果 → 文件状态 → 来源弹窗','Search → document status → primary source'),url:'#/lib',label:tx('检查数据库','Explore the library')},
     {n:'02',tag:tx('研究与判断','RESEARCH & INTERPRETATION'),title:tx('政策脉络：把规则放回条件里','Policy context, conditions and implications'),problem:tx('一个比例或门槛，往往不足以判断项目是否适用。','A single threshold rarely answers whether a project is eligible.'),method:tx('结合上位依据、实施口径和适用条件，区分原文、分析与待核项。','Follow the source instruments, implementation conditions and open questions.'),proof:tx('完整研究示例 → 条件说明 → 原始依据','Worked research → conditions → source evidence'),url:'#/topic/绿电直连',label:tx('阅读完整研究','Read a worked example')},
-    {n:'03',tag:tx('建模与工程','MODELLING & ENGINEERING'),title:tx('透明算例：结果可以自己复算','Reproducible worked scenarios'),problem:tx('一个计算结果，需要能解释输入、约束和边界。','A useful model needs visible inputs, constraints and limits.'),method:tx('使用合成数据，展示调度、费用与守恒检查，并提供样例下载。','Use synthetic inputs to explain dispatch, costs and balance checks, with downloadable examples.'),proof:tx('修改样例 → 看约束与结果 → 下载复现','Inspect inputs → check results → reproduce'),url:'#/park-demo',label:tx('试用园区算例','Explore the park example')}
+    {n:'03',tag:tx('建模与工程','MODELLING & ENGINEERING'),title:tx('透明算例：结果可以自己复算','Reproducible worked scenarios'),problem:tx('一个计算结果，需要能解释输入、约束和边界。','A useful model needs visible inputs, constraints and limits.'),method:tx('使用合成数据，展示调度、费用与守恒检查，并提供样例下载。','Use synthetic inputs to explain dispatch, costs and balance checks, with downloadable examples.'),proof:tx('选择样例 → 看约束与结果 → 下载复现','Inspect inputs → check results → reproduce'),url:'#/park-demo',label:tx('试用园区算例','Explore the park example')}
   ];}
   function workRows() {return workItems().map(x=>`<article class="work-row"><div class="work-number">${x.n}</div><div><div class="eyebrow">${x.tag}</div><h3><a href="${x.url}">${x.title} <span>↗</span></a></h3><p>${x.problem}</p><small>${x.proof}</small></div><a class="work-action" href="${x.url}">${x.label} ↗</a></article>`).join('');}
   function productHome() {
@@ -436,9 +436,63 @@
     <section class="editorial-closing"><div><div class="eyebrow">${tx('研究方法与合作','RESEARCH WITH A CLEAR SCOPE')}</div><h2>${tx('让作品先回答问题。','From a question to a usable deliverable.')}</h2><p>${tx('原始依据、适用条件与可复现过程，是这个项目的核心。欢迎围绕能源研究、数据与产品工程交流岗位或项目合作。','Commission a defined research question, a procurement comparison brief or a dedicated research resource. Public samples remain open; scope, inputs and acceptance are agreed separately.')}</p></div><div class="closing-links"><a href="${en()?'#/services':'#/methods'}">${tx('检查研究方法','Explore services')} ↗</a><a href="${en()?'#/work':'#/services'}">${tx('讨论岗位或项目合作','See the work samples')} ↗</a></div></section>`;
     $('#home-search').onsubmit=e=>{e.preventDefault();location.hash='#/lib?q='+encodeURIComponent($('#home-query').value.trim());};
   }
-  function workPage() {
-    $('#app').innerHTML=`<section class="hero demo-page-head"><div><div class="eyebrow">${tx('项目作品 / 研究 / 数据 / 工程','WORK SAMPLES / METHODS / EVIDENCE')}</div><h1>${tx('从可检查的作品，<br>看研究与工程能力。','Inspect the work.<br>Then define your question.')}</h1><p class="lede">${tx('选择一个案例，沿着问题、方法、依据与运行结果检查。这里展示项目成果；个人履历、任职经历和客户案例以另行确认的信息为准。','Follow each example from its question to methods, sources and runnable outputs. These are public project samples, including synthetic scenarios.')}</p></div></section><section class="work-cases">${workItems().map(x=>`<article class="work-case"><header><span class="work-number">${x.n}</span><div><div class="eyebrow">${x.tag}</div><h2>${x.title}</h2></div></header><dl><div><dt>${tx('问题','QUESTION')}</dt><dd>${x.problem}</dd></div><div><dt>${tx('方法','METHOD')}</dt><dd>${x.method}</dd></div><div><dt>${tx('怎么检查','HOW TO VERIFY')}</dt><dd>${x.proof}</dd></div></dl><a class="btn" href="${x.url}">${x.label} ↗</a></article>`).join('')}</section><section class="work-provenance"><div><h2>${tx('从来源，到可复用的成果。','From sources to reusable work.')}</h2><p>${tx('公开内容保留依据与边界；计算样例标明合成输入；开源范围与许可见仓库和来源说明。','Public work retains sources and limits. Worked scenarios identify synthetic inputs. See the repository and source notes for release scope and licensing.')}</p></div><a href="https://github.com/xuqinnn/energy-storage-policy" target="_blank" rel="noopener noreferrer">${tx('检查公开仓库','Inspect the public repository')} ↗</a><a href="#/about">${tx('来源与公开范围','Sources & public scope')} ↗</a></section><section class="editorial-closing"><div><h2>${tx('围绕具体问题，交流合作。','Have a specific question?')}</h2><p>${tx('研究、数据或产品工程相关的岗位与项目，可以从这三份作品开始交流。','Bring a market, region or procurement question. We can discuss a small, clearly scoped first deliverable.')}</p></div><a class="btn pri" href="#/services">${tx('岗位与项目合作','Discuss a scope')} ↗</a></section>`;
+  function workEvidence(n) {
+    const item=workItems().find(x=>x.n===n);
+    const topic=(D.topics||[]).find(t=>t.名==='绿电直连');
+    const sourceLinks=topic?[...topic.md.matchAll(/\[([^\]]+)\]\((https:\/\/[^\s)]+)\)/g)].map(m=>({label:m[1],url:m[2]})):[];
+    const doc=D.docs.ZCJX29;
+    const steps=n==='01'?[
+      tx('按地区、关键词和文件状态检索，打开一条政策详情。','Search by region, keyword and document status; open one record.'),
+      tx('分别核对成文、公开与生效日期，缺失日期不推定。','Check issue, publication and effective dates separately; do not infer missing dates.'),
+      tx('打开原发布链接，将简述与原文的对象和条件逐项对照。','Open the original source and compare the summary with its scope and conditions.')
+    ]:n==='02'?[
+      tx('先读绿电直连研究示例，确认地区、用户、电源与接网类型。','Read the worked example and identify region, users, generation and grid connection.'),
+      tx('分别核每个比例的分子、分母、期间与限定词。','Check each ratio’s numerator, denominator, period and qualifications.'),
+      tx('沿文末来源查对应条款；规划方向与具体项目条件分开判断。','Follow the cited clauses; distinguish planning direction from project eligibility.')
+    ]:[
+      tx('选择固定场景，检查负荷、发电、储能和价格假设。','Choose a fixed case and inspect load, generation, storage and price assumptions.'),
+      tx('查看逐时调度、能量核对及费用构成，再比较另一组输入。','Inspect hourly dispatch, energy balance and cost components, then compare another case.'),
+      tx('下载合成数据与标准库脚本，在本机重建八例并核对结果。','Download the synthetic data and standard-library script; rebuild and compare all eight cases.')
+    ];
+    const limit=n==='01'?tx('目录与简述帮助定位；收录不代表全库本轮重新审定，也不代表项目已获资格。来源的实时可达性须使用时再核。','Records help locate evidence; inclusion is not a fresh review of the entire library or a project eligibility decision. Source availability can change.'):
+      n==='02'?tx('研究按正文标注的截至日与地域使用；公开删减文本不能证明未公开部分没有规定。','Use the research date and regional scope stated in the article. An abridged public text cannot establish what omitted sections contain.'):
+      tx('全部为固定合成场景；不是任意输入在线优化、实际项目报价、利润或政策自用率。逐时调度可能不唯一。','Fixed synthetic cases only: not unrestricted online optimisation, actual quotes, profits or a policy self-use ratio. Hourly schedules may not be unique.');
+    const sources=n==='01'?(doc&&/^https:\/\//.test(doc.url)?[{label:doc.title,url:doc.url}]:[]):n==='02'?sourceLinks:[
+      {label:tx('合成输入与结果','Synthetic inputs & results'),url:'examples/park-scenarios.json'},
+      {label:tx('复现脚本','Reproduction script'),url:'tools/park_examples.py'}
+    ];
+    return {item,steps,limit,sources};
   }
+  function workEvidenceMarkdown(n) {
+    const e=workEvidence(n);
+    const lines=['# '+e.item.title,'',tx('数据版本','Data version')+': '+D.meta.version,
+      tx('快照时间','Snapshot time')+': '+D.meta.exported,'',
+      '## '+tx('问题与方法','Question & method'),e.item.problem,e.item.method,'',
+      '## '+tx('核验步骤','Verification steps'),...e.steps.map((s,i)=>(i+1)+'. '+s),'',
+      '## '+tx('来源与材料','Sources & materials'),...e.sources.map(s=>'- ['+s.label+']('+(s.url.startsWith('https:')?s.url:'https://github.com/xuqinnn/energy-storage-policy/blob/main/'+s.url)+')'),''];
+    if(n==='02')lines.push('## '+tx('研究正文（保留原文语言）','Research text (original language)'),((D.topics||[]).find(t=>t.名==='绿电直连')?.md||'').replace(/【(ZC[A-Z]*\d+)】/g,(_,code)=>D.docs[code]?.title||tx('来源见正文链接','See source links'))||tx('当前快照未收录此示例。','Not included in this snapshot.'),'');
+    if(n==='03')lines.push('## '+tx('复现','Reproduction'),'`python tools/park_examples.py`',tx('使用同一快照中的数据与脚本，保留完整精度核对。','Use data and code from the same snapshot; compare at full precision.'),'');
+    lines.push('## '+tx('边界','Limits'),e.limit,'',tx('公开仓库','Public repository')+': https://github.com/xuqinnn/energy-storage-policy',
+      tx('数据和第三方材料的许可分别见仓库 LICENSE-DATA.md 与 ASSETS.json。此文件不附原件或内部资料。','See LICENSE-DATA.md and ASSETS.json for data and third-party scope. Originals and internal files are not attached.'));
+    return lines.join('\n')+'\n';
+  }
+  function workEvidenceHTML(n) {
+    const e=workEvidence(n);
+    return `<details class="work-evidence"><summary>${tx('核验清单与边界','Verification checklist & limits')}</summary><ol>${e.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol><p class="note">${esc(e.limit)}</p><ul class="evidence-sources">${e.sources.map(s=>`<li><a href="${esc(s.url)}"${s.url.startsWith('https:')?' target="_blank" rel="noopener noreferrer"':''}>${esc(s.label)} ↗</a></li>`).join('')}</ul></details>`;
+  }
+  function workPage() {
+    $('#app').innerHTML=`<section class="hero demo-page-head"><div><div class="eyebrow">${tx('项目作品 / 研究 / 数据 / 工程','WORK SAMPLES / METHODS / EVIDENCE')}</div><h1>${tx('从可检查的作品，<br>看研究与工程能力。','Inspect the work.<br>Then define your question.')}</h1><p class="lede">${tx('选择一个案例，沿着问题、方法、依据与运行结果检查。这里展示项目成果；个人履历、任职经历和客户案例以另行确认的信息为准。','Follow each example from its question to methods, sources and runnable outputs. These are public project samples, including synthetic scenarios.')}</p></div></section><section class="work-cases">${workItems().map(x=>`<article class="work-case"><header><span class="work-number">${x.n}</span><div><div class="eyebrow">${x.tag}</div><h2>${x.title}</h2></div></header><dl><div><dt>${tx('问题','QUESTION')}</dt><dd>${x.problem}</dd></div><div><dt>${tx('方法','METHOD')}</dt><dd>${x.method}</dd></div><div><dt>${tx('怎么检查','HOW TO VERIFY')}</dt><dd>${x.proof}</dd></div></dl>${workEvidenceHTML(x.n)}<div class="work-evidence-actions"><a class="btn" href="${x.url}">${x.label} ↗</a><button type="button" class="btn" data-work-download="${x.n}">${tx('下载证据清单 · Markdown','Download evidence notes · Markdown')}</button></div></article>`).join('')}</section><section class="work-provenance"><div><h2>${tx('从来源，到可复用的成果。','From sources to reusable work.')}</h2><p>${tx('公开内容保留依据与边界；计算样例标明合成输入；开源范围与许可见仓库和来源说明。','Public work retains sources and limits. Worked scenarios identify synthetic inputs. See the repository and source notes for release scope and licensing.')}</p></div><a href="https://github.com/xuqinnn/energy-storage-policy" target="_blank" rel="noopener noreferrer">${tx('检查公开仓库','Inspect the public repository')} ↗</a><a href="#/about">${tx('来源与公开范围','Sources & public scope')} ↗</a></section><section class="editorial-closing"><div><h2>${tx('围绕具体问题，交流合作。','Have a specific question?')}</h2><p>${tx('研究、数据或产品工程相关的岗位与项目，可以从这三份作品开始交流。','Bring a market, region or procurement question. We can discuss a small, clearly scoped first deliverable.')}</p></div><a class="btn pri" href="#/services">${tx('岗位与项目合作','Discuss a scope')} ↗</a></section>`;
+  }
+  document.addEventListener('click',event=>{
+    const button=event.target.closest('[data-work-download]');
+    if(!button||!D)return;
+    const n=button.dataset.workDownload;
+    if(!workItems().some(x=>x.n===n))return;
+    const blob=new Blob([workEvidenceMarkdown(n)],{type:'text/markdown;charset=utf-8'});
+    const url=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=url;a.download='energy-research-work-'+n+'-'+(en()?'en':'zh')+'.md';
+    document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  });
   function toolHubPage(){
     const tools=[['#/tools',tx('容量与充电费用','Capacity & charging costs'),tx('一个参考折算值，或一笔费用如何组成。','Understand a reference calculation or a charging bill.'),tx('输入时长、标准或费用项，展开公式和边界。适合核对计算口径。','Enter durations, reference standards or fee items. Inspect the formula and its limits.'),tx('可修改输入','Editable inputs')],['#/park-demo',tx('园区储能演示','Park storage scenarios'),tx('削峰、套利、消纳，储能分别改变了什么？','What changes with peak shaving, arbitrage or renewable use?'),tx('切换8组合成案例，查看逐时调度、能量与费用；不是任意输入的在线求解器。','Switch between eight synthetic cases. Inspect hourly flows, energy and cost; this is not an unrestricted online solver.'),tx('固定案例 · 可复现','Fixed cases · Reproducible')],['#/rev',tx('运营差额试算','Operating-margin example'),tx('先改变假设，再看结果。','Change the assumptions, then inspect the result.'),tx('用合成教学输入理解收入与成本的关系。未计投资、融资、税费和折旧，不是投资回报率。','Explore revenue and costs with synthetic inputs. Excludes investment, finance, tax and depreciation; not an investment return.'),tx('合成教学示例','Synthetic worked example')]];
     $('#app').innerHTML=`<section class="hero demo-page-head"><div class="eyebrow">${tx('免费工具与演示','FREE TOOLS & WORKED EXAMPLES')}</div><h1>${tx('看得懂，也能亲手试。','Understand it. Then try it.')}</h1><p class="lede">${tx('先选择你要回答的问题。输入、单位、假设和适用边界随结果一起展示。','Choose the question you need to answer. Inputs, units, assumptions and limits stay visible alongside the result.')}</p></section><div class="service-offers">${tools.map(x=>`<article class="service-offer"><span class="service-tag">${x[4]}</span><h2>${x[1]}</h2><h3>${x[2]}</h3><p>${x[3]}</p><a class="btn" href="${x[0]}">${tx('打开工具','Open the tool')} ↗</a></article>`).join('')}</div><section class="proof-band product-section"><div><div class="eyebrow">${tx('从结果回到证据','FROM THE RESULT TO THE EVIDENCE')}</div><h2>${tx('计算正确，还要核适用条件。','Correct arithmetic still needs applicability.')}</h2><p>${tx('公开工具帮助解释方法。实际项目的地区、日期、资格和结算规则仍须独立确认。','The tools explain methods. Region, dates, eligibility and settlement rules still need independent review for a real project.')}</p></div><div class="proof-links"><a href="#/methods/capacity-cost">${tx('容量与费用研究方法','Capacity & cost methodology')} ↗</a><a href="#/services">${tx('需要实际情景模型？','Need a model for your situation?')} ↗</a></div></section>`;

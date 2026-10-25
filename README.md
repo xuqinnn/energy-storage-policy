@@ -56,3 +56,7 @@ python3 -m http.server 8002 --bind 127.0.0.1 --directory /tmp/energy-synthetic
 园区固定合成演示见`#/park-demo`：8组24小时输入、可行调度、费用分项和守恒核对。仅切换预计算场景，不支持任意项目输入或在线LP。无发电时利用率为“不适用”；绿电利用率包含损耗，不等同政策自用比例。容量目标权重按整个24小时构造时段计，不是实际日价；运行费不是利润。
 
 用Python标准库复现：`python tools/park_examples.py > /tmp/park-scenarios.json`。该脚本只构造8个固定算例；与JSON逐项对拍及物理约束核对见`python -m unittest discover -s tests`。无NumPy/SciPy、私有库或网络依赖。源代码MIT、构造数据CC0的范围见ASSETS.json和LICENSE-DATA.md，不给上游园区候选LP或历史资料整体授权。
+
+### Work samples and evidence notes
+
+Open `#/work` for three project samples. Each has a keyboard-accessible verification checklist, source/material links, limits and a Markdown download with its data version and snapshot time. The research note preserves the reviewed Chinese article; English framing does not translate the original policy. Synthetic examples link to the public reconstruction script and inputs. These notes contain no private originals and work in the offline single-file preview as well. Use code and data from the same snapshot when reproducing results; source availability may change.
