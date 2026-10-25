@@ -13,7 +13,8 @@
         "assets/storage-math.js",
         "tests/test_storage_math.js",
         "tools/park_examples.py",
-        "tests/test_park_examples.py"
+        "tests/test_park_examples.py",
+        "assets/research-ui.css"
       ],
       "class": "B",
       "origin": "本项目Git历史可追溯的自有前台及本轮通用实现",
@@ -74,6 +75,19 @@
       "license": "CC-BY-4.0",
       "decision": "include-reviewed-content",
       "sha256": "b263935471dfb51749d4cc608d6206095eb20fb5b1e45fa6a2f835a3eb2bd317"
+    },
+    {
+      "paths": [
+        "assets/vendor/open-props-1.7.23.min.css",
+        "assets/vendor/tabler-icons.js",
+        "assets/vendor/OPEN-PROPS-LICENSE.txt",
+        "assets/vendor/TABLER-LICENSE.txt",
+        "assets/vendor/DESIGN-SOURCES.json"
+      ],
+      "class": "A",
+      "origin": "Open Props 1.7.23 and selected Tabler Icons 3.34.1; exact sources and SHA in DESIGN-SOURCES.json",
+      "license": "MIT; upstream licenses retained separately",
+      "decision": "include-local-with-notices"
     }
   ],
   "reviewed_public_guides": {

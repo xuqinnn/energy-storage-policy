@@ -12,7 +12,7 @@ import shutil
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE if (HERE / 'index.html').is_file() else HERE.parent
-WEB_FILES = ['index.html', 'assets/app.js', 'assets/storage-math.js', 'assets/app.css', 'assets/vendor/echarts.min.js', 'assets/vendor/LICENSE', 'assets/vendor/NOTICE']
+WEB_FILES = ['assets/research-ui.css', 'assets/vendor/open-props-1.7.23.min.css', 'assets/vendor/tabler-icons.js', 'assets/vendor/OPEN-PROPS-LICENSE.txt', 'assets/vendor/TABLER-LICENSE.txt', 'assets/vendor/DESIGN-SOURCES.json'] + ['index.html', 'assets/app.js', 'assets/storage-math.js', 'assets/app.css', 'assets/vendor/echarts.min.js', 'assets/vendor/LICENSE', 'assets/vendor/NOTICE']
 DOC_FILES = ['content/reading-notes.json', 'README.md', 'LICENSE', 'LICENSE-DATA.md', 'CONTRIBUTING.md', 'ASSETS.json', '.gitignore', 'examples/synthetic.json', 'tests/test_public.py', 'tests/test_storage_math.js', 'examples/method-arithmetic.json', 'tools/park_examples.py', 'examples/park-scenarios.json', 'tests/test_park_examples.py']
 ALLOWED_TOP = {'meta','metrics','provinces','docs','cards','events','dev','diff','score','example','briefs','links','tags','tagdocs','methods','lib','research','learning','stats','mech','topics','topicmap','synthetic_example','public_guides'}
 
