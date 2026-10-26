@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "items": [
+    {
+      "id": "RPLY-NEA-20260630-4106",
+      "title": "安徽电力外送与就近消纳如何协同？",
+      "source_kind": "人大建议答复",
+      "issuer": "国家能源局",
+      "reply_title": "对十四届全国人大四次会议第4106号建议的答复",
+      "reply_number": "国能建电力〔2026〕103号",
+      "reply_issued_at": "2026-06-30",
+      "date_precision": "day",
+      "official_page_publishdate": "2026-06-30",
+      "first_publication_date": null,
+      "first_publication_date_status": "NOT_ESTABLISHED_BY_URL_OR_CURRENT_META",
+      "summary": "答复针对安徽电力保供和外送需求提出下一步规划研究，并援引国家文件讨论外送与就近消纳协同。",
+      "our_analysis": "可把跨区外送与本地消纳分别列入安徽选址研究，再核查正式政策、负荷与接入条件。答复中的规划意向不等于项目已经纳规或获批。",
+      "boundary": "国家部门答复涉及安徽，不能据此认定安徽项目享有审批、减免费用或收益资格，也不能外推到全部省份。",
+      "quote": "支持新能源就近消纳新业态发展",
+      "source_anchor": "三、关于“支持富余电力就地转化”的建议",
+      "source_url": "https://www.nea.gov.cn/20260803/2eaa886b47074aa395ff974d7895494f/c.html",
+      "tags": [
+        "绿电直连",
+        "新能源消纳"
+      ],
+      "region_scope": "国家部门答复涉及安徽；国家政策背景不等于安徽地方实施规则",
+      "verified_region_codes": [
+        "安徽"
+      ],
+      "policy_ids": [
+        "ZCGJ13",
+        "ZCGJ120"
+      ],
+      "evidence_checks": {
+        "source_verified": true,
+        "cited_policies_verified": true,
+        "project_applicability_verified": false
+      },
+      "evidence_check_scope": "已核本条两件援引身份及对应主题段落；不代表整套政策、地方或项目适用性通过",
+      "reviewed_on": "2026-10-25"
+    },
+    {
+      "id": "RPLY-NEA-20260630-7948",
+      "title": "安全评价与容量电价挂钩进展到哪一步？",
+      "source_kind": "人大建议答复",
+      "issuer": "国家能源局",
+      "reply_title": "对十四届全国人大四次会议第7948号建议的答复",
+      "reply_number": "国能建安全〔2026〕111号",
+      "reply_issued_at": "2026-06-30",
+      "date_precision": "day",
+      "official_page_publishdate": "2026-06-30",
+      "first_publication_date": null,
+      "first_publication_date_status": "NOT_ESTABLISHED_BY_URL_OR_CURRENT_META",
+      "summary": "答复介绍储能安全管理措施，并将安全结果与容量电价挂钩表述为研究推动方向。",
+      "our_analysis": "应区分已印发的容量电费考核要求与仍在研究的安全结果挂钩安排；项目测算须另核正式文件、地方细则和具体适用条件。",
+      "boundary": "本答复未给统一定检周期、评级扣费比例、评价收费或容量收益公式；“研究推动”不等于全国统一安全评分扣费办法已经实施。",
+      "quote": "研究推动有关安全结果和容量电价挂钩",
+      "source_anchor": "二、关于推动定检结果与电站容量电费、保险等经济收益挂钩",
+      "source_url": "https://www.nea.gov.cn/20260724/e663dba5f6274b6abf267dac57dcd6c4/c.html",
+      "tags": [
+        "储能",
+        "安全评价"
+      ],
+      "region_scope": "全国研究背景；未建立地方关联，不向省份看板广播",
+      "verified_region_codes": [],
+      "policy_ids": [
+        "ZCGJ03",
+        "ZCGJ04"
+      ],
+      "evidence_checks": {
+        "source_verified": true,
+        "cited_policies_verified": false,
+        "project_applicability_verified": false
+      },
+      "evidence_check_scope": "两处政策关联已核，其他援引版本未全核；本答复内容接受不等于安全结果挂钩规则已实施",
+      "reviewed_on": "2026-10-25"
+    }
+  ]
+}

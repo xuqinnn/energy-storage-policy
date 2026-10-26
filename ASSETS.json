@@ -14,7 +14,8 @@
         "tests/test_storage_math.js",
         "tools/park_examples.py",
         "tests/test_park_examples.py",
-        "assets/research-ui.css"
+        "assets/research-ui.css",
+        "tests/test_reply_insights.py"
       ],
       "class": "B",
       "origin": "本项目Git历史可追溯的自有前台及本轮通用实现",
@@ -88,6 +89,16 @@
       "origin": "Open Props 1.7.23 and selected Tabler Icons 3.34.1; exact sources and SHA in DESIGN-SOURCES.json",
       "license": "MIT; upstream licenses retained separately",
       "decision": "include-local-with-notices"
+    },
+    {
+      "paths": [
+        "content/reply-insights.json"
+      ],
+      "class": "A/B",
+      "origin": "RPLY-02两条限定接受的独立公开投影；安徽4106、全国背景7948；仅摘要/自有解释/短引与链接",
+      "license": "自有摘要与分析CC-BY-4.0；官方短引按来源，不覆盖第三方全文；详见LICENSE-DATA.md",
+      "decision": "include-reviewed-projection",
+      "sha256": "3ebf7946dea944b3ac49ed0451947d1d24f65c1175e61439f52e60fc5db6cf8f"
     }
   ],
   "reviewed_public_guides": {
