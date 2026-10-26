@@ -201,7 +201,7 @@
     const t0 = new Date().toISOString().slice(0, 10);
     const li = e => `<li><span class="mono">${esc((e.published || e.date || '').slice(5))}</span><span class="pv">${esc(e.prov || '')}</span><span>${e.kind !== '新发布' ? `<span class="st ${e.kind === '征求截止' ? 'draft' : e.kind === '即将执行' ? 'ok' : 'none'}">${esc(e.kind)}</span> ` : ''}${e.code ? `<button type="button" class="cite ${statusClass(e.status)}" data-code="${esc(e.code)}">${esc(e.code)}</button> ` : ''}${esc(String(e.title || '').replace(/^\d{6}/, ''))}${e.code && briefOf(e.code) ? ` <button type="button" class="blink" data-code="${esc(e.code)}">分析</button>` : ''}${(D.docs[e.code] || {}).summary ? `<p class="policy-summary">${esc(D.docs[e.code].summary)}</p>` : ''}</span></li>`;
     const up = ev.filter(e => e.kind !== '新发布' && e.date >= t0).slice(0, 10);
-    const nw = ev.filter(e => e.kind === '新发布').sort((a, b) => (b.published || b.date || '').localeCompare(a.published || a.date || '') || (b.landed || '').localeCompare(a.landed || ''));   /* 按索引／事件日期倒序（原按收录时间排，日期看着乱） */
+    const nw = ev.filter(e => e.kind === '新发布').sort((a, b) => (b.published || b.date || '').localeCompare(a.published || a.date || '') || (b.landed || '').localeCompare(a.landed || ''));   /* 按公开／索引／事件日期倒序（原按收录时间排，日期看着乱） */
     const cats = [...new Set(nw.map(e => e.cat).filter(Boolean))];
     const newList = (items, n) => `<ul class="evl" style="margin-top:10px">${items.slice(0, n).map(li).join('') || '<li class="note">暂无</li>'}</ul>${items.length > n ? `<details class="more"><summary>展开全部 ${items.length} 件</summary><ul class="evl">${items.slice(n).map(li).join('')}</ul></details>` : ''}`;
     // 用户 10-16：全部分类、近 60 天发布或近 30 天新收录，按分类筛；有简析的带链接
@@ -378,7 +378,7 @@
   }
   function learningPage() {
     $('#app').innerHTML = `<section class="hero"><div><div class="eyebrow">政策学习</div><h1>学习主题与政策索引</h1><p class="lede">按学习主题汇集已收录政策，随政策状态和主题索引更新。点击圆点查看政策简述与分析。</p></div></section>
-      <div class="mech">${(D.learning || []).map(t => `<section class="card"><h2>${esc(t.title)}</h2><p class="sub">${t.codes.length} 件相关政策 · 按索引／事件日期倒序</p><ul class="evl">${t.codes.slice(0, 8).map(code => docRow(code)).join('')}</ul>${t.codes.length > 8 ? `<details><summary>查看其余 ${t.codes.length - 8} 件</summary><ul class="evl">${t.codes.slice(8).map(code => docRow(code)).join('')}</ul></details>` : ''}</section>`).join('')}</div>`;
+      <div class="mech">${(D.learning || []).map(t => `<section class="card"><h2>${esc(t.title)}</h2><p class="sub">${t.codes.length} 件相关政策 · 按公开／索引／事件日期倒序</p><ul class="evl">${t.codes.slice(0, 8).map(code => docRow(code)).join('')}</ul>${t.codes.length > 8 ? `<details><summary>查看其余 ${t.codes.length - 8} 件</summary><ul class="evl">${t.codes.slice(8).map(code => docRow(code)).join('')}</ul></details>` : ''}</section>`).join('')}</div>`;
   }
   // ---------- 首页（研究线首页文案 v1）：主张、家底数字、常问问题、收益机制速览、近期新政策、怎么读本站；数字构建时实时算 ----------
   const MECH = [
@@ -618,7 +618,7 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
   const LIBX = () => D._lx || (D._lx = Object.fromEntries((D.lib || []).map(r => [r[0], r])));
   const days = d => (Date.parse(today()) - Date.parse(d)) / 864e5;
   const isYMD = d => /^\d{4}-\d{2}-\d{2}$/.test(d || '');
-  const actDate = r => isYMD(r[4]) && !r[4].endsWith('-01') ? r[4] : (isYMD(r[8]) ? r[8] : '');          /* 日为 1 号的占位日期改用收录日 */
+  const actDate = r => { const published=D.docs[r[0]]?.published; return isYMD(published)?published:(isYMD(r[4])&&!r[4].endsWith('-01')?r[4]:(isYMD(r[8])?r[8]:'')); }; /* 近期活动优先用已核公开日；不推定最早首发，未知才回退成文/收录日。 */
   const midDate = r => isYMD(r[4]) ? (r[4].endsWith('-01') ? r[4].slice(0, 8) + '15' : r[4]) : '';     /* 更新状态：占位日期按月中计 */
   const tilesOf = r => r[5] === '内蒙古' ? ['蒙西', '蒙东'] : r[5] === '跨省区域' ? (r[9] || []) : TILES[r[5]] ? [r[5]] : [];
   const libProv = p => (p === '蒙西' || p === '蒙东') ? '内蒙古' : p;
@@ -646,7 +646,7 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
           ${tileMapHTML(p => { const k = q(act[p]); return { bg: k < 0 ? GRAY : BLUES[k], val: cnt[p] ? cnt[p] + ' 件' : '', dim: sel && sel !== p, tip: cnt[p] ? `${p}：近 30 天 ${cnt[p]} 件，其中重要性 4 级以上 ${hi[p] || 0} 件；最近一件《${last[p][1].replace(/^\d{6}/, '').slice(0, 40)}》` : `${p}：近 30 天无新件` }; }, 'pTiles')}
           ${legendHTML([[GRAY, '无'], ...BLUES.map((c, i) => [c, ['低', '较低', '中', '较高', '高'][i]])])}
           <p class="note">近 30 天资料活跃度＝重要性按时间衰减加总（每 10 天减半）；区域文件计入所覆盖各省、权重减半；国家文件单列。</p></div>
-        <div class="plist"><div class="sub">${sel ? `${esc(sel)} · ${list.length} 件 · <a href="#/policy">看全部</a> · <a href="#/p/${encodeURIComponent(sel)}">进入${esc(sel)}看板 →</a>` : `近 30 天 ${list.length} 件，按索引／事件日期倒序`}</div><ul class="prl">${list.map(card).join('') || '<li class="note">无</li>'}</ul></div></section>
+        <div class="plist"><div class="sub">${sel ? `${esc(sel)} · ${list.length} 件 · <a href="#/policy">看全部</a> · <a href="#/p/${encodeURIComponent(sel)}">进入${esc(sel)}看板 →</a>` : `近 30 天 ${list.length} 件，按公开／索引／事件日期倒序`}</div><ul class="prl">${list.map(card).join('') || '<li class="note">无</li>'}</ul></div></section>
       <section style="margin-top:20px"><h2 style="margin-bottom:12px">找政策</h2><div class="mech entries">
         <a class="mc" href="#/policy/prov"><div class="mh"><b>按省份</b></div><p>31 省网格，看每省件数和最近更新。</p></a>
         <a class="mc" href="#/topics"><div class="mh"><b>按专题</b></div><p>${(D.topics || []).map(t => esc(t.名)).join('、')}。</p></a>
@@ -1025,7 +1025,7 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
   }
   function contentSourcesHTML(id) {
     const sources=contentLayer.source_links.filter(s=>s.policy_id===id),legacy=D.docs[id]?.url;
-    if(!sources.length&&/^https:\/\//.test(legacy||''))return `<div class="block"><a class="btn" href="${esc(legacy)}" target="_blank" rel="noopener noreferrer" data-source-link>查看官方发布页 ↗</a></div>`;
+    if(!sources.length&&/^https?:\/\//.test(legacy||''))return `<div class="block"><a class="btn" href="${esc(legacy)}" target="_blank" rel="noopener noreferrer" data-source-link>查看官方发布页 ↗</a></div>`;
     return sources.map(s=>`<div class="block"><a class="btn" href="${esc(s.url)}" target="_blank" rel="noopener noreferrer" data-source-link data-source-role="${esc(s.role)}">${esc(EnergyContent.SOURCE_LABELS[s.role])} ↗</a>${!s.role.startsWith('ORIGINAL_')?'<p class="note">关联来源，不替代原文件发布页；未据此扩展政策参数核验。</p>':''}</div>`).join('');
   }
   function shareContentHTML(id) {

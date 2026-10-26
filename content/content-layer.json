@@ -118,6 +118,26 @@
       "importance_reason": "重点用能单位合规关注信息，储能主链关联较弱评3；保留检索/分享，未达4不等于不得公开。",
       "classification_basis": "p1仅征求废止意见，p2—p6是被讨论旧办法全文，不是本公告另行制定的规则或正式废止决定。",
       "evidence_scope": "原件所见身份/主对象/分类与评分理由/明示日期；无新增完整内容、数值参数或权利资格接受"
+    },
+    {
+      "id": "ZCSH43",
+      "canonical_document_id": "ZCSH43",
+      "content_type": "policy",
+      "subtype": "新能源上网电价改革规则（正式通知）",
+      "importance": 4,
+      "importance_reason": "省级价格与交易机制调整，影响新能源结算及配储研究边界，编辑评4；不据此确认具体项目收益。",
+      "classification_basis": "主件与三附件规定新能源入市、机制差价结算、增量竞价及成本调查，主对象是适用规则，归政策；标题通知是行文形式。",
+      "evidence_scope": "已核正式身份、元数据、受控摘要与官方来源；具体项目适用及自动参数绑定未验收。"
+    },
+    {
+      "id": "ZCSD53",
+      "canonical_document_id": "ZCSD53",
+      "content_type": "policy",
+      "subtype": "电力零售价格风险防控细则（正式修订稿）",
+      "importance": 4,
+      "importance_reason": "省级零售风险防控规则调整，对售电、虚拟电厂及用户套餐核对有直接研究价值，编辑评4；不代项目适用核验。",
+      "classification_basis": "三部门正式印发42条实施细则及五附件，规定封顶、重点关注、预警和信息公开机制；修订稿不是征求意见稿，归政策。",
+      "evidence_scope": "已核正式身份、元数据、受控摘要与官方来源；具体项目适用及自动参数绑定未验收。"
     }
   ],
   "source_links": [

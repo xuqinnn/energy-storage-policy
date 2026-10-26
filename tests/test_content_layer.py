@@ -48,7 +48,7 @@ class ContentProjectionTest(unittest.TestCase):
 
     def test_final_nine_fields_source_hold_and_scores_are_enforced(self):
         layer=self.layer()
-        self.assertEqual(len(layer['classifications']),9)
+        self.assertEqual(len(layer['classifications']),11)
         self.assertNotIn('ZCMD22',{c['id'] for c in layer['classifications']})
         for modify in [lambda d:d.update(source_gaps=[]),
                        lambda d:d['source_gaps'][0].update(id='OTHER'),
