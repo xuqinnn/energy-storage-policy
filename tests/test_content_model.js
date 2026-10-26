@@ -6,7 +6,7 @@ const replies=JSON.parse(fs.readFileSync(path.join(root,'content/reply-insights.
 if(data.meta.dataset==='synthetic'){console.log('Synthetic-only build: real classification contract not applicable.');process.exit(0);}
 const before=JSON.stringify(data),model=M.create(data,layer,replies),stats=M.stats(model);
 assert.strictEqual(JSON.stringify(data),before,'classification must not change source statuses, dates or parameters');
-assert.deepStrictEqual([stats.policy,stats.notices,stats.important,stats.unscored],[3,11,6,2]);
+assert.deepStrictEqual([stats.policy,stats.notices,stats.important,stats.unscored],[4,11,6,2]);
 assert.strictEqual(model.records.size,new Set([...Object.keys(data.docs),...layer.notices.map(n=>n.id),...replies.map(r=>r.id)]).size);
 for(const id of ['ZCHEB52','ZCLN37']){assert.strictEqual(M.query(model,{q:id,type:'notice'})[0].importance,3);}
 assert(M.query(model,{q:'广州电力交易中心 正式运行',type:'notice'}).some(r=>r.id==='NTF-GZPEC-20261024-FORMAL'));
@@ -20,7 +20,7 @@ assert.strictEqual(M.query(model,{type:'notice',yr:'2026-10'}).filter(r=>r.kind=
 assert.strictEqual(M.query(model,{type:'article_report'}).length,0,'unreviewed research materials are not all reclassified as reports');
 assert(stats.classification_pending>0);
 for(const id of ['ZCSN34','ZCSD45','ZCAH63'])assert.strictEqual(model.records.get(id).importance,4);
-assert.strictEqual(layer.classifications.length,11);
+assert.strictEqual(layer.classifications.length,12);
 for(const [id,province,published] of [['ZCSH43','上海','2026-10-20'],['ZCSD53','山东','2026-10-15']]){
   assert.strictEqual(M.query(model,{q:id,type:'policy',prov:province})[0].id,id);
   assert.strictEqual(M.query(model,{q:id,type:'notice'}).length,0,'policy wording is not a notice event');
@@ -45,3 +45,9 @@ const related=layer.source_links.filter(s=>!s.role.startsWith('ORIGINAL_'));
 assert.strictEqual(related.length,6);assert.strictEqual(layer.source_links.length-related.length,25);
 assert(related.filter(s=>['ZCAH16','ZCAH18'].includes(s.policy_id)).every(s=>s.role==='OFFICIAL_REPRINT_ATTACHMENT'&&s.url.endsWith('.pdf')));
 console.log('Content search, deduplication, limited counts, dates, low/unscored notices, source roles and negative contracts passed.');
+
+assert.strictEqual(model.records.get('ZCXJ32').content_type,'policy');
+assert.strictEqual(model.records.get('ZCXJ24').status,'已废止');
+assert.strictEqual(model.records.get('ZCXJ13').status,'现行有效');
+assert(data.docs.ZCXJ13.reference_warning.text.includes('不改本件状态'));
+assert(data.provinces['新疆']['②c5'].staleCites.includes('ZCXJ24'));

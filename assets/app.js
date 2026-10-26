@@ -252,6 +252,7 @@
       ${sum ? `<p class="summary">${citeHTML(sum)}</p>` : ''}${mainTagsOf(code).length ? `<div class="chips">${mainTagsOf(code).map(tagLink).join('')}</div>` : ''}</div>`;
     const blk = [];
     if(!held)blk.push(contentSourcesHTML(code));
+    if(!held&&d.reference_warning){const warning=d.reference_warning;blk.push(`<section class="block" data-reference-warning><h3>${esc(warning.title)}</h3><p>${esc(warning.text)}</p><button type="button" class="analysis-policy-link" data-code="${esc(warning.policy_id)}">查看明示废止通知 →</button>${/^https?:\/\//.test(warning.url||'')?`<a class="btn" data-reference-source href="${esc(warning.url)}" target="_blank" rel="noopener noreferrer">废止通知官方来源 ↗</a>`:''}</section>`);}
     if(held)blk.push(`<div class="block" data-source-gap><h3>来源缺口</h3><p>${esc(classified.source_gap)}</p><p class="note">原索引状态与题名不构成公告发布、效力或补偿兑现的核验结果；原资料保留。</p></div>`);
     if(classified?.importance_reason)blk.push(`<div class="block"><h3>编辑重要性 ${classified.importance}级</h3><p>${esc(classified.importance_reason)}</p></div>`);
     if(code==='ZCAH19')blk.push('<div class="block"><p class="note">发布页文号栏未载；正文所引505号属于被引用文件，本件自有文号仍待核。</p></div>');

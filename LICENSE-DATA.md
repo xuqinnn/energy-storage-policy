@@ -15,3 +15,5 @@ Apache ECharts 5.5.1使用Apache-2.0，完整许可及NOTICE保留在assets/vend
 `assets/content-model.js`, `tests/test_content_layer.py` and `tests/test_content_model.js` are project-authored code covered by MIT. `content/content-layer.json` contains a limited public notice projection, nine final classification labels with editorial importance and one source-provenance hold, and source-link roles. Original summaries and analysis are CC BY 4.0 with attribution to 独立能源研究站; the short notice quotation and metadata remain attributed to 广州电力交易中心 and the linked sources. This does not grant redistribution rights to source pages, publisher assets, reports or attachments. Event dates, page-publication dates and unknown earliest publication remain distinct. Classification and editorial importance do not certify legal effect, project eligibility or model parameters.
 
 ZCMD22仅保留旧资料索引与来源缺口说明，不计入本批已审通知或重要更新；其旧题名/日期/状态不构成公告母页或补偿兑现的核验。分类保留最终9项标签，另新增上海42号、山东712号两件正式政策；既有南方运行公告与31条来源角色保持。两件仅公开自有摘要、分析及官方来源，不复制完整正文、WPS、公式图片或归档合订件；未绑定自动测算参数。
+
+新疆废止决定仅公开第11项的独立分析、原页链接及直接费用分摊引用提示；完整目录DOC和阅读合订件不复制到公共包。明示旧规废止不自动决定其他文件全文效力或全部收益取消。
