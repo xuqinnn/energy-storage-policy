@@ -6,19 +6,29 @@ const replies=JSON.parse(fs.readFileSync(path.join(root,'content/reply-insights.
 if(data.meta.dataset==='synthetic'){console.log('Synthetic-only build: real classification contract not applicable.');process.exit(0);}
 const before=JSON.stringify(data),model=M.create(data,layer,replies),stats=M.stats(model);
 assert.strictEqual(JSON.stringify(data),before,'classification must not change source statuses, dates or parameters');
-assert.deepStrictEqual([stats.policy,stats.notices,stats.important,stats.unscored],[1,12,7,2]);
+assert.deepStrictEqual([stats.policy,stats.notices,stats.important,stats.unscored],[1,11,6,2]);
 assert.strictEqual(model.records.size,new Set([...Object.keys(data.docs),...layer.notices.map(n=>n.id),...replies.map(r=>r.id)]).size);
-for(const id of ['ZCHEB52','ZCLN37']){assert.strictEqual(M.query(model,{q:id,type:'notice'})[0].importance,2);}
+for(const id of ['ZCHEB52','ZCLN37']){assert.strictEqual(M.query(model,{q:id,type:'notice'})[0].importance,3);}
 assert(M.query(model,{q:'广州电力交易中心 正式运行',type:'notice'}).some(r=>r.id==='NTF-GZPEC-20261024-FORMAL'));
 assert(M.query(model,{q:'1461',type:'notice'}).some(r=>r.id==='ZCGJ110'));
 assert.strictEqual(model.records.get('ZCGJ110').kind,'policy','use its own existing document renderer, not a reused reply body');
-assert.strictEqual(model.records.get('ZCGJ110').summary,layer.classifications.find(c=>c.id==='ZCGJ110').classification_boundary);
+assert.strictEqual(model.records.get('ZCGJ110').summary,layer.classifications.find(c=>c.id==='ZCGJ110').classification_basis);
 assert.strictEqual(model.records.get('ZCGJ110').body,'','do not inherit a separate accepted reply or old unreviewed analysis');
 assert.strictEqual(M.query(model,{type:'notice',prov:'广东'}).some(r=>r.id==='NTF-GZPEC-20261024-FORMAL'),false);
 assert.strictEqual(M.query(model,{type:'notice',prov:'安徽'}).filter(r=>r.kind==='reply').length,1);
 assert.strictEqual(M.query(model,{type:'notice',yr:'2026-10'}).filter(r=>r.kind==='reply').length,0,'June replies are not October additions');
 assert.strictEqual(M.query(model,{type:'article_report'}).length,0,'unreviewed research materials are not all reclassified as reports');
 assert(stats.classification_pending>0);
+for(const id of ['ZCSN34','ZCSD45','ZCAH63'])assert.strictEqual(model.records.get(id).importance,4);
+assert.strictEqual(layer.classifications.length,9);
+assert.strictEqual(model.records.get('ZCMD22').review_hold,true);
+assert.strictEqual(model.records.get('ZCMD22').content_type,'unclassified');
+assert.strictEqual(model.records.get('ZCMD22').importance,null);
+assert.strictEqual(M.query(model,{q:'ZCMD22',type:'notice'}).length,0);
+assert.strictEqual(M.query(model,{q:'ZCMD22'})[0].body,'');
+const fallback=M.create(data,{schema:1,notices:[],classifications:[],source_links:[],source_gaps:[]},replies);
+assert.strictEqual(fallback.records.get('ZCMD22').review_hold,true,'content fetch failure must not release a known source hold');
+assert.throws(()=>M.validate({...layer,classifications:[...layer.classifications,{...layer.classifications[0],id:'ZCMD22',canonical_document_id:'ZCMD22'}]}));
 assert.throws(()=>M.create({...data,docs:{...data.docs,[layer.notices[0].id]:{title:'duplicate'}}},layer,replies));
 assert.throws(()=>M.validate({...layer,classifications:[...layer.classifications,layer.classifications[0]]}));
 assert.throws(()=>M.validate({...layer,private_source_path:'excluded'}));

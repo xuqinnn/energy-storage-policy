@@ -33,81 +33,91 @@
       "id": "ZCGJ45",
       "canonical_document_id": "ZCGJ45",
       "content_type": "notice",
-      "subtype": "名单公示（建设名单·第一批）",
+      "subtype": "建设名单发布及名单内推进安排",
       "importance": 5,
-      "classification_boundary": "国家级零碳园区建设名单；建设名单身份不等于储能或绿电直连项目准入资格。"
+      "importance_reason": "国家首批建设名单及推进安排是涉及多地区园区的重要实施事件，编辑评5；不以全国唯一/全覆盖或通用准入阈值为理由。",
+      "classification_basis": "主对象是经申报/推荐/评审等程序确定的首批建设名单，并附名单内建设、支持、跟踪及验收后认定安排；不是已完成零碳认定的名单，也不能概括为无任何管理条件。",
+      "evidence_scope": "原件所见身份/主对象/分类与评分理由/明示日期；无新增完整内容、数值参数或权利资格接受"
     },
     {
       "id": "ZCGJ110",
       "canonical_document_id": "ZCGJ110",
       "content_type": "notice",
-      "subtype": "官方答复（人大建议答复）",
+      "subtype": "官方答复（人大建议办理）",
       "importance": 4,
-      "classification_boundary": "第1461号建议答复；分类标签不代表正文数值或项目适用已核验，不引用其他答复的核验结果。"
-    },
-    {
-      "id": "ZCMD22",
-      "canonical_document_id": "ZCMD22",
-      "content_type": "notice",
-      "subtype": "名单公示（补偿标准·项目级）",
-      "importance": 4,
-      "classification_boundary": "项目级放电量补偿标准公告，不将项目标准推为区域普适电价。"
+      "importance_reason": "对新能源、调节资源和绿电直连的官方办理表述有研究解释价值，评4；答复中的统计与援引政策不作为新增义务或投资参数。",
+      "classification_basis": "p1具体建议办理答复、p2机关落款；属于官方解释/办理信息，不自动成为普遍适用规则。",
+      "evidence_scope": "原件所见身份/主对象/分类与评分理由/明示日期；无新增完整内容、数值参数或权利资格接受"
     },
     {
       "id": "ZCSN34",
       "canonical_document_id": "ZCSN34",
       "content_type": "notice",
-      "subtype": "名单公示（项目建设清单·第一批）",
-      "importance": 5,
-      "classification_boundary": "第一批建设清单公示；公示不等于最终批准或补偿资格。"
+      "subtype": "建设清单结果公示",
+      "importance": 4,
+      "importance_reason": "区域储能建设项目的重要公示，开发研究价值明确评4；不采用决定谁进入容量补偿盘子的5级理由。",
+      "classification_basis": "p1明确建设清单结果公示，公示6/24—6/30；实际列项目并接受异议，不等同正式最终清单或补偿到账。",
+      "evidence_scope": "原件所见身份/主对象/分类与评分理由/明示日期；无新增完整内容、数值参数或权利资格接受"
     },
     {
       "id": "ZCGX34",
       "canonical_document_id": "ZCGX34",
       "content_type": "notice",
-      "subtype": "结果公告（机制电价竞价结果）",
+      "subtype": "竞价结果及本批执行安排",
       "importance": 4,
-      "classification_boundary": "机制电价竞价结果通知；某轮结果不直接代表所有项目现行统一价格。"
+      "importance_reason": "对广西本批增量项目结算理解有明确价值，评4；结果值不扩为全省所有新能源/储能保底价。",
+      "classification_basis": "p1公布本批结果，第二/三部分同时规定本批起始/延期/合同等执行安排；属结果通知，不等于不带条件或没有效力。",
+      "evidence_scope": "原件所见身份/主对象/分类与评分理由/明示日期；无新增完整内容、数值参数或权利资格接受"
     },
     {
       "id": "ZCHEB52",
       "canonical_document_id": "ZCHEB52",
       "content_type": "notice",
-      "subtype": "名单公示（项目安排·第二批）",
-      "importance": 2,
-      "classification_boundary": "拟安排项目公示；公示不等于项目批准。重要性保留原有编辑评分2级。"
+      "subtype": "拟安排项目公示",
+      "importance": 3,
+      "importance_reason": "局部项目安排和申报参考信息评3，保持检索/关联可达；不以未核第一批连续性为加分理由。",
+      "classification_basis": "p1拟安排项目公示、p2所附本批清单；不是通用直连规则，也不是最终批准证明。",
+      "evidence_scope": "原件所见身份/主对象/分类与评分理由/明示日期；无新增完整内容、数值参数或权利资格接受"
     },
     {
       "id": "ZCLN37",
       "canonical_document_id": "ZCLN37",
       "content_type": "notice",
-      "subtype": "评估结果公告",
-      "importance": 2,
-      "classification_boundary": "季度承载力评估结果，不据图认定配储义务或项目可接入。重要性保留原有编辑评分2级。"
+      "subtype": "运行信息公告（季度承载力评估）",
+      "importance": 3,
+      "importance_reason": "区域接入核查入口有参考价值评3，保留检索/分享与省份关联，不作为新准入制度或项目储能要求。",
+      "classification_basis": "p1发布季度评估结果；p2展示图的图注只说明等级依据。",
+      "evidence_scope": "原件所见身份/主对象/分类与评分理由/明示日期；无新增完整内容、数值参数或权利资格接受"
     },
     {
       "id": "ZCSD45",
       "canonical_document_id": "ZCSD45",
       "content_type": "notice",
-      "subtype": "征求公告（价格参数征求意见）",
-      "importance": 5,
-      "classification_boundary": "价格参数征求意见公告；拟议价格不等于正式切换，保留征求意见稿身份。"
+      "subtype": "征求意见公告（拟调价格参数）",
+      "importance": 4,
+      "importance_reason": "重要现货参数调整建议有研究价值评4；征求阶段不能用核心机制正式切换的5级理由，亦不证明收益已改变。",
+      "classification_basis": "此原ID保存的主对象是公开征集程序及拟调整说明，未另附独立完整规则文件；受控标签按征求公告归notice，保留所含拟调整内容及阶段，不拆新policy重复计数。",
+      "evidence_scope": "原件所见身份/主对象/分类与评分理由/明示日期；无新增完整内容、数值参数或权利资格接受"
     },
     {
       "id": "ZCAH63",
       "canonical_document_id": "ZCAH63",
       "content_type": "policy",
-      "subtype": "办法（暂行·征求意见稿）",
-      "importance": 5,
-      "classification_boundary": "办法正文属于政策征求稿，公告和起草说明为配套部分；不作为现行项目收益依据，也不重复计为另一件文件。"
+      "subtype": "项目清单管理办法（暂行·征求意见稿）",
+      "importance": 4,
+      "importance_reason": "区域清单管理机制草案影响研究判断，评4；不以已封死双收益的现行结论评分，未经后续正式稿核验不按实施事件处理。",
+      "classification_basis": "合件包含征求公告、完整拟议办法和起草说明；p3—p4有主体范围、建设/清单程序等条款，主对象是普遍管理办法草案，按内容归policy。",
+      "evidence_scope": "原件所见身份/主对象/分类与评分理由/明示日期；无新增完整内容、数值参数或权利资格接受"
     },
     {
       "id": "ZCTJ19",
       "canonical_document_id": "ZCTJ19",
       "content_type": "notice",
-      "subtype": "征求公告（拟废止·征求意见）",
+      "subtype": "征求意见公告（拟废止旧办法）",
       "importance": 3,
-      "classification_boundary": "征求废止意见公告不等于办法已废止，所附旧办法也不构成正式废止决定。"
+      "importance_reason": "重点用能单位合规关注信息，储能主链关联较弱评3；保留检索/分享，未达4不等于不得公开。",
+      "classification_basis": "p1仅征求废止意见，p2—p6是被讨论旧办法全文，不是本公告另行制定的规则或正式废止决定。",
+      "evidence_scope": "原件所见身份/主对象/分类与评分理由/明示日期；无新增完整内容、数值参数或权利资格接受"
     }
   ],
   "source_links": [
@@ -265,6 +275,12 @@
       "policy_id": "ZCAH20",
       "url": "https://hdj.nea.gov.cn/xxgk/fdzdgknr/gfxwj/hdnyjgfxwj/202311/P020231103398677809081.pdf",
       "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    }
+  ],
+  "source_gaps": [
+    {
+      "id": "ZCMD22",
+      "boundary": "当前可核来源仅见补偿标准情况表；公告发布母页、发出机关及日期/批次版本待核。保留旧资料索引，暂不计入已审通知和重要更新，也不能证明补偿已兑现。"
     }
   ]
 }

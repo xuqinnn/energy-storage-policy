@@ -46,6 +46,18 @@ class ContentProjectionTest(unittest.TestCase):
         layer=self.layer();layer['source_links'][0]['url']='javascript:alert(1)'
         with self.assertRaises(ValueError):builder.validate_content_schema(layer)
 
+    def test_final_nine_fields_source_hold_and_scores_are_enforced(self):
+        layer=self.layer()
+        self.assertEqual(len(layer['classifications']),9)
+        self.assertNotIn('ZCMD22',{c['id'] for c in layer['classifications']})
+        for modify in [lambda d:d.update(source_gaps=[]),
+                       lambda d:d['source_gaps'][0].update(id='OTHER'),
+                       lambda d:next(c for c in d['classifications'] if c['id']=='ZCSN34').update(importance=5),
+                       lambda d:d['classifications'][0].update(issued_at='2025-12-23'),
+                       lambda d:d['classifications'][0].update(source_raw_sha256='0'*64)]:
+            bad=copy.deepcopy(layer);modify(bad)
+            with self.assertRaises(ValueError):builder.validate_content_schema(bad)
+
     def test_existing_snapshot_and_two_replies_keep_their_own_identities(self):
         data=json.loads((ROOT/'data/storage.json').read_text());layer=self.layer()
         if data['meta']['dataset']=='synthetic':self.skipTest('synthetic snapshot has no real classifications')
