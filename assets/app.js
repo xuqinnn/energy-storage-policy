@@ -1013,6 +1013,7 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
   function renderInlineAnalysis() {
     const panel=document.querySelector('#analysis-workspace'),current=inlineAnalysis.current;
     if(!panel||!current)return;
+    tip.hidden=true; // Replacing the hovered source node does not dispatch mouseout.
     let content;
     if(current.kind==='reply'){
       const r=replyItems.find(r=>r.id===current.id);if(!r)return;
@@ -1045,6 +1046,7 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
   }
   function panelFocus(){document.querySelector('#analysis-workspace #analysis-title')?.focus({preventScroll:true});}
   function closeInlineAnalysis(back=false) {
+    tip.hidden=true;
     if(back&&inlineAnalysis.history.length){const previous=inlineAnalysis.history.pop();inlineAnalysis.current=previous;renderInlineAnalysis();panelFocus();scrollTo(0,previous.y);return;}
     const panel=document.querySelector('#analysis-workspace'),origin=inlineAnalysis.origin;
     if(panel)panel.hidden=true;inlineAnalysis.current=null;inlineAnalysis.history=[];
