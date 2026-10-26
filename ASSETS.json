@@ -15,7 +15,10 @@
         "tools/park_examples.py",
         "tests/test_park_examples.py",
         "assets/research-ui.css",
-        "tests/test_reply_insights.py"
+        "tests/test_reply_insights.py",
+        "assets/content-model.js",
+        "tests/test_content_layer.py",
+        "tests/test_content_model.js"
       ],
       "class": "B",
       "origin": "本项目Git历史可追溯的自有前台及本轮通用实现",
@@ -99,6 +102,16 @@
       "license": "自有摘要与分析CC-BY-4.0；官方短引按来源，不覆盖第三方全文；详见LICENSE-DATA.md",
       "decision": "include-reviewed-projection",
       "sha256": "3ebf7946dea944b3ac49ed0451947d1d24f65c1175e61439f52e60fc5db6cf8f"
+    },
+    {
+      "paths": [
+        "content/content-layer.json"
+      ],
+      "class": "A/B",
+      "origin": "一条运行公告的限定公开投影、十条现有记录分类与编辑评分、25原页和6条明示角色关联来源；不包含原页字节或未取得的复函/正式方案",
+      "license": "自有摘要与分析CC-BY-4.0；短引与来源元数据按原来源，不覆盖第三方全文",
+      "decision": "include-reviewed-projection",
+      "sha256": "265ed8e2fec5f6d3fa7506445ed551732cf6fbf9775eb88cc616bff802239a01"
     }
   ],
   "reviewed_public_guides": {

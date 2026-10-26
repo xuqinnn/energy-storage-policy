@@ -66,3 +66,12 @@ The arithmetic and park-demo pages include twelve reviewed Chinese reading notes
 ### Province analysis workspace
 
 Province pages have four peer modules: policy, development, questions and official replies. Policy and reply details switch inside one page workspace, with a previous-item action and a return to the original list position. The legacy `#/brief` URLs remain compatible; the interface calls this content “analysis”. Reply data is an independently reviewed `content/reply-insights.json`, separate from policy records, counts and calculator inputs. Only the first sample is linked to Anhui; national context is reachable through the explicitly reviewed policy analysis links, not broadcast to every province. The offline HTML embeds the same reviewed reply data.
+
+
+## 通知、来源角色与局部分类
+
+现有检索统一覆盖已公开资料、运行公告和两条既有答复；`#/notice/<id>` 可直达同页分析工作区。南方公告保留事件日、公众号页日期依据、未知最早首发及访问限制，并另链能源局事件佐证。175号复函及正式运行方案未纳入本次核验，不提供项目参数映射。
+
+`content/content-layer.json` 只含一条新增通知、十条既有记录分类，以及25条原页/配套附件和6条标明角色的关联来源。编辑重要性4、5进入默认重要通知流，低分与未评分仍可检索和直达。首页计数明确已审范围；旧资料和研究资料未完成全量分类，不把原目录数量当纯政策数或全部研报数。分类文件请求失败会显示真实错误及重试入口。
+
+复核内容边界及查询/计数：`python -m unittest discover -s tests`，`node tests/test_content_model.js`；既有算术测试仍为 `node tests/test_storage_math.js`。浏览器构建和离线版使用同一公开内容清单；原页、内部审核记录和个人路径不随包分发。

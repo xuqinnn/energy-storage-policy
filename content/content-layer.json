@@ -1,0 +1,270 @@
+{
+  "schema": 1,
+  "notices": [
+    {
+      "id": "NTF-GZPEC-20261024-FORMAL",
+      "content_type": "notice",
+      "subtype": "运行公告",
+      "title": "南方区域电力市场转入正式运行",
+      "issuer": "广州电力交易中心",
+      "importance": 5,
+      "importance_reason": "区域电力市场运行阶段发生切换，具有重大市场运行研究价值；编辑评分，非机关评级。",
+      "issued_at": "2026-10-24",
+      "published_at": "2026-10-24",
+      "publication_date_basis": "该公众号文章ct元数据；不等全网最早公开日",
+      "first_publication_date": null,
+      "event_at": "2026-10-24",
+      "summary": "公告宣布南方区域电力市场自2026年10月24日起转入正式运行，现货参数设置与衔接按正式运行相关规则及方案执行。",
+      "our_analysis": "需核对所研究交易和主体采用的正式规则版本。运行阶段变化本身不证明某项目准入、价格上限或收益已经改变。",
+      "quote": "自2026年10月24日起，南方区域电力市场转入正式运行。",
+      "source_url": "https://mp.weixin.qq.com/s?__biz=MzI3NDY5OTA4NA==&mid=2247500440&idx=1&sn=a90f5d8c58cf639925c0ebfb36882212",
+      "source_access_note": "公众号原页，部分访问环境需验证；提供能源局官方事件佐证，不声称交易中心普通官网已发布同页。",
+      "corroborating_url": "https://www.nea.gov.cn/20261024/5507e2777ede4b7e97ae56de1d275d46/c.html",
+      "boundary": "公告仅明确运行切换与另依规则执行。175号复函原文及正式运行方案本轮未取得，不能使用转载数值或以ZCNF31征求稿替代正式参数。",
+      "region_scope": "南方区域；具体主体/省网区资格依各正式规则核验",
+      "verified_region_codes": [],
+      "policy_ids": [],
+      "cited_document_number": "发改办体改〔2026〕175号",
+      "cited_document_verification": "仅公告中的引用已核，复函原件未取得"
+    }
+  ],
+  "classifications": [
+    {
+      "id": "ZCGJ45",
+      "canonical_document_id": "ZCGJ45",
+      "content_type": "notice",
+      "subtype": "名单公示（建设名单·第一批）",
+      "importance": 5,
+      "classification_boundary": "国家级零碳园区建设名单；建设名单身份不等于储能或绿电直连项目准入资格。"
+    },
+    {
+      "id": "ZCGJ110",
+      "canonical_document_id": "ZCGJ110",
+      "content_type": "notice",
+      "subtype": "官方答复（人大建议答复）",
+      "importance": 4,
+      "classification_boundary": "第1461号建议答复；分类标签不代表正文数值或项目适用已核验，不引用其他答复的核验结果。"
+    },
+    {
+      "id": "ZCMD22",
+      "canonical_document_id": "ZCMD22",
+      "content_type": "notice",
+      "subtype": "名单公示（补偿标准·项目级）",
+      "importance": 4,
+      "classification_boundary": "项目级放电量补偿标准公告，不将项目标准推为区域普适电价。"
+    },
+    {
+      "id": "ZCSN34",
+      "canonical_document_id": "ZCSN34",
+      "content_type": "notice",
+      "subtype": "名单公示（项目建设清单·第一批）",
+      "importance": 5,
+      "classification_boundary": "第一批建设清单公示；公示不等于最终批准或补偿资格。"
+    },
+    {
+      "id": "ZCGX34",
+      "canonical_document_id": "ZCGX34",
+      "content_type": "notice",
+      "subtype": "结果公告（机制电价竞价结果）",
+      "importance": 4,
+      "classification_boundary": "机制电价竞价结果通知；某轮结果不直接代表所有项目现行统一价格。"
+    },
+    {
+      "id": "ZCHEB52",
+      "canonical_document_id": "ZCHEB52",
+      "content_type": "notice",
+      "subtype": "名单公示（项目安排·第二批）",
+      "importance": 2,
+      "classification_boundary": "拟安排项目公示；公示不等于项目批准。重要性保留原有编辑评分2级。"
+    },
+    {
+      "id": "ZCLN37",
+      "canonical_document_id": "ZCLN37",
+      "content_type": "notice",
+      "subtype": "评估结果公告",
+      "importance": 2,
+      "classification_boundary": "季度承载力评估结果，不据图认定配储义务或项目可接入。重要性保留原有编辑评分2级。"
+    },
+    {
+      "id": "ZCSD45",
+      "canonical_document_id": "ZCSD45",
+      "content_type": "notice",
+      "subtype": "征求公告（价格参数征求意见）",
+      "importance": 5,
+      "classification_boundary": "价格参数征求意见公告；拟议价格不等于正式切换，保留征求意见稿身份。"
+    },
+    {
+      "id": "ZCAH63",
+      "canonical_document_id": "ZCAH63",
+      "content_type": "policy",
+      "subtype": "办法（暂行·征求意见稿）",
+      "importance": 5,
+      "classification_boundary": "办法正文属于政策征求稿，公告和起草说明为配套部分；不作为现行项目收益依据，也不重复计为另一件文件。"
+    },
+    {
+      "id": "ZCTJ19",
+      "canonical_document_id": "ZCTJ19",
+      "content_type": "notice",
+      "subtype": "征求公告（拟废止·征求意见）",
+      "importance": 3,
+      "classification_boundary": "征求废止意见公告不等于办法已废止，所附旧办法也不构成正式废止决定。"
+    }
+  ],
+  "source_links": [
+    {
+      "policy_id": "ZCGJ13",
+      "url": "https://www.ndrc.gov.cn/xxgk/zcfb/tz/202512/t20251231_1402949.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCGJ120",
+      "url": "https://www.ndrc.gov.cn/xxgk/zcfb/tz/202511/t20251110_1401469.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCGJ03",
+      "url": "https://www.ndrc.gov.cn/xwdt/tzgg/202601/t20260130_1403525.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCGJ04",
+      "url": "https://www.ndrc.gov.cn/xxgk/zcfb/tz/202509/t20250912_1400425.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCBJ21",
+      "url": "https://fgw.beijing.gov.cn/fgwzwgk/2024zcwj/bwqtwj/202610/t20261016_4906079.htm",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCGD48",
+      "url": "https://drc.gd.gov.cn/ywtz/content/mpost_4967040.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCGJ175",
+      "url": "https://www.gov.cn/yaowen/liebiao/202610/content_7082824.htm",
+      "role": "OFFICIAL_RELEASE_REPORT"
+    },
+    {
+      "policy_id": "ZCGJ178",
+      "url": "https://www.nea.gov.cn/20261021/9a8269c785e2418dae8d7fdf24a6a241/c.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCGJ179",
+      "url": "https://www.nea.gov.cn/20261019/2b3b4fb293ff4c2dad59a8608d5275d6/c.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCHEB60",
+      "url": "https://hbdrc.hebei.gov.cn/zxy/zxjj/tzgg/202610/t20261013_140410.html",
+      "role": "OFFICIAL_INSTITUTION_REPRINT"
+    },
+    {
+      "policy_id": "ZCJL41",
+      "url": "https://nyj.jl.gov.cn/hdjl/dczj/202610/t20261008_3674006.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCLN37",
+      "url": "https://fgw.ln.gov.cn/fgw/index/tzgg/2026101409160533733/index.shtml",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCNX38",
+      "url": "https://fzggw.nx.gov.cn/zzb/tzgg_69405/202610/t20261016_5374606.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCQH42",
+      "url": "https://xbj.nea.gov.cn/dtyw/tzgg/202610/t20261009_310051.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCSC54",
+      "url": "https://www.sc.gov.cn/10462/zfwjts/2026/10/20/c86851681d5f436294330ea75c3cca1f.shtml",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCSD50",
+      "url": "http://www.shandong.gov.cn/art/2026/10/10/art_267492_85829.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCSH42",
+      "url": "https://www.shanghai.gov.cn/gwk/search/content/68a561a1b2ee440e9f66793deade946a",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCSX37",
+      "url": "https://nyj.shanxi.gov.cn/zfxxgk/fdzdgknr/sjwj/202610/t20261016_10236977.shtml",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCTJ19",
+      "url": "https://fzgg.tj.gov.cn/xxfb/tzggx/202610/t20261015_7632441.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCAH01",
+      "url": "https://fzggw.ah.gov.cn/public/7011/150463481.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCAH02",
+      "url": "https://fzggw.ah.gov.cn/group6/M00/0F/44/wKg8Bmnu1UqAHmVlAABQTDmHVAA15.docx",
+      "role": "ORIGINAL_EXPLANATORY_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCAH10",
+      "url": "https://hdj.nea.gov.cn/hdhy/dczj/202605/t20260525_301716.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCAH11",
+      "url": "https://fzggw.ah.gov.cn/public/7011/150202081.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCAH13",
+      "url": "https://hdj.nea.gov.cn/dtyw/tzgg/202603/P020260331593555268345.pdf",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCAH14",
+      "url": "https://fzggw.ah.gov.cn/public/22554241/150011941.html",
+      "role": "OFFICIAL_INTERPRETATION"
+    },
+    {
+      "policy_id": "ZCAH15",
+      "url": "https://fzggw.ah.gov.cn/public/7011/150266101.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCAH16",
+      "url": "https://www.mingguang.gov.cn/group5/M00/02/B1/CpYIoGkMXmiAbo4YABwX6SOILgk354.pdf",
+      "role": "OFFICIAL_REPRINT_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCAH17",
+      "url": "https://fzggw.ah.gov.cn/jgsz/jgcs/myjjj/hqzc/149826041.html",
+      "role": "OFFICIAL_ANALYSIS_MENTION_ONLY"
+    },
+    {
+      "policy_id": "ZCAH18",
+      "url": "https://www.fy.gov.cn/files/1/202511/20251111084338799rh7x1p.pdf",
+      "role": "OFFICIAL_REPRINT_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCAH19",
+      "url": "https://fzggw.ah.gov.cn/public/7011/150372001.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCAH20",
+      "url": "https://hdj.nea.gov.cn/xxgk/fdzdgknr/gfxwj/hdnyjgfxwj/202311/P020231103398677809081.pdf",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    }
+  ]
+}

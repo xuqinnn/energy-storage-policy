@@ -16,6 +16,8 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE if (HERE / 'index.html').is_file() else HERE.parent
 WEB_FILES = ['assets/research-ui.css', 'assets/vendor/open-props-1.7.23.min.css', 'assets/vendor/tabler-icons.js', 'assets/vendor/OPEN-PROPS-LICENSE.txt', 'assets/vendor/TABLER-LICENSE.txt', 'assets/vendor/DESIGN-SOURCES.json'] + ['index.html', 'assets/app.js', 'assets/storage-math.js', 'assets/app.css', 'assets/vendor/echarts.min.js', 'assets/vendor/LICENSE', 'assets/vendor/NOTICE']
 DOC_FILES = ['content/reply-insights.json', 'tests/test_reply_insights.py', 'content/reading-notes.json', 'README.md', 'LICENSE', 'LICENSE-DATA.md', 'CONTRIBUTING.md', 'ASSETS.json', '.gitignore', 'examples/synthetic.json', 'tests/test_public.py', 'tests/test_storage_math.js', 'examples/method-arithmetic.json', 'tools/park_examples.py', 'examples/park-scenarios.json', 'tests/test_park_examples.py']
+WEB_FILES += ['assets/content-model.js']
+DOC_FILES += ['content/content-layer.json','tests/test_content_layer.py','tests/test_content_model.js']
 ALLOWED_TOP = {'meta','metrics','provinces','docs','cards','events','dev','diff','score','example','briefs','links','tags','tagdocs','methods','lib','research','learning','stats','mech','topics','topicmap','synthetic_example','public_guides'}
 
 def digest(path):
@@ -112,6 +114,61 @@ def validate_reply_insights(path):
     return validate_reply_schema(json.loads(Path(path).read_text(encoding='utf-8')))
 
 
+CONTENT_LAYER_SHA = '265ed8e2fec5f6d3fa7506445ed551732cf6fbf9775eb88cc616bff802239a01'
+CONTENT_CLASS_IDS = {'ZCGJ45','ZCGJ110','ZCMD22','ZCSN34','ZCGX34','ZCHEB52','ZCLN37','ZCSD45','ZCAH63','ZCTJ19'}
+NOTICE_FIELDS = {'id','content_type','subtype','title','issuer','importance','importance_reason','issued_at','published_at','publication_date_basis','first_publication_date','event_at','summary','our_analysis','quote','source_url','source_access_note','corroborating_url','boundary','region_scope','verified_region_codes','policy_ids','cited_document_number','cited_document_verification'}
+SOURCE_ROLES = {'ORIGINAL_PUBLICATION_OR_ATTACHMENT','ORIGINAL_EXPLANATORY_ATTACHMENT','OFFICIAL_RELEASE_REPORT','OFFICIAL_INSTITUTION_REPRINT','OFFICIAL_INTERPRETATION','OFFICIAL_REPRINT_ATTACHMENT','OFFICIAL_ANALYSIS_MENTION_ONLY'}
+
+def validate_content_schema(layer):
+    if not isinstance(layer,dict) or set(layer)!={'schema','notices','classifications','source_links'} or layer['schema']!=1:
+        raise ValueError('content layer schema: envelope')
+    if any(not isinstance(layer[k],list) for k in ('notices','classifications','source_links')):
+        raise ValueError('content layer schema: arrays')
+    if len(layer['notices'])!=1:raise ValueError('content layer schema: one reviewed new notice')
+    notice=layer['notices'][0]
+    if not isinstance(notice,dict) or set(notice)!=NOTICE_FIELDS:raise ValueError('content layer schema: internal or missing notice fields')
+    if notice['id']!='NTF-GZPEC-20261024-FORMAL' or notice['content_type']!='notice' or type(notice['importance']) is not int or notice['importance']!=5:
+        raise ValueError('content layer schema: unreviewed notice identity or importance')
+    if notice['first_publication_date'] is not None or notice['verified_region_codes']!=[] or notice['policy_ids']!=[]:
+        raise ValueError('content layer schema: unreviewed first publication, province or policy mapping')
+    for key in NOTICE_FIELDS-{'importance','first_publication_date','verified_region_codes','policy_ids'}:
+        if not isinstance(notice[key],str) or not notice[key].strip():raise ValueError('content layer schema: missing text '+key)
+    for key in ('issued_at','published_at','event_at'):
+        try:date.fromisoformat(notice[key])
+        except (ValueError,TypeError):raise ValueError('content layer schema: invalid date')
+        if notice[key]!='2026-10-24':raise ValueError('content layer schema: unreviewed date')
+    if not notice['source_url'].startswith('https://mp.weixin.qq.com/s?') or not notice['corroborating_url'].startswith('https://www.nea.gov.cn/'):
+        raise ValueError('content layer schema: unreviewed notice sources')
+    seen=set()
+    for item in layer['classifications']:
+        if not isinstance(item,dict) or set(item)!={'id','canonical_document_id','content_type','subtype','importance','classification_boundary'}:
+            raise ValueError('content layer schema: classification fields')
+        code=item['id']
+        if code in seen or code not in CONTENT_CLASS_IDS or code!=item['canonical_document_id']:raise ValueError('content layer schema: duplicate or unknown identity')
+        seen.add(code)
+        if item['content_type']!=('policy' if code=='ZCAH63' else 'notice') or type(item['importance']) is not int or not 1<=item['importance']<=5:
+            raise ValueError('content layer schema: unreviewed classification or rating')
+        if not all(isinstance(item[k],str) and item[k].strip() for k in ('subtype','classification_boundary')):raise ValueError('content layer schema: missing classification boundary')
+    if seen!=CONTENT_CLASS_IDS:raise ValueError('content layer schema: incomplete first ten labels')
+    seen=set();original=0
+    for link in layer['source_links']:
+        if not isinstance(link,dict) or set(link)!={'policy_id','url','role'}:raise ValueError('content layer schema: source fields')
+        if link['policy_id'] in seen or not re.fullmatch(r'ZC[A-Z]+\d+',link['policy_id']):raise ValueError('content layer schema: duplicate source identity')
+        seen.add(link['policy_id'])
+        if link['role'] not in SOURCE_ROLES or not isinstance(link['url'],str) or not re.match(r'^https?://',link['url']):raise ValueError('content layer schema: source role or URL')
+        original+=link['role'].startswith('ORIGINAL_')
+        if link['policy_id'] in {'ZCAH14','ZCAH16','ZCAH17','ZCAH18','ZCGJ175','ZCHEB60'} and link['role'].startswith('ORIGINAL_'):
+            raise ValueError('content layer schema: related source promoted to original')
+    if len(seen)!=31 or original!=25:raise ValueError('content layer schema: expected 25 original / 6 related links')
+    text=json.dumps(layer,ensure_ascii=False)
+    if any(token in text for token in ('/Users/','file://','source_path','source_raw_sha256','raw_path','workbook_written')) or re.search(r'<[!/a-zA-Z]',text):
+        raise ValueError('content layer schema: private fields or unsafe markup')
+    return copy.deepcopy(layer)
+
+def validate_content_layer(path):
+    if digest(path)!=CONTENT_LAYER_SHA:raise ValueError('unreviewed content layer; SHA changed')
+    return validate_content_schema(json.loads(Path(path).read_text(encoding='utf-8')))
+
 def build_package(snapshot, dist, source=ROOT):
     data = validate_snapshot(snapshot); dist = Path(dist); source = Path(source)
     if dist.exists() and any(dist.iterdir()): raise ValueError('output directory must be empty; old files are never deleted')
@@ -121,7 +178,11 @@ def build_package(snapshot, dist, source=ROOT):
     validate_park_examples(docs/'examples/park-scenarios.json')
     validate_reading_notes(docs/'content/reading-notes.json')
     replies=validate_reply_insights(docs/'content/reply-insights.json')
+    content=validate_content_layer(docs/'content/content-layer.json')
     if data['meta'].get('dataset')=='public-reviewed' and any(code not in data['docs'] for r in replies['items'] for code in r['policy_ids']):raise ValueError('reply refers to a policy absent from public snapshot')
+    if data['meta'].get('dataset')=='public-reviewed':
+        if any(c['id'] not in data['docs'] for c in content['classifications']) or any(s['policy_id'] not in data['docs'] for s in content['source_links']):raise ValueError('content refers to a document absent from public snapshot')
+        if content['notices'][0]['id'] in data['docs']:raise ValueError('new notice duplicates existing snapshot identity')
     for f in WEB_FILES + DOC_FILES:
         src = (source if f in WEB_FILES else docs) / f
         dst = dist / f; dst.parent.mkdir(parents=True, exist_ok=True); shutil.copyfile(src, dst)
