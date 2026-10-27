@@ -5,6 +5,7 @@
   'use strict';
   let D = null;
   let replyItems = [], replyLoad, replyLoadError = false;
+  let dailyBrief=null,dailyLoad,dailyLoadError=false;
   let contentLayer = {schema:1,notices:[],classifications:[],source_links:[],source_gaps:[]}, contentLoad, contentLoadError = false, contentModel;
   const inlineAnalysis = {route:null,current:null,history:[],origin:null};
   const $ = (s, el = document) => el.querySelector(s);
@@ -92,16 +93,21 @@
 
   // ---------- 提示框（依据详情） ----------
   const tip = $('#tip');
-  document.addEventListener('mouseover', e => {
-    const c = e.target.closest('[data-code]'); if (!c) return;
-    const rawDoc=D.docs[c.dataset.code],d=contentModel?.records.get(c.dataset.code)?.review_hold?{...rawDoc,status:'来源待核'}:rawDoc;
+  function showSourceTip(c,point){
+    if(!D||!c)return;
+    const daily=c.dataset.dailyId&&dailyBrief?.items.find(r=>r.id===c.dataset.dailyId),rawDoc=daily?{title:daily.title,status:daily.status||(daily.type==='notice'?'公告':'政策'),summary:daily.summary,date:daily.display_date}:D.docs[c.dataset.code],d=contentModel?.records.get(c.dataset.code)?.review_hold?{...rawDoc,status:'来源待核'}:rawDoc;
     tip.innerHTML = d ? `${externalSite() ? '' : `<b>${esc(c.dataset.code)}</b>　`}<span class="st ${statusClass(d.status)}">${esc(d.status)}</span><br>${esc(d.title)}<br>${esc(d.no || '')}　${esc(d.date || '')}${d.yjc && !externalSite() ? '<br>研究库编号：' + esc(d.yjc.join('、')) : ''}`
       : `${externalSite() ? '' : `<b>${esc(c.dataset.code)}</b><br>`}未收录文件`;
-    tip.hidden = false; move(e);
-  });
+    if(c.hasAttribute('data-row-preview')&&d?.summary)tip.insertAdjacentHTML('beforeend',`<p>${esc(d.summary.replace(/【?(?:ZC|YJC?|FG|NY)[A-Z]*\d+(?:·[^】]*)?】?/g,''))}</p>`);
+    tip.hidden = false;tip.setAttribute('role','tooltip');move(point);
+  }
+  document.addEventListener('mouseover', e => showSourceTip(e.target.closest('[data-code],[data-daily-id]'),e));
+  document.addEventListener('focusin',e=>{const c=e.target.closest('[data-row-preview]');if(c){const r=c.getBoundingClientRect();showSourceTip(c,{clientX:r.left+12,clientY:r.top+Math.min(r.height,48)});}});
+  document.addEventListener('focusout',e=>{if(e.target.closest('[data-row-preview]'))tip.hidden=true;});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')tip.hidden=true;});
   document.addEventListener('mousemove', e => { if (!tip.hidden) move(e); });
-  document.addEventListener('mouseout', e => { if (e.target.closest('[data-code]')) tip.hidden = true; });
-  function move(e) { tip.style.left = Math.min(e.clientX + 14, innerWidth - 400) + 'px'; tip.style.top = (e.clientY + 16) + 'px'; }
+  document.addEventListener('mouseout', e => { if (e.target.closest('[data-code],[data-daily-id]')) tip.hidden = true; });
+  function move(e) { const w=Math.min(400,innerWidth-32);tip.style.maxWidth=w+'px';tip.style.left=Math.max(16,Math.min(e.clientX+14,innerWidth-w-16))+'px';tip.style.top=Math.max(12,Math.min(e.clientY+16,innerHeight-tip.getBoundingClientRect().height-12))+'px'; }
 
   // ---------- 全国一张图：投资分级地图 ----------
   const GRADES = ['优先开发', '储备开发', '谨慎开发'];
@@ -353,16 +359,16 @@
   const tagSet = () => { const m = {}; Object.entries(D.tagdocs || {}).forEach(([k, v]) => v.主.forEach(c => (m[c] = m[c] || []).push(k))); return m; };
   function libPage(qs) {
     const P=new URLSearchParams(qs||''),TM=tagSet(),legacy=new Map((D.lib||[]).map(r=>[r[0],r]));
-    const f=Object.fromEntries(['type','prov','cat','st','tag','yr','q'].map(k=>[k,P.get(k)||'']));
+    const f=Object.fromEntries(['type','prov','cat','st','tag','yr','q','important'].map(k=>[k,P.get(k)||'']));
     const rows=EnergyContent.query(contentModel,f).filter(r=>{const old=legacy.get(r.id);return (!f.cat||old?.[6]===f.cat)&&(!f.st||STG(r.status)===f.st)&&(!f.tag||(TM[r.id]||[]).includes(f.tag));});
     const uniq=i=>[...new Set((D.lib||[]).map(r=>r[i]).filter(Boolean))];
     const opt=(k,values,label)=>`<label class="fc"><span>${label}</span><select data-f="${k}"><option value="">全部</option>${values.map(([v,t])=>`<option value="${esc(v)}"${v===f[k]?' selected':''}>${esc(t)}</option>`).join('')}</select></label>`;
     const vals=x=>x.map(v=>[v,v]),N=Math.max(1,Math.min(3000,Number(P.get('n'))||120));
-    $('#app').innerHTML=`<section class="hero"><div><div class="eyebrow">统一资料检索</div><h1>查政策、通知与研究资料</h1><p class="lede">已公开内容可按标题、文号、机构、主题、摘要与已公开正文检索；旧记录未逐件分类，研究资料中包含标准等其他材料。</p></div></section>
+    $('#app').innerHTML=`<section class="hero"><div><div class="eyebrow">统一资料检索</div><h1>查政策、公告与研究资料</h1><p class="lede">已公开内容可按标题、文号、机构、主题、摘要与已公开正文检索；旧记录未逐件分类，研究资料中包含标准等其他材料。</p></div></section>
       ${contentCountsHTML()}${analysisWorkspaceHTML()}
       <section class="card"><div class="facets">${opt('type',Object.entries(EnergyContent.TYPES),'内容类型')}${opt('prov',vals(uniq(5).sort((a,b)=>a.localeCompare(b,'zh'))),'省份')}${opt('cat',vals(uniq(6).sort((a,b)=>a.localeCompare(b,'zh'))),'原目录主题')}${opt('st',vals(['施行中','征求稿','已替代','已废止','参考']),'原状态')}${opt('tag',vals((D.tags||[]).map(t=>t.标签)),'机制标签')}${opt('yr',vals(uniq(4).map(x=>x.slice(0,4)).filter((x,i,a)=>/^\d{4}$/.test(x)&&a.indexOf(x)===i).sort().reverse()),'年份')}
       <label class="fc grow"><span>关键词</span><input data-f="q" value="${esc(f.q)}" placeholder="名称、机构、文号或正文"></label></div>
-      <p class="sub" data-search-count="${rows.length}">${rows.length} 条结果${Object.values(f).some(Boolean)?' · <a href="#/lib">清除筛选</a>':''}</p>
+      ${f.important?'<p class="note">仅显示已审重要公告（4、5级） · <a href="#/lib?type=notice">查看全部公告</a></p>':''}<p class="sub" data-search-count="${rows.length}">${rows.length} 条结果${Object.values(f).some(Boolean)?' · <a href="#/lib">清除筛选</a>':''}</p>
       <div class="bcards">${rows.slice(0,N).map(contentCardHTML).join('')||'<p class="note">当前筛选无结果，不代表没有相关规定。</p>'}</div>
       ${rows.length>N?`<button type="button" class="dim" id="libMore">再显示 ${Math.min(240,rows.length-N)} 条</button>`:''}</section>`;
     const go=patch=>{const state={...f,...patch};const query=new URLSearchParams(Object.entries(state).filter(([,v])=>v)).toString();location.hash='#/lib'+(query?'?'+query:'');};
@@ -443,14 +449,15 @@
   function workRows() {return workItems().map(x=>`<article class="work-row"><div class="work-number">${x.n}</div><div><div class="eyebrow">${x.tag}</div><h3><a href="${x.url}">${x.title} <span>↗</span></a></h3><p>${x.problem}</p><small>${x.proof}</small></div><a class="work-action" href="${x.url}">${x.label} ↗</a></article>`).join('');}
   function icon(name,cls='') {return `<svg class="ui-icon ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${(window.EnergyIcons||{})[name]||''}</svg>`;}
   const SITE_SECTIONS=[
-    {id:'policy',route:'#/policy',zh:'最新政策分析',en:'Policy analysis',icon:'file-analytics',subzh:'政策变化与学习',suben:'Instruments & learning'},
+    {id:'policy',route:'#/policy',zh:'今日政策速递',en:'Daily policy brief',icon:'file-analytics',subzh:'政策与公告日报',suben:'Policies & announcements'},
     {id:'topics',route:'#/topics',zh:'重点专题研究',en:'Research',icon:'books',subzh:'专题、资料与方法',suben:'Topics, sources & methods'},
     {id:'map',route:'#/map',zh:'投资分级地图',en:'Investment map',icon:'map-2',subzh:'省份与投资条件',suben:'Regions & conditions'},
     {id:'tools',route:'#/explore',zh:'收益测算工具',en:'Returns tools',icon:'calculator',subzh:'显式假设与复算',suben:'Assumptions & scenarios'},
     {id:'services',route:'#/services',zh:'咨询与定制',en:'Advisory',icon:'messages',subzh:'研究、采购与站点',suben:'Research, sourcing & sites'}
   ];
   function sectionOf(h) {
-    if(/^#\/(policy|brief|lib|learning|notice)/.test(h))return 'policy';
+    if(/^#\/(policy|brief|lib|notice)/.test(h))return 'policy';
+    if(/^#\/learning/.test(h))return 'topics';
     if(/^#\/(topics|topic\/|research|methods|work|glossary)/.test(h))return 'topics';
     if(/^#\/(map|p\/|dev\/|score)/.test(h))return 'map';
     if(/^#\/(explore|tools|rev|park-demo)/.test(h))return 'tools';
@@ -477,11 +484,11 @@
   }
   function compactMap() {return `<div class="studio-tilemap" aria-label="${tx('省份与电网板块研究入口','Province and grid-area research navigation')}">${PROVS.map(p=>`<a href="#/p/${encodeURIComponent(p)}" style="grid-column:${TILES[p][0]+1};grid-row:${TILES[p][1]+1};background:${capPolicy(p)==='已出台'?'#c2d9d3':capPolicy(p)==='征求意见稿'?'#f2dfbd':'#e3e6e9'}" title="${esc(p)} · ${esc(capPolicy(p))}">${esc(p)}</a>`).join('')}</div>`;}
   function productHome() {
-    const recent=[...new Map([...(D.events||[]).map(e=>contentModel.records.get(e.code)).filter(Boolean),...[...contentModel.records.values()].filter(r=>r.kind==='notice'&&r.importance>=4)].map(r=>[r.id,r])).values()].filter(r=>!r.review_hold&&(r.content_type!=='notice'||r.importance>=4)).sort((a,b)=>String(b.sortDate).localeCompare(String(a.sortDate))).slice(0,4);
+    const actualToday=EnergyContent.today(),todayRows=dailyBrief?EnergyContent.dailyQuery(dailyBrief,{},actualToday):[],latestDay=dailyBrief?.items.filter(r=>r.publication_verified&&r.display_date<=actualToday).map(r=>r.display_date).sort().reverse()[0],homeRows=todayRows.length?todayRows:dailyBrief&&latestDay?EnergyContent.dailyQuery(dailyBrief,{date:latestDay},actualToday):[];
     const topics=[['绿电直连','Direct green power','direct',tx('从接入方式到适用条件，沿证据逐项判断。','Connection arrangements, applicable conditions and the source evidence.')],['虚拟电厂','Virtual power plants','vpp',tx('把资源、准入、交易与结算分开研究。','Separate resource aggregation, eligibility, trading and settlement.')],['零碳园区','Zero-carbon parks','park',tx('连接政策目标、园区场景与可复现算例。','Connect policy goals, park scenarios and reproducible examples.')]];
     $('#app').innerHTML=`<section class="studio-hero"><div class="studio-hero-copy"><div class="hero-kicker"><span></span>${tx('中国能源 · 独立研究与分析','CHINA ENERGY · INDEPENDENT RESEARCH')}</div><h1>${tx('看懂政策。<br>看清项目。','Understand policy.<br>Assess the project.')}</h1><p>${tx('政策分析、专题研究、省份研判与透明测算。<br>让每一个判断，都能回到来源与适用边界。','Policy analysis, regional research and transparent scenarios.<br>Trace each assessment to its sources and conditions.')}</p><div class="hero-actions"><a class="btn pri" data-primary-action href="${en()?'#/services':'#/policy'}">${tx('开始政策研究','Discuss a research brief')}${icon('arrow-up-right')}</a><a class="hero-secondary" href="${en()?'#/work':'#/topics'}">${tx('浏览重点专题','Inspect the work')}${icon('arrow-right')}</a></div><form id="home-search" class="hero-search"><label for="home-query">${icon('search')}<span class="sr-only">${tx('搜索政策库','Search the policy library')}</span></label><input id="home-query" type="search" placeholder="${tx('搜索地区、政策或文号','Search a region, policy or document number')}" required><button type="submit" aria-label="${tx('搜索','Search')}">${icon('arrow-right')}</button></form><div class="hero-footnote">${icon('shield-check')}${tx('免费开放 · 无需注册 · 依据可追溯','Free access · No account · Traceable evidence')}</div></div><aside class="hero-research-card"><div class="feature-card-top"><span>${tx('研究视野','RESEARCH PERSPECTIVE')}</span>${icon('chart-line')}</div><div class="hero-visual">${topicDrawing('direct')}<div class="visual-caption"><span>01 / POLICY</span><span>02 / CONDITIONS</span><span>03 / SCENARIOS</span></div></div><h2>${tx('绿电直连，<br>先看哪些条件？','Direct green power.<br>Which conditions matter?')}</h2><p>${tx('从一份完整研究开始，核对政策对象、条件与原文。','Start with a worked study: identify the project scope, conditions and original instruments.')}</p><a href="#/topic/绿电直连">${tx('打开研究示例','Open the worked study')}${icon('arrow-up-right')}</a></aside></section>
-    <div class="snapshot-strip"><span class="snapshot-label">${tx('公开研究快照','PUBLIC RESEARCH SNAPSHOT')}</span>${[[D.lib.length,tx('旧资料索引','legacy indexed records')],[(D.research||[]).length,tx('研究资料','research records')],[(D.topics||[]).length,tx('重点专题','research topics')],[PROVS.length,tx('省份/电网入口','region / grid entries')]].map(x=>`<span class="snapshot-count"><b>${x[0].toLocaleString()}</b>${x[1]}</span>`).join('')}<small>${esc(D.meta.exported||'')}</small></div>${contentCountsHTML()}
-    <section class="studio-section" data-home-section="policy">${sectionHead('01',tx('最新政策分析','Policy analysis'),tx('保留日期、状态与原始依据','DATES, STATUS & PRIMARY EVIDENCE'),'#/policy',tx('全部政策分析','All policy analysis'))}<div class="policy-study-layout"><div class="policy-update-list">${recent.map(r=>`<button type="button" class="studio-policy-row update-card" ${r.kind==='notice'?`data-notice-id="${esc(r.id)}"`:`data-code="${esc(r.id)}"`}><div class="policy-row-date"><span>${esc(r.sortDate.slice(5)||'—')}</span><small>${esc(r.province||'区域')}</small></div><div><div class="row-status"><span>${esc(contentTypeLabel(r))}</span><span>${esc(r.dateLabel)} ${esc(r.sortDate||'未确认')}</span></div><h3>${esc(r.title)}</h3><p>${esc(r.summary||'').slice(0,96)}</p></div>${icon('arrow-up-right')}</button>`).join('')}</div><aside class="study-panel">${icon('book-2')}<div class="section-overline">${tx('政策学习','POLICY LEARNING')}</div><h3>${tx('看懂政策，<br>也看懂判断的方法。','Read the policy.<br>Inspect the reasoning.')}</h3><p>${tx('从主题索引进入，分清对象、条件、状态和未知项。','Follow topic-based learning and distinguish scope, conditions, status and unknowns.')}</p><a href="#/learning">${tx('进入政策学习','Explore learning')}${icon('arrow-right')}</a></aside></div></section>
+    <div class="snapshot-strip"><span class="snapshot-label">${tx('公开研究快照','PUBLIC RESEARCH SNAPSHOT')}</span>${[[D.lib.length,tx('政策/公告索引（含待分类）','policy / announcement index'),'#/lib'],[EnergyContent.stats(contentModel).important,tx('重要公告（含答复/公示等）','important announcements'),'#/lib?type=notice&important=1'],[(D.research||[]).length,tx('研究资料索引（分类持续完善）','research index, classification ongoing'),'#/research'],[(D.topics||[]).length,tx('专题与学习','research & learning'),'#/topics']].map(x=>`<a class="snapshot-count" href="${x[2]}"><b>${x[0].toLocaleString()}</b>${x[1]}</a>`).join('')}<small>${esc(D.meta.exported||'')}</small></div>${contentCountsHTML()}
+    <section class="studio-section" data-home-section="policy">${sectionHead('01',tx('今日政策速递','Daily policy brief'),tx('保留日期、状态与原始依据','DATES, STATUS & PRIMARY EVIDENCE'),'#/policy',tx('打开每日速递','Open the daily brief'))}<div class="policy-study-layout"><div class="home-daily"><div class="daily-home-state" data-home-daily-today="${actualToday}" data-today-count="${todayRows.length}"><strong>${actualToday} · 今日 ${todayRows.length} 件</strong>${todayRows.length?'':`<p>${dailyLoadError?'日报暂未加载。':'今天暂无已核新增。'}${latestDay?'以下为最近已收录日 '+latestDay+' 的资料。':''}</p>`}</div><div class="daily-scroll home-daily-scroll" role="region" tabindex="0" aria-label="首页政策与公告速递">${homeRows.length?homeRows.map(dailyItemHTML).join(''):'<p class="note">可打开每日页选择日期，或检索已有公开资料。</p>'}</div></div><aside class="study-panel daily-home-note">${icon('file-analytics')}<div class="section-overline">${tx('按日回看','READ BY DATE')}</div><h3>${tx('读更新，<br>也读适用条件。','Read the updates.<br>Understand the conditions.')}</h3><p>${tx('选择日期或近日范围，在一页阅读政策与公告解析，并回到原始来源。','Choose a date or recent period to review the analysis and original sources.')}</p><small>资料截至 ${esc(dailyBrief?.snapshot_built_at||D.meta.exported)} · 北京时间</small><a href="#/policy">${tx('打开今日与历史速递','Open the daily brief')}${icon('arrow-right')}</a></aside></div></section>
     <section class="studio-section" data-home-section="topics">${sectionHead('02',tx('重点专题研究','Research themes'),tx('把分散信息组织成完整问题','RESEARCH A COMPLETE QUESTION'),'#/topics',tx('全部专题','All themes'))}<div class="studio-topics">${topics.map((t,i)=>`<a class="studio-topic topic-${t[2]}" href="#/topic/${encodeURIComponent(t[0])}"><div class="topic-art">${topicDrawing(t[2])}<span>RESEARCH / 0${i+1}</span></div><div class="topic-copy"><h3>${tx(t[0],t[1])}${icon('arrow-up-right')}</h3><p>${t[3]}</p></div></a>`).join('')}</div>${researchContinuations()}</section>
     <section class="studio-section" data-home-section="map">${sectionHead('03',tx('投资分级地图','Investment research map'),tx('保留成熟的参数地图与省份看板','POLICY INDICATORS & REGIONAL VIEWS'),'#/map',tx('打开地图','Open the map'))}<div class="map-preview-layout"><div class="cartogram-surface">${compactMap()}<small>${tx('省份/电网示意布局 · 非地理边界','Province / grid-area cartogram · not geographic boundaries')}</small></div><div class="map-preview-copy"><span class="section-overline">REGIONAL RESEARCH</span><h3>${tx('先核规则与条件，<br>再讨论投资判断。','Understand the rules.<br>Then assess the project.')}</h3><p>${tx('切换容量机制、现货阶段、费用规则等维度，查看图例、分省参数和来源。','Switch between capacity mechanisms, spot-market stages and charge rules; inspect regional parameters and their sources.')}</p><a class="btn" href="#/map">${tx('查看省份板块','Explore regions')}${icon('arrow-right')}</a></div></div></section>
     <section class="studio-section" data-home-section="tools">${sectionHead('04',tx('收益测算工具','Returns & scenario tools'),tx('把假设展开，把结果复算','EXPLICIT INPUTS · REPRODUCIBLE OUTPUTS'),'#/explore',tx('全部工具','All tools'))}<div class="tool-showcase"><div class="tool-feature"><div class="tool-mark">${icon('calculator')}</div><h3>${tx('从一个算例，<br>看清收益的构成。','Start with a scenario.<br>Understand the components.')}</h3><p>${tx('容量折算、充电费用与园区情景，分别展示输入、单位、约束与结果边界。','Inspect capacity arithmetic, charging costs and park scenarios, with units, constraints and limits.')}</p><a class="btn" href="#/tools">${tx('打开容量与费用工具','Open capacity & charges')}${icon('arrow-up-right')}</a></div><div class="tool-shelf">${[['#/tools','calculator',tx('容量与费用','Capacity & charges'),tx('看折算、费用与声明退减','Inspect arithmetic and declared charges')],['#/rev','chart-line',tx('收益情景测算','Revenue scenario'),tx('合成输入，解释收入与成本','Synthetic inputs, revenue and cost components')],['#/park-demo','building-factory-2',tx('园区合成演示','Park scenarios'),tx('固定场景、逐时调度与复现','Fixed cases, hourly dispatch and reproduction')]].map(x=>`<a href="${x[0]}">${icon(x[1])}<div><h4>${x[2]}</h4><p>${x[3]}</p></div>${icon('arrow-up-right')}</a>`).join('')}</div></div></section>
@@ -589,31 +596,33 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
     });
     flush(); return out.join('');
   }
-  function topicIndex() {
-    const art={储能:'vpp',绿电直连:'direct',零碳园区:'park',零碳工厂:'park',虚拟电厂:'vpp'};
-    const intro={储能:tx('区分容量机制、现货与辅助服务，核查收入条件与重复计取。','Distinguish capacity mechanisms, spot markets and ancillary services; inspect revenue conditions.'),绿电直连:tx('研究接入模式、电量比例、费用与项目适用边界。','Inspect connection arrangements, energy ratios, charges and project scope.'),零碳园区:tx('从政策目标进入园区条件、能源方案与合成算例。','Connect policy goals to park conditions, energy planning and synthetic scenarios.'),零碳工厂:tx('看认定对象、指标体系与资料准备，分清政策和标准。','Review eligibility, indicator frameworks and evidence requirements.'),虚拟电厂:tx('梳理聚合资源、市场准入、交易与结算四个层次。','Research aggregation, market eligibility, trading and settlement separately.')};
-    const names={储能:'Grid-side standalone storage',绿电直连:'Direct green power',零碳园区:'Zero-carbon parks',零碳工厂:'Zero-carbon factories',虚拟电厂:'Virtual power plants'};
-    $('#app').innerHTML=`<section class="hero demo-page-head"><div><div class="eyebrow">${tx('专题 / 资料 / 方法','TOPICS / SOURCES / METHODS')}</div><h1>${tx('重点专题研究','Research themes')}</h1><p class="lede">${tx('从一个完整问题出发，连接国家框架、地方实施、研究资料与判断方法。每项结论保留依据和适用边界。','Explore a complete question across national instruments, regional implementation, source material and methods. Original studies remain in Chinese.')}</p></div></section><div class="studio-topics topic-library">${(D.topics||[]).map((t,i)=>{const text=(t.md.split(/##\s*一句话/)[1]||'').split('\n').find(x=>x.trim())||'';return `<a class="studio-topic topic-${art[t.名]||'park'}" href="#/topic/${encodeURIComponent(t.名)}"><div class="topic-art">${topicDrawing(art[t.名]||'park')}<span>RESEARCH / 0${i+1}</span></div><div class="topic-copy"><h3>${esc(tx(t.题||t.名,names[t.名]||t.名))}${icon('arrow-up-right')}</h3><p>${intro[t.名]||tx('查看完整研究、政策条件与来源。','Inspect the study, conditions and sources.')}</p></div></a>`;}).join('')}</div>${researchContinuations()}`;
+  function relatedPolicyRows(codes){
+    return `<div class="related-policy-list">${codes.filter(code=>D.docs[code]).map(code=>{const d=D.docs[code],record=contentModel.records.get(code),brief=briefOf(code),summary=record?.review_hold?record.source_gap:(d.summary||brief?.概述||'摘要待补，可查看现有索引与来源。');return `<button type="button" class="related-policy-row" data-code="${esc(code)}" data-row-preview aria-controls="analysis-workspace" aria-describedby="tip" title="${esc(summary)}"><span class="related-row-main"><strong>${esc(d.title)}</strong><span class="related-row-summary">${esc(summary)}</span><small>${esc(EnergyContent.TYPES[record?.content_type]||'待分类资料')} · ${brief?'摘要与解析':d.summary?'文件摘要与来源':'仅索引，解析待补'}</small></span><span class="related-row-meta"><time>${esc(d.published||d.date||'日期未确认')}</time><small>${d.published?'该页公开':'索引成文日'}</small>${stChip(record?.review_hold?'来源待核':d.status)}<span class="row-open-label">本页阅读 →</span></span></button>`;}).join('')}</div>`;
   }
-  function topicPage(arg) {
-    const [name, focus] = String(arg || '').split('/'), t = (D.topics || []).find(x => x.名 === name); if (!t) return topicIndex();
-    const hasMap = Object.keys((D.topicmap || {})[name] || {}).length > 0;
-    const base = p => p.split(/[·(（]/)[0], rank = p => /^(国家|全国)/.test(p) ? 0 : PROVS.includes(base(p)) || base(p) === '内蒙古' ? 1 : 2;
-    const subs = Object.keys(t.rows).filter(p => !/^研究参考/.test(p)).sort((a, b) => rank(a) - rank(b) || base(a).localeCompare(base(b), 'zh') || a.localeCompare(b, 'zh'));   /* 研究参考行不进对照表 */
-    const v = { 主: [...new Set(TOPIC_TAGS(name).flatMap(k => ((D.tagdocs || {})[k] || { 主: [] }).主))] }, rel = v.主.slice().sort((a, b) => String((D.docs[b] || {}).date || '').localeCompare(String((D.docs[a] || {}).date || ''))).slice(0, 40);
-    $('#app').innerHTML = `<section class="hero"><div><div class="eyebrow"><a href="#/topics">专题</a></div><h1>${esc(t.题 || name)}</h1></div></section>
-      ${hasMap ? '<section class="card mapcard" style="margin-bottom:18px"><div id="tmap"></div></section>' : ''}
-      <article class="card prose-topic">${mdHTML(t.md)}${name==='零碳园区'?'<p><a href="#/park-demo">查看园区储能合成演示 →</a></p>':''}</article>
-      <section class="card" style="margin-top:18px"><h2>分省对照 <small class="note" style="display:inline">${subs.length} 行 · 按政策更新</small></h2>
-        <div class="sub">每格只给结论句；点圆点看依据文件。「—」为本站未采集，不等于该省无规定。</div>
-        <div class="tbl topic-tbl"><table><thead><tr><th>省份</th>${t.cols.map(([, h]) => `<th>${esc(h)}</th>`).join('')}</tr></thead>
-        <tbody>${subs.map(p => `<tr><th>${PROVS.includes(base(p)) ? `<a href="#/p/${encodeURIComponent(base(p))}">${esc(p)}</a>` : esc(p)}</th>${t.cols.map(([m]) => `<td>${t.rows[p][m] ? citeHTML(clean(t.rows[p][m]).replace(/^【结论】\s*/, '')) : '<span class="note">—</span>'}</td>`).join('')}</tr>`).join('')}</tbody></table></div></section>
-      ${rel.length ? `<section class="card" style="margin-top:18px"><h2>相关政策 <small class="note" style="display:inline">${v.主.length} 件，显示最近 ${rel.length} 件</small></h2><ul class="evl">${rel.map(c => docRow(c)).join('')}</ul>${TOPIC_TAGS(name).length === 1 ? `<p class="sub"><a href="#/lib?tag=${encodeURIComponent(name)}">在政策库里筛选全部 →</a></p>` : ''}</section>` : ''}`;
-    if (hasMap) {
-      wireTopicMap(name, 'comp');
-      if (name === '储能') $('#tmap').closest('section').insertAdjacentHTML('afterend', landingHTML('ZCGJ03'));
-    }
-    if (focus && TILES[focus]) openPanel(provTopicCard(name, focus));
+  function lessonSectionHTML(section){return `<section><h3>${esc(section.title)}</h3>${(section.paragraphs||[]).map(t=>`<p>${inlineMD(t)}</p>`).join('')}${section.md?mdHTML(section.md):''}${section.table?mdHTML(section.table):''}</section>`;}
+  function topicLearningHTML(name,all=false){
+    const pack=D.topic_learning;if(!pack?.lessons)return '';
+    const topic=pack.topics.find(t=>t.name===name),lessons=all?pack.lessons:(topic?.lesson_ids||[]).map(id=>pack.lessons.find(l=>l.id===id)).filter(Boolean);const commonBoundary=new Set(lessons.map(l=>l.public_boundary)).size===1?lessons[0]?.public_boundary:'';
+    return `<section id="topic-learning" class="topic-learning topic-reading"><header><div class="eyebrow">${tx('专题学习','TOPIC LEARNING')}</div><h2>${all?'全部学习主题':esc(name)+' · 学习与应用'}</h2><p>${lessons.length} 个学习单元 · 在本页展开原理、误读与练习</p>${commonBoundary?`<p class="note">${esc(commonBoundary)}</p>`:''}${!all?'<a href="#/topics?section=learning">在本页查看全部学习主题 →</a>':''}</header>${lessons.map(l=>`<details class="lesson" id="lesson-${esc(l.id)}"><summary><strong>${esc(l.title)}</strong><span>${esc(l.question)}</span></summary><div class="lesson-body prose-topic">${topic?.lesson_contexts?.[l.id]?`<p class="analysis-boundary">${esc(topic.lesson_contexts[l.id])}</p>`:''}${l.sections.map(lessonSectionHTML).join('')}${l.misconceptions?.length?`<section><h3>常见误读</h3><dl class="misconceptions">${l.misconceptions.map(m=>`<dt>${esc(m.claim)}</dt><dd>${esc(m.correction)}</dd>`).join('')}</dl></section>`:''}${l.exercise?`<section><h3>练习与核对</h3><p>${esc(l.exercise.prompt)}</p><details class="exercise-answer"><summary>展开核对要点</summary><ul>${(l.exercise.answer_points||[]).map(t=>`<li>${inlineMD(t)}</li>`).join('')}</ul></details></section>`:''}${l.links?.length?`<section class="lesson-links"><h3>继续核对依据与方法</h3>${l.links.map(link=>link.policy_id&&D.docs[link.policy_id]?`<button type="button" class="lesson-policy-link" data-code="${esc(link.policy_id)}" aria-controls="analysis-workspace">${esc(link.label)} ${stChip(contentModel.records.get(link.policy_id)?.review_hold?'来源待核':D.docs[link.policy_id].status)}</button>`:`<a href="${esc(link.href||link.route||'')}"${/^https?:/.test(link.href||link.route||'')?' target="_blank" rel="noopener noreferrer"':''}>${esc(link.label||link.title||'查看来源')} ↗</a>`).join('')}</section>`:''}${l.public_boundary&&!commonBoundary?`<p class="analysis-boundary">${esc(l.public_boundary)}</p>`:''}</div></details>`).join('')}</section>`;
+  }
+  function topicWorkspaceHTML(name,allLessons=false){
+    const t=(D.topics||[]).find(t=>t.名===name);if(!t)return '';
+    const base=p=>p.split(/[·(（]/)[0],rank=p=>/^(国家|全国)/.test(p)?0:PROVS.includes(base(p))||base(p)==='内蒙古'?1:2;
+    const subs=Object.keys(t.rows).filter(p=>!/^研究参考/.test(p)).sort((a,b)=>rank(a)-rank(b)||base(a).localeCompare(base(b),'zh')||a.localeCompare(b,'zh'));
+    const codes=[...new Set(TOPIC_TAGS(name).flatMap(k=>((D.tagdocs||{})[k]||{主:[]}).主))].sort((a,b)=>String(D.docs[b]?.published||D.docs[b]?.date||'').localeCompare(String(D.docs[a]?.published||D.docs[a]?.date||''))).slice(0,40);
+    const reviewed=D.topic_learning?.topics.find(topic=>topic.name===name);
+    const introduction=reviewed?`<h2>${esc(reviewed.title)}</h2><p class="lede">${esc(reviewed.intro)}</p><p>${esc(reviewed.goal)}</p>${reviewed.sections.map(lessonSectionHTML).join('')}`:mdHTML(t.md);
+    return `<div id="topic-workspace" data-topic="${esc(name)}">${analysisWorkspaceHTML()}<article class="card prose-topic topic-reading">${introduction}${reviewed?`<details class="topic-original-study"><summary>查看已审案例与适用条件</summary><div class="prose-topic">${mdHTML(t.md)}</div></details>`:''}${name==='零碳园区'?'<p><a href="#/park-demo">查看园区储能合成演示 →</a></p>':''}</article>${topicLearningHTML(name,allLessons)}<section class="card related-policy-panel"><h2>相关政策与公告 <small class="note">${codes.length} 项</small></h2><p class="note">整行可悬停或聚焦查看提示，点击后在本页核对解析、来源与适用边界。</p>${relatedPolicyRows(codes)}</section><details class="card topic-comparison"><summary>展开分省对照 · ${subs.length} 行</summary><p class="note">数值与适用条件按原有审定快照；“—”表示本站未采集。</p><div class="tbl topic-tbl"><table><thead><tr><th>省份</th>${t.cols.map(([,h])=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${subs.map(p=>`<tr><th>${PROVS.includes(base(p))?`<a href="#/p/${encodeURIComponent(base(p))}">${esc(p)}</a>`:esc(p)}</th>${t.cols.map(([m])=>`<td>${t.rows[p][m]?citeHTML(clean(t.rows[p][m]).replace(/^【结论】\s*/,'')):'<span class="note">—</span>'}</td>`).join('')}</tr>`).join('')}</tbody></table></div></details></div>`;
+  }
+  function topicIndex(query=''){
+    const params=new URLSearchParams(query),name=(D.topics||[]).some(t=>t.名===params.get('topic'))?params.get('topic'):(D.topics?.[0]?.名||'储能'),allLessons=params.get('section')==='learning';
+    $('#app').innerHTML=`<section class="hero"><div><div class="eyebrow">${tx('研究 · 学习 · 来源与方法','RESEARCH · LEARNING · SOURCES & METHODS')}</div><h1>${tx('重点专题研究','Research themes')}</h1><p class="lede">${tx('围绕同一个问题，接续阅读原理、适用条件、相关政策与核对方法。','Study the principles, conditions, related instruments and methods in one workspace.')}</p></div></section><div class="topic-switcher" role="group" aria-label="选择研究问题">${(D.topics||[]).map(t=>`<button type="button" data-topic-select="${esc(t.名)}" aria-pressed="${t.名===name}">${esc(t.名)}</button>`).join('')}</div>${topicWorkspaceHTML(name,allLessons)}${researchContinuations()}`;
+    document.querySelectorAll('[data-topic-select]').forEach(button=>button.onclick=()=>{location.hash='#/topics?topic='+encodeURIComponent(button.dataset.topicSelect);});
+    if(allLessons)requestAnimationFrame(()=>document.querySelector('#topic-learning')?.scrollIntoView({block:'start'}));
+  }
+  function topicPage(arg){
+    const [name]=String(arg||'').split('/');if(!(D.topics||[]).some(t=>t.名===name))return topicIndex();
+    $('#app').innerHTML=`<section class="hero"><div><div class="eyebrow"><a href="#/topics">专题与学习</a></div><h1>${esc(name)}</h1></div></section>${topicWorkspaceHTML(name)}${researchContinuations()}`;
   }
   // ---------- 信息架构 v2（研究线 10-16，用户定）：「政策」板块（最新政策看板＋四入口＋列表）、专题地图三图层、省份页反向链接 ----------
   const LIBX = () => D._lx || (D._lx = Object.fromEntries((D.lib || []).map(r => [r[0], r])));
@@ -630,31 +639,23 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
   const legendHTML = items => `<div class="legend">${items.map(([bg, t]) => `<span><span class="sw" style="background:${bg}"></span>${esc(t)}</span>`).join('')}</div>`;
   const quint = vals => { const v = vals.filter(x => x > 0).sort((a, b) => a - b); return x => !(x > 0) ? -1 : Math.min(4, Math.floor(v.filter(y => y <= x).length / v.length * 5 - 1e-9)); };
   const impDots = n => n ? `<span class="imp" title="重要性 ${n}／5">${'●'.repeat(n)}${'○'.repeat(5 - n)}</span>` : '';
-  function policyPage(arg) {
-    const L = D.lib || [], recent = L.filter(r => { const d = actDate(r),record=contentModel.records.get(r[0]); return d && days(d) >= 0 && days(d) <= 30 && !/参考|已替代|重复作废|废止/.test(r[3])&&!record?.review_hold&&(record?.content_type!=='notice'||record.importance>=4); });
-    const act = {}, cnt = {}, hi = {}, last = {}; let nat = 0;
-    recent.forEach(r => { const d = actDate(r), importance=contentModel.records.get(r[0])?.importance??r[7]??1, w = importance * Math.pow(0.5, days(d) / 10);
-      if (r[5] === '全国') { nat++; return; }
-      tilesOf(r).forEach(p => { act[p] = (act[p] || 0) + w * (r[5] === '跨省区域' ? 0.5 : 1); cnt[p] = (cnt[p] || 0) + 1; if (importance >= 4) hi[p] = (hi[p] || 0) + 1; if (!last[p] || d > actDate(last[p])) last[p] = r; }); });
-    const q = quint(Object.values(act)), sel = arg && TILES[arg] ? arg : '';
-    const listed=recent.filter(r=>!sel||tilesOf(r).includes(sel)).map(r=>({...contentModel.records.get(r[0]),sortDate:actDate(r)}));
-    const notices=EnergyContent.query(contentModel,{type:'notice'}).filter(r=>r.importance>=4&&r.sortDate&&days(r.sortDate)>=0&&days(r.sortDate)<=30&&(!sel||r.verified_region_codes?.includes(sel)||r.province===sel));
-    const list=[...new Map([...listed,...notices].map(r=>[r.id,r])).values()].sort((a,b)=>String(b.sortDate).localeCompare(String(a.sortDate)));
-    const card=r=>`<li><button type="button" class="prow" aria-controls="analysis-workspace" ${r.kind==='notice'?`data-notice-id="${esc(r.id)}"`:`data-code="${esc(r.id)}"`}><span class="pv">${esc(r.province||'区域')}</span><span class="st">${esc(contentTypeLabel(r))}</span><span class="pt">${esc(r.title)}</span><span class="mono pd">${esc(r.sortDate.slice(5))}</span></button></li>`;
-    $('#app').innerHTML = `<section class="hero"><div><div class="eyebrow">旧资料索引 ${L.length} 条 · 分类持续完善</div><h1>最新政策分析</h1>
-        <p class="lede">左图按已有关联展示近30天资料活跃度；右侧合并近期资料和4、5级重要通知。类型尚未全量审定，点条目查看摘要、分析与来源。</p></div></section>
-      ${contentCountsHTML()}${analysisWorkspaceHTML()}<section class="card pboard"><div class="pmap"><div class="sub">国家层面近 30 天 <b class="mono">${nat}</b> 件 · <a href="#/lib?prov=全国">看国家文件 →</a></div>
-          ${tileMapHTML(p => { const k = q(act[p]); return { bg: k < 0 ? GRAY : BLUES[k], val: cnt[p] ? cnt[p] + ' 件' : '', dim: sel && sel !== p, tip: cnt[p] ? `${p}：近 30 天 ${cnt[p]} 件，其中重要性 4 级以上 ${hi[p] || 0} 件；最近一件《${last[p][1].replace(/^\d{6}/, '').slice(0, 40)}》` : `${p}：近 30 天无新件` }; }, 'pTiles')}
-          ${legendHTML([[GRAY, '无'], ...BLUES.map((c, i) => [c, ['低', '较低', '中', '较高', '高'][i]])])}
-          <p class="note">近 30 天资料活跃度＝重要性按时间衰减加总（每 10 天减半）；区域文件计入所覆盖各省、权重减半；国家文件单列。</p></div>
-        <div class="plist"><div class="sub">${sel ? `${esc(sel)} · ${list.length} 件 · <a href="#/policy">看全部</a> · <a href="#/p/${encodeURIComponent(sel)}">进入${esc(sel)}看板 →</a>` : `近 30 天 ${list.length} 件，按公开／索引／事件日期倒序`}</div><ul class="prl">${list.map(card).join('') || '<li class="note">无</li>'}</ul></div></section>
-      <section style="margin-top:20px"><h2 style="margin-bottom:12px">找政策</h2><div class="mech entries">
-        <a class="mc" href="#/policy/prov"><div class="mh"><b>按省份</b></div><p>31 省网格，看每省件数和最近更新。</p></a>
-        <a class="mc" href="#/topics"><div class="mh"><b>按专题</b></div><p>${(D.topics || []).map(t => esc(t.名)).join('、')}。</p></a>
-        <a class="mc" href="#/policy/time"><div class="mh"><b>按时间</b></div><p>近 24 个月每月发文件数，点月份看当月政策。</p></a>
-        <form class="mc" id="psearch"><div class="mh"><b>直接搜索</b></div><input name="q" placeholder="政策名称或文号" aria-label="搜索政策"><button class="dim on" type="submit">搜索</button></form></div></section>`;
-    $('#pTiles').onclick = e => { const t = e.target.closest('[data-tp]'); if (t) location.hash = '#/policy/' + (sel === t.dataset.tp ? '' : encodeURIComponent(t.dataset.tp)); };
-    $('#psearch').onsubmit = ev => { ev.preventDefault(); const v = ev.target.q.value.trim(); location.hash = '#/lib' + (v ? '?q=' + encodeURIComponent(v) : ''); };
+  async function loadDailyBrief(){
+    if(!dailyLoad)dailyLoad=(async()=>{try{let payload=window.__DAILY_BRIEF__;if(!payload){const response=await fetch('content/daily-brief.json',{cache:'no-store'});if(!response.ok)throw Error('速递未取得');payload=await response.json();}dailyBrief=EnergyContent.validateDaily(payload,contentModel,D.meta);dailyLoadError=false;}catch(error){dailyBrief=null;dailyLoadError=true;}})();return dailyLoad;
+  }
+  const analysisLabel = value => value==='full'?'完整分析':value==='summary'?'摘要与解析':'仅索引，解析待补';
+  function dailyItemHTML(r){
+    const attrs=r.renderer==='notice'?`data-notice-id="${esc(r.id)}"`:r.renderer==='reply'?`data-reply-id="${esc(r.id)}"`:`data-code="${esc(r.id)}"`;
+    return `<article class="daily-item"><button type="button" class="daily-open" ${attrs} data-daily-id="${esc(r.id)}" data-row-preview aria-describedby="tip" aria-controls="analysis-workspace" title="${esc(r.summary)}"><span class="daily-meta"><span>${r.type==='policy'?'政策':'公告'} · ${esc(r.subtype)}</span><span>${esc(r.date_label)} ${esc(r.display_date||'未确认')}</span></span><h2>${esc(r.title)}</h2><span class="daily-qualifiers">${r.region?`<span>${esc(r.region)}</span>`:''}${r.status?stChip(r.status):''}<span class="analysis-state">${analysisLabel(r.analysis_state)}</span>${r.importance!==null?`<span>编辑重要性 ${r.importance}级</span>`:'<span>未评分</span>'}</span><p>${esc(r.summary||'摘要待补，可查看文件索引。')}</p>${!r.publication_verified?'<strong class="date-fallback">非当日新发 · 仅按成文/收录索引定位</strong>':''}<span class="row-open-label">在本页阅读解析 →</span></button><footer>${r.source_url?`<a data-daily-source href="${esc(r.source_url)}" target="_blank" rel="noopener noreferrer">${esc(r.source_label)} ↗</a>`:'<span>原发布页待补</span>'}<a data-daily-share href="${esc(r.route)}">分享条目直达链接</a></footer></article>`;
+  }
+  function policyPage(arg){
+    const h=decodeURIComponent(location.hash||'#/policy'),P=new URLSearchParams(h.split('?')[1]||''),legacy=h.split('?')[0].split('/')[2],actualToday=EnergyContent.today();
+    const f={date:EnergyContent.validDate(P.get('date'))?P.get('date'):actualToday,range:['7','30','all','index'].includes(P.get('range'))?P.get('range'):'day',type:['policy','notice'].includes(P.get('type'))?P.get('type'):'',prov:P.get('prov')||(TILES[legacy]?legacy:''),important:P.get('important')==='1'};
+    const all=dailyBrief?.items||[],rows=dailyBrief?EnergyContent.dailyQuery(dailyBrief,f,actualToday):[],latest=all.filter(r=>r.publication_verified&&r.display_date<=actualToday).map(r=>r.display_date).sort().reverse()[0];
+    const share=new URL(location.href);share.hash='#/policy?'+new URLSearchParams(Object.entries({...f,important:f.important?'1':''}).filter(([,v])=>v));
+    const empty=dailyLoadError?'<p role="status">速递暂未加载，已有公开资料仍可检索。<button type="button" data-daily-retry>重试</button></p>':`<p role="status">${esc(f.range==='day'?f.date+' 当前筛选当天暂无已核公开/事件新增。':'当前范围没有符合筛选的已审条目。')}</p>${latest?`<a id="daily-latest" href="#/policy?date=${latest}">查看最近已收录日 ${latest} →</a>`:''}`;
+    $('#app').innerHTML=`<section class="hero daily-head"><div><div class="eyebrow">${tx('已审公开资料 · 按日回看','REVIEWED PUBLIC SOURCES · DAILY VIEW')}</div><h1>${tx('今日政策速递','Daily policy brief')}</h1><p class="lede">${tx('政策变化与公告事件，在同一页核日期、读解析、回来源。','Review policy changes and official announcements, with dates, analysis and source links.')}</p><p class="note" data-daily-cutoff>北京时间今天 ${actualToday} · 资料快照构建 ${esc(dailyBrief?.snapshot_built_at||D.meta.exported)}（Asia/Shanghai）。仅已审公开条目，非实时全网汇总。</p></div></section>${P.has('date')&&!EnergyContent.validDate(P.get('date'))?'<p class="note" role="alert">日期参数不是有效公历日；当前显示北京时间今天，可重新选择。</p>':''}${contentCountsHTML()}${analysisWorkspaceHTML()}<section class="daily-board"><form id="daily-filters" class="daily-filters"><label>日期<input type="date" name="date" value="${esc(f.date)}"></label><label>范围<select name="range">${[['day','选定日'],['7','截至选定日近7天'],['30','截至选定日近30天'],['all','全部已核公开/事件日'],['index','成文/收录索引（非新发）']].map(([v,t])=>`<option value="${v}"${v===f.range?' selected':''}>${t}</option>`).join('')}</select></label><label>类型<select name="type"><option value="">政策与公告</option><option value="policy"${f.type==='policy'?' selected':''}>政策</option><option value="notice"${f.type==='notice'?' selected':''}>公告（含答复/公示等）</option></select></label><label class="daily-important"><input type="checkbox" name="important"${f.important?' checked':''}>仅重要公告（4、5级）</label><button type="submit" class="btn">查看</button><a class="btn" href="#/policy?date=${actualToday}">回到今天</a></form>${f.prov?`<p>地区：${esc(f.prov)} · <a href="#/policy">清除地区筛选</a></p>`:''}<div class="daily-list-heading"><h2>${f.range==='day'?esc(f.date):f.range==='index'?'已有资料的日期索引':'已核政策与公告'}</h2><span data-daily-count="${rows.length}">${rows.length} 件 · 同件去重</span><a data-daily-filter-share href="${esc(share.href)}">分享当前筛选</a></div><p class="note">事件日与该页公开日分开标记；只有成文或收录日的条目放在独立索引范围，不计作今日新发。可用鼠标、触控或键盘手动滚动。</p><div class="daily-scroll" role="region" tabindex="0" aria-label="政策与公告日报条目">${rows.length?rows.map(dailyItemHTML).join(''):`<div class="daily-empty">${empty}</div>`}</div><p class="daily-more"><a href="#/lib">检索全部公开索引 →</a> · <a href="#/topics">沿专题继续学习与研究 →</a></p></section>`;
+    $('#daily-filters').onsubmit=e=>{e.preventDefault();const values=new FormData(e.currentTarget),query=new URLSearchParams();for(const key of ['date','range','type'])if(values.get(key))query.set(key,values.get(key));if(values.get('important'))query.set('important','1');if(f.prov)query.set('prov',f.prov);location.hash='#/policy?'+query;};
+    document.querySelector('[data-daily-retry]')?.addEventListener('click',()=>{dailyLoad=null;loadDailyBrief().then(route);});
   }
   function policyProv() {
     const L = D.lib || [], n = {}, last = {};
@@ -1004,7 +1005,7 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
     if(!contentLoad)contentLoad=(async()=>{
       try{
         let payload=window.__CONTENT_LAYER__;
-        if(!payload){const response=await fetch('content/content-layer.json',{cache:'no-store'});if(!response.ok)throw Error('通知内容未取得');payload=await response.json();}
+        if(!payload){const response=await fetch('content/content-layer.json',{cache:'no-store'});if(!response.ok)throw Error('公告内容未取得');payload=await response.json();}
         contentLayer=EnergyContent.validate(payload);contentLoadError=false;
       }catch(error){contentLoadError=true;contentLayer={schema:1,notices:[],classifications:[],source_links:[],source_gaps:[]};}
     })();
@@ -1014,9 +1015,9 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
     return (EnergyContent.TYPES[record?.content_type]||'待分类资料')+(record?.subtype?' · '+record.subtype:'');
   }
   function contentCountsHTML() {
-    if(contentLoadError)return '<p class="note" role="status" data-content-load-error>通知与分类暂未加载，旧资料索引仍可使用。<button type="button" data-content-retry>重试加载</button></p>';
+    if(contentLoadError)return '<p class="note" role="status" data-content-load-error>公告与分类暂未加载，旧资料索引仍可使用。<button type="button" data-content-retry>重试加载</button></p>';
     const c=EnergyContent.stats(contentModel);
-    return `<p class="note" data-classification-stats data-notices="${c.notices}" data-important="${c.important}">已审分类范围：政策 ${c.policy} 件 · 通知共 ${c.notices} 件，其中重要通知 ${c.important} 件、未评分 ${c.unscored} 件。${replyLoadError?'答复样例暂未加载。':''}文章研报尚未逐件分类，其余 ${c.classification_pending} 条旧资料保留待分类；不代表全站分类已完成。</p>`;
+    return `<p class="note" data-classification-stats data-notices="${c.notices}" data-important="${c.important}">已审分类范围：政策 ${c.policy} 件 · 公告共 ${c.notices} 件，其中重要公告 ${c.important} 件、未评分 ${c.unscored} 件。${replyLoadError?'答复样例暂未加载。':''}文章研报尚未逐件分类，其余 ${c.classification_pending} 条旧资料保留待分类；不代表全站分类已完成。</p>`;
   }
   function contentCardHTML(r) {
     if(r.kind==='reply')return replyCardHTML(r);
@@ -1035,13 +1036,13 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
     return `<div class="block"><a data-share-link href="${esc(url.href)}">分享直达链接</a> · <button type="button" class="dim" data-copy-content="${esc(url.href)}">复制链接</button><span data-share-status role="status"></span></div>`;
   }
   function noticeAnalysisHTML(n) {
-    return `<div class="shead"><span class="reply-type">通知 · ${esc(n.subtype)}</span><h2 id="analysis-title" tabindex="-1">${esc(n.title)}</h2><p>${esc(n.issuer)} · 编辑重要性 ${n.importance}级</p><p class="note">${esc(n.importance_reason)}</p><div class="dates"><span>事件：<b>${esc(n.event_at)}</b></span><span>署名日期：${esc(n.issued_at)}</span><span>该页公开：${esc(n.published_at)}</span><span>最早首发：${esc(n.first_publication_date||'未确认')}</span></div><p class="note">${esc(n.publication_date_basis)}</p><p class="summary">${esc(n.summary)}</p></div>
+    return `<div class="shead"><span class="reply-type">公告 · ${esc(n.subtype)}</span><h2 id="analysis-title" tabindex="-1">${esc(n.title)}</h2><p>${esc(n.issuer)} · 编辑重要性 ${n.importance}级</p><p class="note">${esc(n.importance_reason)}</p><div class="dates"><span>事件：<b>${esc(n.event_at)}</b></span><span>署名日期：${esc(n.issued_at)}</span><span>该页公开：${esc(n.published_at)}</span><span>最早首发：${esc(n.first_publication_date||'未确认')}</span></div><p class="note">${esc(n.publication_date_basis)}</p><p class="summary">${esc(n.summary)}</p></div>
       <div class="sbody"><section class="block"><h3>我们的分析</h3><p>${esc(n.our_analysis)}</p><p class="analysis-boundary">${esc(n.boundary)}</p><p>${esc(n.region_scope)}</p></section><section class="block"><h3>依据原文</h3><blockquote>${esc(n.quote)}</blockquote><a class="btn" data-notice-source href="${esc(n.source_url)}" target="_blank" rel="noopener noreferrer">交易中心署名公告原页 ↗</a><p class="note">${esc(n.source_access_note)}</p><a data-notice-corroboration href="${esc(n.corroborating_url)}" target="_blank" rel="noopener noreferrer">能源局事件佐证 ↗</a></section><section class="block"><h3>公告所引文件</h3><p>${esc(n.cited_document_number)}：${esc(n.cited_document_verification)}</p><p>没有已审的正式参数或省网区映射，不据此广播到各省或收益工具。</p></section>${shareContentHTML(n.id)}</div>`;
   }
   function noticePage(id) {
     libPage('type=notice');const r=contentModel.records.get(id);
     if(r?.review_hold){showInlineAnalysis('policy',id,{scroll:true,push:false});return;}
-    if(!r||r.content_type!=='notice'){$('#analysis-workspace').hidden=false;$('#analysis-workspace').innerHTML=`<p role="status">${contentLoadError?'通知内容暂未加载，请使用上方重试。':'当前没有可公开直达的该通知。'}</p>`;return;}
+    if(!r||r.content_type!=='notice'){$('#analysis-workspace').hidden=false;$('#analysis-workspace').innerHTML=`<p role="status">${contentLoadError?'公告内容暂未加载，请使用上方重试。':'当前没有可公开直达的该公告。'}</p>`;return;}
     showInlineAnalysis(r.kind,id,{scroll:true,push:false});
   }
   function loadReplyInsights() {
@@ -1115,7 +1116,7 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
   }
   document.addEventListener('click',event=>{
     const notice=event.target.closest('[data-notice-id]');if(notice){event.preventDefault();showInlineAnalysis('notice',notice.dataset.noticeId,{opener:notice});return;}
-    const retry=event.target.closest('[data-content-retry]');if(retry){contentLoad=null;loadContentLayer().then(()=>{contentModel=EnergyContent.create(D,contentLayer,replyItems);route();});return;}
+    const retry=event.target.closest('[data-content-retry]');if(retry){contentLoad=null;loadContentLayer().then(()=>{contentModel=EnergyContent.create(D,contentLayer,replyItems);dailyLoad=null;loadDailyBrief().then(route);});return;}
     const copy=event.target.closest('[data-copy-content]');if(copy){const status=copy.parentElement.querySelector('[data-share-status]');if(navigator.clipboard?.writeText)navigator.clipboard.writeText(copy.dataset.copyContent).then(()=>status.textContent=' 已复制').catch(()=>status.textContent=' 无法自动复制，请复制上方链接地址。');else status.textContent=' 请复制上方链接地址。';return;}
     const reply=event.target.closest('[data-reply-id]');
     if(reply){event.preventDefault();showInlineAnalysis('reply',reply.dataset.replyId,{opener:reply});return;}
@@ -1140,7 +1141,7 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
     await loadReplyInsights();
     const box=document.querySelector('[data-province-replies]');if(!box||box.dataset.provinceReplies!==p)return;
     const rows=EnergyContent.query(contentModel,{type:'notice'}).filter(r=>r.verified_region_codes?.includes(p)||r.province===p);
-    box.innerHTML=rows.map(contentCardHTML).join('')||`<p class="note">${replyLoadError||contentLoadError?'通知或答复暂未加载，请稍后重试。':'当前暂无已审定的本省通知；全国或区域背景材料不广播到全部省份。'}</p>`;
+    box.innerHTML=rows.map(contentCardHTML).join('')||`<p class="note">${replyLoadError||contentLoadError?'公告或答复暂未加载，请稍后重试。':'当前暂无已审定的本省公告；全国或区域背景材料不广播到全部省份。'}</p>`;
     refreshInlineAnalysis();
   }
   function province(p) {
@@ -1399,7 +1400,7 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
     const dev = h.match(/^#\/dev\/(.+)$/);
     if (dev) { province(dev[1]); return; }
     if (/^#\/research/.test(h)) { researchPage(h.split('?')[1]); return; }
-    if (h === '#/learning') { learningPage(); return; }
+    if (h === '#/learning') { location.replace('#/topics?section=learning'); return; }
     if(h.startsWith('#/notice/')){noticePage(h.slice(9));return;}
     $('#provSelect').value = m ? m[1] : '';
     if(h==='#/map/method'){location.replace('#/methods/capacity-cost');return;}
@@ -1408,8 +1409,7 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
     if (h === '#/explore') { toolHubPage(); scrollTo(0,0); return; }
     if (h === '#/start') { startPage(); scrollTo(0,0); return; }
     if (h === '#/subscribe') { subscribePage(); scrollTo(0,0); return; }
-    if (m) { province(m[1]); $('#app').insertAdjacentHTML('beforeend', provTopicsHTML(m[1])); } else if (h === '#/about') publicAbout(); else if (h === '#/tools') arithmeticPage(); else if (h === '#/park-demo') parkDemoPage(); else if (h === '#/services') servicesPage(); else if (h === '#/score' && !D.score) home(); else if (h === '#/rev') revenue(); else if (/^#\/brief/.test(h)) { briefPage(h.split('/')[2]); return; } else if (h === '#/tags') tagIndex(); else if (h === '#/topics') topicIndex(); else if (/^#\/topic\//.test(h)) topicPage(h.slice(8)); else if (h === '#/policy/prov') policyProv(); else if (h === '#/policy/time') policyTime(); else if (/^#\/policy/.test(h)) policyPage(h.split('/')[2]); else if (/^#\/m\//.test(h)) { front(); const el = document.getElementById('mc-' + h.slice(4)); if (el) { el.scrollIntoView({ block: 'center' }); el.classList.add('flash'); } return; } else if (/^#\/lib/.test(h)) libPage(h.split('?')[1]); else if (h === '#/map') home(); else if (/^#\/methods/.test(h)) { if (PUB()) publicGuidesPage(h.split('/')[2]); else methodsPage(h.split('/')[2]); } else if (/^#\/tag\//.test(h)) tagPage(h.slice(6)); else if (h === '#/ex') { location.replace('#/rev'); return; } /* 用户 10-15 合并：旧链接落到全景页 */ else if (h === '#/score' && D.score) scorePage(); else front();
-    if(h==='#/policy')$('#app').insertAdjacentHTML('beforeend',learningContinuation());
+    if (m) { province(m[1]); $('#app').insertAdjacentHTML('beforeend', provTopicsHTML(m[1])); } else if (h === '#/about') publicAbout(); else if (h === '#/tools') arithmeticPage(); else if (h === '#/park-demo') parkDemoPage(); else if (h === '#/services') servicesPage(); else if (h === '#/score' && !D.score) home(); else if (h === '#/rev') revenue(); else if (/^#\/brief/.test(h)) { briefPage(h.split('/')[2]); return; } else if (h === '#/tags') tagIndex(); else if (h.split('?')[0] === '#/topics') topicIndex(h.split('?')[1]); else if (/^#\/topic\//.test(h)) topicPage(h.slice(8)); else if (h === '#/policy/prov') policyProv(); else if (h === '#/policy/time') policyTime(); else if (/^#\/policy/.test(h)) policyPage(h.split('/')[2]); else if (/^#\/m\//.test(h)) { front(); const el = document.getElementById('mc-' + h.slice(4)); if (el) { el.scrollIntoView({ block: 'center' }); el.classList.add('flash'); } return; } else if (/^#\/lib/.test(h)) libPage(h.split('?')[1]); else if (h === '#/map') home(); else if (/^#\/methods/.test(h)) { if (PUB()) publicGuidesPage(h.split('/')[2]); else methodsPage(h.split('/')[2]); } else if (/^#\/tag\//.test(h)) tagPage(h.slice(6)); else if (h === '#/ex') { location.replace('#/rev'); return; } /* 用户 10-15 合并：旧链接落到全景页 */ else if (h === '#/score' && D.score) scorePage(); else front();
     scrollTo(0, 0);
   }
   function syntheticRevenue() {
@@ -1504,7 +1504,7 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
     $('#ver').textContent = `更新 ${d.meta.exported.slice(0,10)}`;
     setupShell();await Promise.all([loadReplyInsights(),loadContentLayer()]);
     if(d.meta.dataset==='synthetic'){contentLayer={schema:1,notices:[],classifications:[],source_links:[],source_gaps:[]};replyItems=[];}
-    contentModel=EnergyContent.create(D,contentLayer,replyItems);
+    contentModel=EnergyContent.create(D,contentLayer,replyItems);await loadDailyBrief();
     const sel = $('#provSelect');
     sel.innerHTML += PROVS.map(p => `<option value="${esc(p)}">${esc(p)}</option>`).join('');
     sel.onchange = () => { if (sel.value) location.hash = '#/p/' + encodeURIComponent(sel.value); };

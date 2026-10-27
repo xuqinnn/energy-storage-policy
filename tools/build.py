@@ -17,8 +17,8 @@ ROOT = HERE if (HERE / 'index.html').is_file() else HERE.parent
 WEB_FILES = ['assets/research-ui.css', 'assets/vendor/open-props-1.7.23.min.css', 'assets/vendor/tabler-icons.js', 'assets/vendor/OPEN-PROPS-LICENSE.txt', 'assets/vendor/TABLER-LICENSE.txt', 'assets/vendor/DESIGN-SOURCES.json'] + ['index.html', 'assets/app.js', 'assets/storage-math.js', 'assets/app.css', 'assets/vendor/echarts.min.js', 'assets/vendor/LICENSE', 'assets/vendor/NOTICE']
 DOC_FILES = ['content/reply-insights.json', 'tests/test_reply_insights.py', 'content/reading-notes.json', 'README.md', 'LICENSE', 'LICENSE-DATA.md', 'CONTRIBUTING.md', 'ASSETS.json', '.gitignore', 'examples/synthetic.json', 'tests/test_public.py', 'tests/test_storage_math.js', 'examples/method-arithmetic.json', 'tools/park_examples.py', 'examples/park-scenarios.json', 'tests/test_park_examples.py']
 WEB_FILES += ['assets/content-model.js']
-DOC_FILES += ['content/content-layer.json','tests/test_content_layer.py','tests/test_content_model.js']
-ALLOWED_TOP = {'meta','metrics','provinces','docs','cards','events','dev','diff','score','example','briefs','links','tags','tagdocs','methods','lib','research','learning','stats','mech','topics','topicmap','synthetic_example','public_guides'}
+DOC_FILES += ['content/content-layer.json','tests/test_content_layer.py','tests/test_content_model.js','tests/test_daily_brief.py','tests/test_daily_model.js']
+ALLOWED_TOP = {'meta','metrics','provinces','docs','cards','events','dev','diff','score','example','briefs','links','tags','tagdocs','methods','lib','research','learning','stats','mech','topics','topicmap','synthetic_example','public_guides','topic_learning'}
 
 def digest(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
@@ -46,6 +46,9 @@ def validate_snapshot(data):
             else: ids.append(guide['id'])
         if len(ids)!=len(set(ids)):errors.append('duplicate public guide')
     docs = data.get('docs', {})
+    if data.get('topic_learning'):
+        try:validate_topic_learning(data['topic_learning'],docs)
+        except ValueError as error:errors.append(str(error))
     for row in data.get('lib', []):
         if not str(row[0]).startswith('ZC') or str(row[0]).startswith('ZCQY'): errors.append('research/company mixed into policy')
     for e in data.get('events', []):
@@ -56,6 +59,30 @@ def validate_snapshot(data):
     if demo.get('kind') != 'synthetic' or not demo.get('inputs'): errors.append('missing explicit synthetic example')
     if errors: raise ValueError('; '.join(errors))
     return copy.deepcopy(data)
+
+
+def validate_topic_learning(pack,docs):
+    if not isinstance(pack,dict) or set(pack)!={'schema_version','language','topics','lessons'}:raise ValueError('unreviewed topic learning fields')
+    topics=pack['topics'];lessons=pack['lessons'];names={'储能','绿电直连','零碳园区','零碳工厂','虚拟电厂'}
+    if len(topics)!=5 or {t['name'] for t in topics}!=names or len(lessons)!=14 or {l['id'] for l in lessons}!={f'tl-{i:02d}' for i in range(1,15)}:raise ValueError('topic/lesson mapping incomplete')
+    topic_fields={'name','title','audience','goal','intro','sections','lesson_ids','route','lesson_contexts'}
+    lesson_fields={'id','source_theme','title','primary_topic','topic_ids','question','sections','misconceptions','exercise','links','public_boundary','related_lessons'}
+    for topic in topics:
+        if set(topic)!=topic_fields or len(topic['sections'])<3 or not topic['lesson_ids']:raise ValueError('topic introduction incomplete or private fields')
+        if set(topic['lesson_ids'])-{l['id'] for l in lessons}:raise ValueError('unknown mapped lesson')
+    if set().union(*(set(t['lesson_ids']) for t in topics))!={l['id'] for l in lessons}:raise ValueError('unmapped lesson')
+    for lesson in lessons:
+        if set(lesson)!=lesson_fields or len(lesson['sections'])<3 or lesson['primary_topic'] not in names or set(lesson['topic_ids'])-names:raise ValueError('lesson fields or content incomplete')
+        if not lesson['misconceptions'] or not lesson['exercise'].get('prompt') or len(lesson['exercise'].get('answer_points',[]))<2:raise ValueError('lesson exercise incomplete')
+        for link in lesson['links']:
+            if not isinstance(link.get('href'),str) or not re.match(r'^(#/|https?://)',link['href']):raise ValueError('unsafe lesson route')
+            if link.get('policy_id') and link['policy_id'] not in docs:raise ValueError('lesson references absent public document')
+    for item in topics+lessons:
+        for section in item['sections']:
+            if set(section)!={'title','paragraphs'} or not section['paragraphs'] or not all(isinstance(t,str) and len(t)>20 for t in section['paragraphs']):raise ValueError('lesson section incomplete')
+    raw=json.dumps(pack,ensure_ascii=False)
+    if any(token in raw for token in ('/Users/','file://','source_sha256','input_sha256','workbook_sha256')) or re.search(r'<[!/a-zA-Z]',raw):raise ValueError('private or unsafe lesson payload')
+    return pack
 
 
 def validate_method_examples(path):
@@ -173,6 +200,50 @@ def validate_content_layer(path):
     if digest(path)!=CONTENT_LAYER_SHA:raise ValueError('unreviewed content layer; SHA changed')
     return validate_content_schema(json.loads(Path(path).read_text(encoding='utf-8')))
 
+
+def assemble_daily(data, layer, replies):
+    """Derive a public canonical reading index; never classify unreviewed legacy rows.
+
+    Fixed snapshot timestamps preserve deterministic rebuilds. The browser computes
+    today's date in Asia/Shanghai rather than treating the build date as today.
+    """
+    docs=data.get('docs',{}); briefs={b['编号']:b for b in data.get('briefs',[])}
+    if data['meta'].get('dataset')=='synthetic':
+        layer={'classifications':[],'notices':[],'source_links':[],'source_gaps':[]};replies=[]
+    links={s['policy_id']:s for s in layer['source_links']}
+    collected={r[0]:r[8] for r in data.get('lib',[]) if len(r)>8}
+    records={}
+    def valid_day(value):
+        try:return date.fromisoformat(value).isoformat() if isinstance(value,str) and len(value)==10 else ''
+        except ValueError:return ''
+    def stamp(event='', published='', issued='', landed=''):
+        for value,basis,label in [(event,'event','事件日'),(published,'published','该页公开日'),(issued,'issued','成文/索引日（公开日未核）'),(landed,'collected','收录日（历史补录，非新发）')]:
+            if valid_day(value):return value,basis,label
+        return '','unknown','日期未确认'
+    def add(record, event='', published='', issued='', landed=''):
+        canonical=record['canonical_document_id']
+        if canonical in records:return
+        day,basis,label=stamp(event,published,issued,landed)
+        record.update(display_date=day,date_basis=basis,date_label=label,publication_verified=basis in ('event','published'),issued_at=valid_day(issued),published_at=valid_day(published),event_at=valid_day(event))
+        if record['source_url'] and not re.match(r'^https?://',record['source_url']):raise ValueError('daily index unsafe source')
+        records[canonical]=record
+    for c in layer['classifications']:
+        canonical=c['canonical_document_id'];d=docs.get(canonical)
+        if not d or canonical in {g['id'] for g in layer['source_gaps']}:continue
+        b=briefs.get(canonical,{});s=links.get(canonical)
+        source_url=s['url'] if s else d.get('url','')
+        source_label=('官方原发布页/附件' if s['role'].startswith('ORIGINAL_') else '官方关联来源（不替代原件）') if s else '官方来源'
+        classification_only='无新增完整内容' in c['evidence_scope']
+        summary=c['classification_basis'] if c['content_type']=='notice' or classification_only else b.get('概述') or d.get('summary') or c['classification_basis']
+        full=not classification_only and b.get('分析验收')=='完整' and bool(b.get('依据'))
+        add({'id':canonical,'canonical_document_id':canonical,'type':c['content_type'],'renderer':'policy','subtype':c['subtype'],'title':d.get('title') or canonical,'summary':summary,'analysis_state':'full' if full else 'summary' if summary else 'index','importance':c['importance'],'status':d.get('status',''),'region':d.get('prov',''),'source_url':source_url,'source_label':source_label,'route':'#/notice/'+canonical if c['content_type']=='notice' else '#/brief/'+canonical},published=d.get('published',''),issued=d.get('date',''),landed=collected.get(canonical,''))
+    for n in layer['notices']:
+        add({'id':n['id'],'canonical_document_id':n.get('canonical_document_id') or n['id'],'type':'notice','renderer':'notice','subtype':n['subtype'],'title':n['title'],'summary':n['summary'],'analysis_state':'summary','importance':n['importance'],'status':'','region':n['region_scope'],'source_url':n['source_url'],'source_label':'署名公告原页','route':'#/notice/'+n['id']},event=n.get('event_at',''),published=n.get('published_at',''),issued=n.get('issued_at',''))
+    for r in replies:
+        add({'id':r['id'],'canonical_document_id':r.get('canonical_document_id') or r['id'],'type':'notice','renderer':'reply','subtype':r['source_kind'],'title':r['title'],'summary':r['summary'],'analysis_state':'summary','importance':None,'status':'答复资料','region':'、'.join(r.get('verified_region_codes',[])),'source_url':r['source_url'],'source_label':'官方答复原页','route':'#/notice/'+r['id']},published=r.get('official_page_publishdate',''),issued=r.get('reply_issued_at',''))
+    items=sorted(records.values(),key=lambda r:(r['display_date'],r['id']),reverse=True)
+    return {'schema':1,'timezone':'Asia/Shanghai','snapshot_version':data['meta']['version'],'snapshot_built_at':data['meta']['exported'],'scope':'仅已审公开政策与公告；该页公开日不等于最早首发；成文/收录索引不计今日新发。','counts':{'policy':sum(r['type']=='policy' for r in items),'notice':sum(r['type']=='notice' for r in items),'important_notice':sum(r['type']=='notice' and r['importance'] is not None and r['importance']>=4 for r in items)},'items':items}
+
 def build_package(snapshot, dist, source=ROOT):
     data = validate_snapshot(snapshot); dist = Path(dist); source = Path(source)
     if dist.exists() and any(dist.iterdir()): raise ValueError('output directory must be empty; old files are never deleted')
@@ -190,6 +261,8 @@ def build_package(snapshot, dist, source=ROOT):
     for f in WEB_FILES + DOC_FILES:
         src = (source if f in WEB_FILES else docs) / f
         dst = dist / f; dst.parent.mkdir(parents=True, exist_ok=True); shutil.copyfile(src, dst)
+    daily=assemble_daily(data,content,replies['items'])
+    (dist/'content/daily-brief.json').write_text(json.dumps(daily,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     script = Path(__file__).resolve(); (dist / 'tools').mkdir(exist_ok=True); shutil.copyfile(script, dist / 'tools/build.py')
     (dist / 'data').mkdir(exist_ok=True)
     (dist / 'data/storage.json').write_text(json.dumps(data, ensure_ascii=False, separators=(',', ':'))+'\n', encoding='utf-8')

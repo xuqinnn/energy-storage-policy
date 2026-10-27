@@ -77,3 +77,9 @@ Province pages have four peer modules: policy, development, questions and offici
 复核内容边界及查询/计数：`python -m unittest discover -s tests`，`node tests/test_content_model.js`；既有算术测试仍为 `node tests/test_storage_math.js`。浏览器构建和离线版使用同一公开内容清单；原页、内部审核记录和个人路径不随包分发。
 
 ZCMD22仅保留旧资料索引与来源缺口说明，不计入本批已审通知或重要更新；其旧题名/日期/状态不构成公告母页或补偿兑现的核验。分类采用最终9项标签，既有南方运行公告与31条来源角色保持。
+
+### Daily policy brief and topic learning
+
+`#/policy` presents a daily view assembled at build time from the reviewed canonical policy and announcement records. Today is calculated in Asia/Shanghai; event dates and current official-page publication dates remain distinct. Issue/index/backfill dates appear in a separate view and are not counted as new releases today. Empty days link to the latest recorded date. Date/type filters are shareable; lists scroll manually and items open in the same workspace. This build does not restart collection schedules.
+
+`#/learning` remains compatible and opens the merged topic-learning area. Five topic introductions and fourteen reviewed learning units share one source, with lessons, misconceptions, exercises and current-policy links. Related instruments are full clickable rows, accessible by keyboard, with same-page analysis, sources, sharing and return. Research index counts are not counts of classified reports; important announcements include reviewed notices/replies/public consultations with editorial importance 4 or 5.

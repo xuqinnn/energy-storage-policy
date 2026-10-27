@@ -112,6 +112,26 @@
       "license": "自有摘要与分析CC-BY-4.0；短引与来源元数据按原来源，不覆盖第三方全文",
       "decision": "include-reviewed-projection",
       "sha256": "8042e3921e548e56909669f938eaaa2bebd9a8b1815f26b8e58ce3451feb3d46"
+    },
+    {
+      "paths": [
+        "content/daily-brief.json"
+      ],
+      "class": "A/B",
+      "origin": "从同版已审公开policy/notice canonical记录自动组装，日期性质保留；不含未分类旧索引，不表示自动采集已恢复",
+      "license": "自有摘要/分析CC BY 4.0；事实与引句按原来源",
+      "decision": "include-generated-reviewed-index"
+    },
+    {
+      "paths": [
+        "data/storage.json"
+      ],
+      "class": "A",
+      "origin": "经独立逐段审定的5专题导读、14学习单元公开投影；不含研究交付内部字段或旧主题卡全文",
+      "license": "CC BY 4.0 by 独立能源研究站；不覆盖原政策或第三方材料",
+      "decision": "include-reviewed-public-projection",
+      "component": "topic_learning",
+      "acceptance_projection_sha256": "34541475074b0aedac6c005d658b4dc078afd83045e9f6c64017fd91b5f7e710"
     }
   ],
   "reviewed_public_guides": {
