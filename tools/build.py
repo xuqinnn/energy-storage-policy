@@ -11,13 +11,15 @@ from pathlib import Path
 import shutil
 from datetime import date
 import re
+import importlib.util
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE if (HERE / 'index.html').is_file() else HERE.parent
-WEB_FILES = ['assets/research-ui.css', 'assets/vendor/open-props-1.7.23.min.css', 'assets/vendor/tabler-icons.js', 'assets/vendor/OPEN-PROPS-LICENSE.txt', 'assets/vendor/TABLER-LICENSE.txt', 'assets/vendor/DESIGN-SOURCES.json'] + ['index.html', 'assets/app.js', 'assets/storage-math.js', 'assets/app.css', 'assets/vendor/echarts.min.js', 'assets/vendor/LICENSE', 'assets/vendor/NOTICE']
+WEB_FILES = ['assets/wb-feed.js'] + ['assets/research-ui.css', 'assets/vendor/open-props-1.7.23.min.css', 'assets/vendor/tabler-icons.js', 'assets/vendor/OPEN-PROPS-LICENSE.txt', 'assets/vendor/TABLER-LICENSE.txt', 'assets/vendor/DESIGN-SOURCES.json'] + ['index.html', 'assets/app.js', 'assets/storage-math.js', 'assets/app.css', 'assets/vendor/echarts.min.js', 'assets/vendor/LICENSE', 'assets/vendor/NOTICE']
 DOC_FILES = ['content/reply-insights.json', 'tests/test_reply_insights.py', 'content/reading-notes.json', 'README.md', 'LICENSE', 'LICENSE-DATA.md', 'CONTRIBUTING.md', 'ASSETS.json', '.gitignore', 'examples/synthetic.json', 'tests/test_public.py', 'tests/test_storage_math.js', 'examples/method-arithmetic.json', 'tools/park_examples.py', 'examples/park-scenarios.json', 'tests/test_park_examples.py']
 WEB_FILES += ['assets/content-model.js']
 DOC_FILES += ['content/content-layer.json','tests/test_content_layer.py','tests/test_content_model.js','tests/test_daily_brief.py','tests/test_daily_model.js']
+DOC_FILES += ['content/wb-feed-reviews.json','content/wb-feed-snapshot.json','tools/wb_feed_guard.py','tools/wb_feed_runtime.py','tests/test_wb_feed.py','tests/test_wb_feed.js','.github/workflows/wb-feed.yml','WB-FEED.md']
 ALLOWED_TOP = {'meta','metrics','provinces','docs','cards','events','dev','diff','score','example','briefs','links','tags','tagdocs','methods','lib','research','learning','stats','mech','topics','topicmap','synthetic_example','public_guides','topic_learning'}
 
 def digest(path):
@@ -265,11 +267,24 @@ def assemble_daily(data, layer, replies):
     items=sorted(records.values(),key=lambda r:(r['display_date'],r['id']),reverse=True)
     return {'schema':1,'timezone':'Asia/Shanghai','snapshot_version':data['meta']['version'],'snapshot_built_at':data['meta']['exported'],'scope':'仅已审公开政策与公告；该页公开日不等于最早首发；成文/收录索引不计今日新发。','counts':{'policy':sum(r['type']=='policy' for r in items),'notice':sum(r['type']=='notice' for r in items),'important_notice':sum(r['type']=='notice' and r['importance'] is not None and r['importance']>=4 for r in items)},'items':items}
 
+def validate_feed_files(docs,data):
+    spec=importlib.util.spec_from_file_location('feed_build_guard',docs/'tools/wb_feed_guard.py')
+    guard=importlib.util.module_from_spec(spec);spec.loader.exec_module(guard)
+    reviews=json.loads((docs/'content/wb-feed-reviews.json').read_text(encoding='utf-8'))
+    guard.validate_reviews(reviews,set(data['docs']) if data['meta'].get('dataset')=='public-reviewed' else None)
+    snapshot=json.loads((docs/'content/wb-feed-snapshot.json').read_text(encoding='utf-8'))
+    # Initial offline snapshot is deliberately empty. A future reviewed local
+    # snapshot needs a separate change and acceptance, not a feed data bypass.
+    if snapshot!={'schema':1,'updated_at':None,'records':[],'gate_stats':{'pending':0},'recent_batches':[]}:raise ValueError('unreviewed local collection snapshot')
+    return reviews,snapshot
+
+
 def build_package(snapshot, dist, source=ROOT):
     data = validate_snapshot(snapshot); dist = Path(dist); source = Path(source)
     if dist.exists() and any(dist.iterdir()): raise ValueError('output directory must be empty; old files are never deleted')
     dist.mkdir(parents=True, exist_ok=True)
     docs = source / 'open_source' if (source / 'open_source').is_dir() else source
+    validate_feed_files(docs,data)
     validate_method_examples(docs/'examples/method-arithmetic.json')
     validate_park_examples(docs/'examples/park-scenarios.json')
     validate_reading_notes(docs/'content/reading-notes.json')

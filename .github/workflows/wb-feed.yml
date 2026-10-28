@@ -1,0 +1,28 @@
+name: WB official-source feed guard
+on:
+  schedule:
+    - cron: '17,47 * * * *'
+  workflow_dispatch:
+permissions: {}
+concurrency:
+  group: wb-feed-live
+  cancel-in-progress: false
+jobs:
+  validate:
+    if: github.repository == 'xuqinnn/energy-storage-policy' && github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      # Fixed checkout v7.0.1 commit; not a floating tag or inbox code.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          submodules: false
+          lfs: false
+      - name: Validate fixed inbox JSON and publish only live data
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 tools/wb_feed_runtime.py process

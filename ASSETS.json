@@ -143,6 +143,24 @@
       "license": "自写分析CC BY 4.0；原政策短引不由本许可另行授权",
       "decision": "include-reviewed-public-projection",
       "acceptance_projection_sha256": "2771497116d19595f252645ff8ca8074395fdd71fbaf8093a452b9a1cf494dd1"
+    },
+    {
+      "paths": [
+        "assets/wb-feed.js",
+        "tools/wb_feed_guard.py",
+        "tools/wb_feed_runtime.py",
+        ".github/workflows/wb-feed.yml",
+        "WB-FEED.md",
+        "tests/test_wb_feed.py",
+        "tests/test_wb_feed.js",
+        "content/wb-feed-reviews.json",
+        "content/wb-feed-snapshot.json"
+      ],
+      "component": "controlled_official_collection_feed",
+      "class": "A",
+      "origin": "独立实现的固定分支/固定JSON/官方HTML校验、同页纯文本消费和版本绑定复核层；初始快讯与复核均为空",
+      "license": "MIT code; self-authored operational documentation CC BY 4.0; upstream policy short excerpts are not relicensed",
+      "decision": "include-code-and-empty-data-only; production enablement and actual publication separately verified"
     }
   ],
   "reviewed_public_guides": {
