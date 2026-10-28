@@ -72,14 +72,16 @@ Province pages have four peer modules: policy, development, questions and offici
 
 现有检索统一覆盖已公开资料、运行公告和两条既有答复；`#/notice/<id>` 可直达同页分析工作区。南方公告保留事件日、公众号页日期依据、未知最早首发及访问限制，并另链能源局事件佐证。175号复函及正式运行方案未纳入本次核验，不提供项目参数映射。
 
-`content/content-layer.json` 只含一条新增通知、九条既有记录最终分类及一条来源缺口提示，以及25条原页/配套附件和6条标明角色的关联来源。编辑重要性4、5进入默认重要通知流，低分与未评分仍可检索和直达。首页计数明确已审范围；旧资料和研究资料未完成全量分类，不把原目录数量当纯政策数或全部研报数。分类文件请求失败会显示真实错误及重试入口。
+`content/content-layer.json` 只含一条新增通知、经逐项审定的既有记录分类及一条来源缺口提示，以及25条原页/配套附件和6条标明角色的关联来源。编辑重要性4、5进入默认重要通知流，低分与未评分仍可检索和直达。首页计数明确已审范围；旧资料和研究资料未完成全量分类，不把原目录数量当纯政策数或全部研报数。分类文件请求失败会显示真实错误及重试入口。
 
 复核内容边界及查询/计数：`python -m unittest discover -s tests`，`node tests/test_content_model.js`；既有算术测试仍为 `node tests/test_storage_math.js`。浏览器构建和离线版使用同一公开内容清单；原页、内部审核记录和个人路径不随包分发。
 
-ZCMD22仅保留旧资料索引与来源缺口说明，不计入本批已审通知或重要更新；其旧题名/日期/状态不构成公告母页或补偿兑现的核验。分类采用最终9项标签，既有南方运行公告与31条来源角色保持。
+ZCMD22仅保留旧资料索引与来源缺口说明，不计入本批已审通知或重要更新；其旧题名/日期/状态不构成公告母页或补偿兑现的核验。分类采用经逐项审定的标签，既有南方运行公告与31条来源角色保持。
 
 ### Daily policy brief and topic learning
 
 `#/policy` presents a daily view assembled at build time from the reviewed canonical policy and announcement records. Today is calculated in Asia/Shanghai; event dates and current official-page publication dates remain distinct. Issue/index/backfill dates appear in a separate view and are not counted as new releases today. Empty days link to the latest recorded date. Date/type filters are shareable; lists scroll manually and items open in the same workspace. This build does not restart collection schedules.
 
 `#/learning` remains compatible and opens the merged topic-learning area. Five topic introductions and fourteen reviewed learning units share one source, with lessons, misconceptions, exercises and current-policy links. Related instruments are full clickable rows, accessible by keyboard, with same-page analysis, sources, sharing and return. Research index counts are not counts of classified reports; important announcements include reviewed notices/replies/public consultations with editorial importance 4 or 5.
+
+Four national policy analyses are available in the existing policy workspace, topics, daily archive and search. They distinguish source facts, interpretation, scope and project checks, with 33 page-and-clause citations and original links. Issued dates and current official-page publication dates are separate; current web metadata does not establish the earliest publication or a separate effective date. No project eligibility, cash flow or real-parameter binding is inferred.

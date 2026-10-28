@@ -34,6 +34,22 @@ class DailyBriefTest(unittest.TestCase):
         if d['meta']['dataset']=='public-reviewed':
             self.assertEqual(len(out['items']),len({x['canonical_document_id'] for x in out['items']}));self.assertNotIn('ZCMD22',{x['id'] for x in out['items']})
         d['meta']['dataset']='synthetic';self.assertEqual(B.assemble_daily(d,l,r)['items'],[])
+    def test_full_analysis_cannot_be_a_label_or_missing_body(self):
+        d,l=self.inputs();d['briefs']=[{'编号':'P1','概述':'有摘要','分析验收':'完整','依据':[1]}]
+        self.assertEqual(B.assemble_daily(d,l,[])['items'][0]['analysis_state'],'summary')
+        d['briefs'][0]['完整分析']={'章节':[]}
+        self.assertEqual(B.assemble_daily(d,l,[])['items'][0]['analysis_state'],'summary')
+
+    def test_accepted_core_bodies_and_dates_fail_closed(self):
+        d=json.loads((ROOT/'data/storage.json').read_text())
+        if d['meta']['dataset']=='synthetic':self.skipTest('synthetic has no real complete analysis')
+        B.validate_core_analyses(d)
+        for mutate in [lambda x:x['briefs'].remove(next(b for b in x['briefs'] if b['编号']=='ZCGJ13')),
+                       lambda x:next(b for b in x['briefs'] if b['编号']=='ZCGJ03')['完整分析']['章节'].clear(),
+                       lambda x:x['docs']['ZCGJ04'].update(date='2025-08-01')]:
+            bad=copy.deepcopy(d);mutate(bad)
+            with self.assertRaises(ValueError):B.validate_core_analyses(bad)
+
     def test_learning_is_complete_public_projection_and_routes_are_known(self):
         d=json.loads((ROOT/'data/storage.json').read_text())
         if not d.get('topic_learning'):self.skipTest('synthetic fixture has no real lessons')

@@ -132,6 +132,17 @@
       "decision": "include-reviewed-public-projection",
       "component": "topic_learning",
       "acceptance_projection_sha256": "34541475074b0aedac6c005d658b4dc078afd83045e9f6c64017fd91b5f7e710"
+    },
+    {
+      "paths": [
+        "data/storage.json"
+      ],
+      "component": "core4_full_analyses",
+      "class": "A",
+      "origin": "四项国家政策自写完整分析与33条短引，独立回原件接受；原件全文与内部审计不纳入",
+      "license": "自写分析CC BY 4.0；原政策短引不由本许可另行授权",
+      "decision": "include-reviewed-public-projection",
+      "acceptance_projection_sha256": "2771497116d19595f252645ff8ca8074395fdd71fbaf8093a452b9a1cf494dd1"
     }
   ],
   "reviewed_public_guides": {

@@ -148,6 +148,46 @@
       "importance_reason": "明示废止早期储能管理规则，对现行依据与历史参数核对有直接研究价值，编辑评4；不等于全省收益归零。",
       "classification_basis": "通知明确改变目录所列规范性文件效力，主对象是废止决定，按政策（通知体）归类；未将行文标题中的通知作为信息通知判据。",
       "evidence_scope": "仅储能旧规则明示废止及直接费用分摊引用提示；不推其他文件全文状态或全省收益变化。"
+    },
+    {
+      "id": "ZCGJ13",
+      "canonical_document_id": "ZCGJ13",
+      "content_type": "policy",
+      "subtype": "国家指导意见",
+      "importance": 3,
+      "importance_reason": "沿用当前条目的编辑重要性，不因补完整分析自动升分；不表示法律效力或项目资格。",
+      "classification_basis": "国家层面的制度机制、发展安排与责任要求，适用于其限定对象；区别于答复、个案公告和研究文章。",
+      "evidence_scope": "完整分析、所列原件物理页及适用边界经独立回读；国家方向或目标不证明项目资格、已实现量或保底收益，互链答复不提升政策效力。"
+    },
+    {
+      "id": "ZCGJ120",
+      "canonical_document_id": "ZCGJ120",
+      "content_type": "policy",
+      "subtype": "国家指导意见",
+      "importance": 4,
+      "importance_reason": "沿用当前条目的编辑重要性，不因补完整分析自动升分；不表示法律效力或项目资格。",
+      "classification_basis": "国家层面的制度机制、发展安排与责任要求，适用于其限定对象；区别于答复、个案公告和研究文章。",
+      "evidence_scope": "完整分析、所列原件物理页及适用边界经独立回读；国家方向或目标不证明项目资格、已实现量或保底收益，互链答复不提升政策效力。"
+    },
+    {
+      "id": "ZCGJ03",
+      "canonical_document_id": "ZCGJ03",
+      "content_type": "policy",
+      "subtype": "容量电价机制通知",
+      "importance": 5,
+      "importance_reason": "沿用当前条目的编辑重要性，不因补完整分析自动升分；不表示法律效力或项目资格。",
+      "classification_basis": "国家层面的制度机制、发展安排与责任要求，适用于其限定对象；区别于答复、个案公告和研究文章。",
+      "evidence_scope": "完整分析、所列原件物理页及适用边界经独立回读；国家方向或目标不证明项目资格、已实现量或保底收益，互链答复不提升政策效力。"
+    },
+    {
+      "id": "ZCGJ04",
+      "canonical_document_id": "ZCGJ04",
+      "content_type": "policy",
+      "subtype": "新型储能行动方案",
+      "importance": 5,
+      "importance_reason": "沿用当前条目的编辑重要性，不因补完整分析自动升分；不表示法律效力或项目资格。",
+      "classification_basis": "国家层面的制度机制、发展安排与责任要求，适用于其限定对象；区别于答复、个案公告和研究文章。",
+      "evidence_scope": "完整分析、所列原件物理页及适用边界经独立回读；国家方向或目标不证明项目资格、已实现量或保底收益，互链答复不提升政策效力。"
     }
   ],
   "source_links": [

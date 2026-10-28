@@ -57,8 +57,27 @@ def validate_snapshot(data):
         if set(t['codes']) - set(docs): errors.append('unknown learning reference')
     demo = data.get('synthetic_example', {})
     if demo.get('kind') != 'synthetic' or not demo.get('inputs'): errors.append('missing explicit synthetic example')
+    if data.get('meta',{}).get('dataset')=='public-reviewed':
+        validate_core_analyses(data)
     if errors: raise ValueError('; '.join(errors))
     return copy.deepcopy(data)
+
+
+def validate_core_analyses(data):
+    rows=[b for b in data.get('briefs',[]) if b.get('编号') in CORE_ANALYSIS_IDS]
+    if len(rows)!=4 or {b['编号'] for b in rows}!=CORE_ANALYSIS_IDS:raise ValueError('core analyses: missing or duplicate identity')
+    encoded=json.dumps(sorted(rows,key=lambda b:b['编号']),ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()
+    if hashlib.sha256(encoded).hexdigest()!=CORE_ANALYSES_SHA:raise ValueError('core analyses: independent approved content changed')
+    for b in rows:
+        if set(b)!={'编号','标题','文号','发文日期','官网公开日期','分析验收','概述','状态标签','省份','依据','完整分析'}:raise ValueError('core analyses: private or missing fields')
+        body=b['完整分析'];evidence=b['依据'];code=b['编号'];d=data['docs'][code]
+        if b['分析验收']!='完整' or len(body['章节'])<5 or len(evidence)<8:raise ValueError('core analyses: incomplete body or evidence')
+        if any(d.get(k)!=b[v] for k,v in [('summary','概述'),('date','发文日期'),('published','官网公开日期')]):raise ValueError('core analyses: metadata or summary drift')
+        for section in body['章节']:
+            if not section['段落'] or not section['依据索引'] or any(type(i)is not int or i<0 or i>=len(evidence) for i in section['依据索引']):raise ValueError('core analyses: section evidence missing')
+        for e in evidence:
+            if set(e)!={'编号','页','条款','原句'} or e['编号']!=code or type(e['页'])is not int or e['页']<1:raise ValueError('core analyses: unreviewed evidence')
+        if any(not re.match(r'^#/(methods|tools|park-demo)',href) for href in body['方法链接']):raise ValueError('core analyses: unreviewed method route')
 
 
 def validate_topic_learning(pack,docs):
@@ -141,8 +160,10 @@ def validate_reply_insights(path):
     return validate_reply_schema(json.loads(Path(path).read_text(encoding='utf-8')))
 
 
-CONTENT_LAYER_SHA = '8042e3921e548e56909669f938eaaa2bebd9a8b1815f26b8e58ce3451feb3d46'
-CONTENT_CLASS_IDS = {'ZCGJ45','ZCGJ110','ZCSN34','ZCGX34','ZCHEB52','ZCLN37','ZCSD45','ZCAH63','ZCTJ19','ZCSH43','ZCSD53','ZCXJ32'}
+CONTENT_LAYER_SHA = 'd935b83861a8bb76633803f08d65ed6efe5089b8b0ad3a119c142478c13362b8'
+CORE_ANALYSIS_IDS = {'ZCGJ13','ZCGJ120','ZCGJ03','ZCGJ04'}
+CORE_ANALYSES_SHA = '2771497116d19595f252645ff8ca8074395fdd71fbaf8093a452b9a1cf494dd1'
+CONTENT_CLASS_IDS = CORE_ANALYSIS_IDS | {'ZCGJ45','ZCGJ110','ZCSN34','ZCGX34','ZCHEB52','ZCLN37','ZCSD45','ZCAH63','ZCTJ19','ZCSH43','ZCSD53','ZCXJ32'}
 NOTICE_FIELDS = {'id','content_type','subtype','title','issuer','importance','importance_reason','issued_at','published_at','publication_date_basis','first_publication_date','event_at','summary','our_analysis','quote','source_url','source_access_note','corroborating_url','boundary','region_scope','verified_region_codes','policy_ids','cited_document_number','cited_document_verification'}
 SOURCE_ROLES = {'ORIGINAL_PUBLICATION_OR_ATTACHMENT','ORIGINAL_EXPLANATORY_ATTACHMENT','OFFICIAL_RELEASE_REPORT','OFFICIAL_INSTITUTION_REPRINT','OFFICIAL_INTERPRETATION','OFFICIAL_REPRINT_ATTACHMENT','OFFICIAL_ANALYSIS_MENTION_ONLY'}
 
@@ -173,11 +194,11 @@ def validate_content_schema(layer):
         code=item['id']
         if code in seen or code not in CONTENT_CLASS_IDS or code!=item['canonical_document_id']:raise ValueError('content layer schema: duplicate or unknown identity')
         seen.add(code)
-        if item['content_type']!=('policy' if code in {'ZCAH63','ZCSH43','ZCSD53','ZCXJ32'} else 'notice') or type(item['importance']) is not int or not 1<=item['importance']<=5:
+        if item['content_type']!=('policy' if code in ({'ZCAH63','ZCSH43','ZCSD53','ZCXJ32'} | CORE_ANALYSIS_IDS) else 'notice') or type(item['importance']) is not int or not 1<=item['importance']<=5:
             raise ValueError('content layer schema: unreviewed classification or rating')
         if not all(isinstance(item[k],str) and item[k].strip() for k in ('subtype','importance_reason','classification_basis','evidence_scope')):raise ValueError('content layer schema: missing classification boundary')
     if seen!=CONTENT_CLASS_IDS:raise ValueError('content layer schema: incomplete reviewed labels')
-    expected_ratings={'ZCGJ45':5,'ZCGJ110':4,'ZCSN34':4,'ZCGX34':4,'ZCHEB52':3,'ZCLN37':3,'ZCSD45':4,'ZCAH63':4,'ZCTJ19':3,'ZCSH43':4,'ZCSD53':4,'ZCXJ32':4}
+    expected_ratings={'ZCGJ13':3,'ZCGJ120':4,'ZCGJ03':5,'ZCGJ04':5,'ZCGJ45':5,'ZCGJ110':4,'ZCSN34':4,'ZCGX34':4,'ZCHEB52':3,'ZCLN37':3,'ZCSD45':4,'ZCAH63':4,'ZCTJ19':3,'ZCSH43':4,'ZCSD53':4,'ZCXJ32':4}
     if {x['id']:x['importance'] for x in layer['classifications']}!=expected_ratings:raise ValueError('content layer schema: unreviewed importance revision')
     gaps=layer['source_gaps']
     if len(gaps)!=1 or not isinstance(gaps[0],dict) or set(gaps[0])!={'id','boundary'} or gaps[0]['id']!='ZCMD22' or not isinstance(gaps[0]['boundary'],str) or not gaps[0]['boundary'].strip():raise ValueError('content layer schema: held source gap missing or changed identity')
@@ -235,7 +256,7 @@ def assemble_daily(data, layer, replies):
         source_label=('官方原发布页/附件' if s['role'].startswith('ORIGINAL_') else '官方关联来源（不替代原件）') if s else '官方来源'
         classification_only='无新增完整内容' in c['evidence_scope']
         summary=c['classification_basis'] if c['content_type']=='notice' or classification_only else b.get('概述') or d.get('summary') or c['classification_basis']
-        full=not classification_only and b.get('分析验收')=='完整' and bool(b.get('依据'))
+        full=not classification_only and b.get('分析验收')=='完整' and bool(b.get('完整分析',{}).get('章节')) and bool(b.get('依据'))
         add({'id':canonical,'canonical_document_id':canonical,'type':c['content_type'],'renderer':'policy','subtype':c['subtype'],'title':d.get('title') or canonical,'summary':summary,'analysis_state':'full' if full else 'summary' if summary else 'index','importance':c['importance'],'status':d.get('status',''),'region':d.get('prov',''),'source_url':source_url,'source_label':source_label,'route':'#/notice/'+canonical if c['content_type']=='notice' else '#/brief/'+canonical},published=d.get('published',''),issued=d.get('date',''),landed=collected.get(canonical,''))
     for n in layer['notices']:
         add({'id':n['id'],'canonical_document_id':n.get('canonical_document_id') or n['id'],'type':'notice','renderer':'notice','subtype':n['subtype'],'title':n['title'],'summary':n['summary'],'analysis_state':'summary','importance':n['importance'],'status':'','region':n['region_scope'],'source_url':n['source_url'],'source_label':'署名公告原页','route':'#/notice/'+n['id']},event=n.get('event_at',''),published=n.get('published_at',''),issued=n.get('issued_at',''))
