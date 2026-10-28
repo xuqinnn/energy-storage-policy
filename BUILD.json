@@ -10,7 +10,7 @@
     "LICENSE": "0bc4c064bc214c2f049a06bf53d7effb9e56ce0cb3132555dba2722c38ecc358",
     "LICENSE-DATA.md": "13b1d3b223bee47fc45cc90e207791032cef7f6f1f534cfa8772c7c0b285977f",
     "README.md": "fce34197e4860db7bf4dd0fdd21d1ebe1e8ea071ae0c3f23f2c7b89c880c6c68",
-    "WB-FEED.md": "5a443d2870d665d6e6a846435761f2baba1e74caf3b7027fc21a40b28aeed1e7",
+    "WB-FEED.md": "5fa0a661bc14f6e1a76ee0cbb9a40c20736e4b57ed5f13bed5abf5e1c440bc52",
     "assets/app.css": "3397690fe628c36dcec278f01b82fc84c0d809cfa74efd531a28a566b506f0ff",
     "assets/app.js": "e57bd940bf4db4552f0d0e4bc71484e367b943beb92a180426347cfe67019071",
     "assets/content-model.js": "35000362a8081a20f2cc603173570229901dbb0cc5e9ae7d8788d72aef872edc",
@@ -45,10 +45,10 @@
     "tests/test_reply_insights.py": "8685b7fd34ea4d7ff5b205c068b81ade8faa110ade8a38cdc0e743efc3dac6c2",
     "tests/test_storage_math.js": "90b4806efa764ec084fac70dd47781bef9fd0b90894576c3443a4b6f99e1869e",
     "tests/test_wb_feed.js": "5b7ba168be22773d7f81c9e89e18c246ce0e5f7513516a2cd1c75f71071ab00c",
-    "tests/test_wb_feed.py": "e2148892ea91a3df0ccdf62cacacd430b15f1721515905f63b813a5396e212ec",
+    "tests/test_wb_feed.py": "ac7876c78874eeb084a386d6aac26ba883184a249384540be6746e0861ce8096",
     "tools/build.py": "41a4c3c27ffb468ea3d100ca8e181829d85a7c7ac4698b1df8f4a6c09b2f8e19",
     "tools/park_examples.py": "feeef42d8d3f138b8806856b70e6ee8158e6b83448a0e891d279529327537687",
     "tools/wb_feed_guard.py": "bf7abb89d9999fdd7449368d4348d5959f6b17d1a0561962d7a21ce583474765",
-    "tools/wb_feed_runtime.py": "c86f7f1a0d5cc0d574bc665d909c8803b94c8828a2607f2b3f5cb905c2c6299d"
+    "tools/wb_feed_runtime.py": "754b80390b28fc34e9ca9fc48d74f50822cb2cff305829194a1a0ccc43f9e942"
   }
 }

@@ -1,7 +1,7 @@
 """Independent feed gates, adversarial inputs and real temporary-bare Git integration.
 Synthetic HTML is injected into Python functions only. No production CLI bypass.
 """
-import copy,datetime as dt,importlib.util,json,os,subprocess,sys,tempfile,unittest
+import contextlib,io,copy,datetime as dt,importlib.util,json,os,subprocess,sys,tempfile,unittest
 from pathlib import Path
 from unittest.mock import patch
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'tools'))
@@ -178,6 +178,17 @@ class GitIntegration(unittest.TestCase):
    call.return_value.stdout='other\n'
    with self.assertRaises(ValueError):r.assert_origin(self.path)
   text=(ROOT/'tools/wb_feed_runtime.py').read_text();self.assertNotIn("add_argument('--skip",text);self.assertNotIn("add_argument('--origin",text)
+
+class UncertainPublication(unittest.TestCase):
+ def test_push_succeeded_but_readback_failed_is_unknown(self):
+  with patch.object(r,'remote_head',side_effect=[None,RuntimeError('readback connection lost')]),patch.object(r,'git') as call:
+   with self.assertRaises(r.PushUncertain) as caught:r.push_fixed('.',r.LIVE,None,'a'*40)
+   self.assertIsNone(caught.exception.receipt['published']);self.assertIsNone(caught.exception.receipt['site_feed_published']);self.assertEqual(caught.exception.receipt['attempted_commit'],'a'*40)
+   self.assertEqual(call.call_args.args[0],'push')
+ def test_cli_keeps_uncertain_receipt_instead_of_false(self):
+  error=r.PushUncertain(r.LIVE,'b'*40);output=io.StringIO()
+  with patch.object(sys,'argv',['runtime','process']),patch.object(r,'action_env',return_value={}),patch.object(r,'process',side_effect=error),contextlib.redirect_stdout(output),self.assertRaises(SystemExit):r.main()
+  receipt=json.loads(output.getvalue());self.assertEqual(receipt['publication_state'],'unknown');self.assertIsNone(receipt['site_feed_published']);self.assertFalse(receipt['workbook_written'])
 
 class WorkflowContract(unittest.TestCase):
  def test_workflow_fixed_entry_and_no_untrusted_code_trigger(self):

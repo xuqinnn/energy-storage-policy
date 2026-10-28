@@ -89,11 +89,22 @@ def commit_data(path,branch,parent,files,env=None):
     if not re.fullmatch(r'[a-f0-9]{40}',commit):raise ValueError('invalid created commit')
     return commit
 
+class PushUncertain(RuntimeError):
+    def __init__(self,branch,commit):
+        super().__init__('ordinary push attempted; remote readback not confirmed')
+        self.receipt={'status':'push_unverified','publication_state':'unknown','branch':branch,
+                      'attempted_commit':commit,'published':None,
+                      'site_feed_published':None if branch==LIVE else False,
+                      'workbook_written':False,'content_acceptance':False}
+
 def push_fixed(path,branch,expected,commit,env=None):
     if branch not in (INBOX,LIVE) or not re.fullmatch(r'[a-f0-9]{40}',commit):raise ValueError('branch/commit forbidden')
     if remote_head(path,branch,env)!=expected:raise RuntimeError('concurrent remote update')
-    git('push','origin',commit+':refs/heads/'+branch,cwd=path,env=env)
-    if remote_head(path,branch,env)!=commit:raise RuntimeError('remote readback mismatch')
+    try:
+        git('push','origin',commit+':refs/heads/'+branch,cwd=path,env=env)
+        if remote_head(path,branch,env)!=commit:raise RuntimeError('remote readback mismatch')
+    except (ValueError,RuntimeError,OSError,subprocess.SubprocessError) as error:
+        raise PushUncertain(branch,commit) from error
 
 def materialize_inbox(path,commit,env=None):
     # Read only a validated JSON tree; no branch checkout or filter execution.
@@ -125,7 +136,7 @@ def create_submit(path,submission,apply=False,*,origin=ORIGIN,env=None,now=None)
         if prior[SUB]==batch:
             materialize_inbox(path,old,env)
             return {'status':'unchanged','inbox_commit':old,'published':False}
-    commit=commit_data(path,INBOX,old,{SUB:batch},env);push_fixed(path,INBOX,old,commit,env);materialize_inbox(path,commit,env)
+    commit=commit_data(path,INBOX,old,{SUB:batch},env);materialize_inbox(path,commit,env);push_fixed(path,INBOX,old,commit,env)
     return {'status':'submitted','inbox_commit':commit,'inbox_url':'https://github.com/xuqinnn/energy-storage-policy/commit/'+commit,'published':False,'site_feed_published':False,'workbook_written':False,'content_acceptance':False}
 
 def action_env():
@@ -163,7 +174,7 @@ def process(*,origin=ORIGIN,env=None,fetcher=None,now=None,known=None):
         args={'known':known}
         if fetcher is not None:args['fetcher']=fetcher
         state,receipt=check_batch(batch,state,now or dt.datetime.now(SH),**args)
-        if receipt['status']=='duplicate':return {'inbox_commit':inbox,'status':'duplicate','published':False,'site_feed_published':False}
+        if receipt['status']=='duplicate':return {'inbox_commit':inbox,'observed_live_commit':old,'status':'duplicate','published':False,'site_feed_published':False}
         receipt['inbox_commit']=inbox
         public={'schema':1,'updated_at':receipt['checked_at'],'records':state['records'],'gate_stats':{'pending':len(state['records'])},'recent_batches':[{k:r[k] for k in ('batch_id','checked_at','status')} for r in state['receipts'][-10:]]}
         if len(canonical(state))>20*1024*1024 or len(canonical(public))>2*1024*1024:raise ValueError('output bounds')
@@ -176,6 +187,9 @@ def main():
     try:
         result=create_submit(a.clone_path,a.submission,a.apply) if a.command=='submit' else process(env=action_env())
         print(json.dumps(result,ensure_ascii=False))
-    except (ValueError,RuntimeError,OSError,subprocess.SubprocessError):
-        print(json.dumps({'status':'blocked','published':False,'reason':'Fixed-scope validation, network, git or permission gate failed. No alternate credential or bypass is attempted.'}));raise SystemExit(1)
+    except PushUncertain as error:
+        print(json.dumps(error.receipt));raise SystemExit(1)
+    except (ValueError,RuntimeError,OSError,subprocess.SubprocessError) as error:
+        certain=isinstance(error,ValueError)
+        print(json.dumps({'status':'blocked','publication_state':'not_attempted' if certain else 'not_confirmed','published':False if certain else None,'site_feed_published':False if certain else None,'workbook_written':False,'content_acceptance':False,'reason':'Fixed-scope validation, network, git or permission gate failed. No alternate credential or bypass is attempted.'}));raise SystemExit(1)
 if __name__=='__main__':main()
