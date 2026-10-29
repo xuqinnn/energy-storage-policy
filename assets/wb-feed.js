@@ -51,25 +51,22 @@
   function node(tag,value,cls){const n=document.createElement(tag);if(value!==undefined)n.textContent=value;if(cls)n.className=cls;return n;}
   function render(container,options){
     if(!container?.isConnected)return;container.replaceChildren();container.className='card wb-feed';container.dataset.feedStatus=state.status;const rows=overlay(state.pack,state.reviews),pending=rows.filter(r=>!r.review).length;
-    container.append(node('h2','采集快讯 · 待复核 '+pending+' 件'),node('p','采集信息先回官方原文核对；复核结果逐条更新。此处数量单列。','note'));container.dataset.feedPending=String(pending);
-    if(state.status==='offline')container.append(node('p','离线版不联网获取快讯。','note'));
-    else if(state.status==='unavailable')container.append(node('p','暂无可用快讯，已有政策与分析可继续阅读。','note'));
-    else if(state.status==='loading')container.append(node('p','正在取得采集快讯…','note'));
-    if(state.pack.updated_at)container.append(node('p','最近检查 '+new Date(state.pack.updated_at).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',hour12:false})+'（北京时间）','note'));
+    container.append(node('h2','政策与公告快讯'));container.dataset.feedPending=String(pending);
+    if(state.status==='unavailable')container.append(node('p','快讯暂不可用，已有政策与分析可继续阅读。','note'));
+    else if(state.status==='loading')container.append(node('p','正在加载…','note'));
     const list=node('div',undefined,'wb-feed-list');container.append(list);
     for(const {record:r,review:v}of rows){
       const article=node('article');article.dataset.wbId=r.id;article.dataset.reviewState=v?.status||'pending';list.append(article);
       if(v?.status==='withdrawn'){article.append(node('h3','一条快讯已撤回'),node('p',v.note));continue;}
-      const effective={...r,...(v?.correction||{})},details=node('details'),summary=node('summary'),title=node('h3',effective.title);summary.append(title,node('span',(effective.category==='policy'?'政策':'公告')+' · 该页公开 '+effective.published_date+' · '+(v?.status==='accepted'?'已复核':v?.status==='corrected'?'已更正':'待复核')));details.append(summary);
-      if(r.mode==='backfill')details.append(node('strong','历史补录 · 不计今日新发','date-fallback'));
-      details.append(node('p',effective.issuer),node('p','官方页面发布此文件，可先回原文核对。'),node('blockquote',effective.source_excerpt),node('p','采集于 '+new Date(r.collected_at).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',hour12:false})+'（北京时间）','note'));
-      if(r.source_check.bytes_changed)details.append(node('p',v?'采集时来源页有更新，所列事实仍匹配。':'来源页有更新，所列事实仍匹配，待复核。','note'));
-      if(v?.note)details.append(node('p','复核说明：'+v.note));
+      const effective={...r,...(v?.correction||{})},details=node('details'),summary=node('summary'),title=node('h3',effective.title);summary.append(title,node('span',(effective.category==='policy'?'政策':'公告')+' · 公开 '+effective.published_date+(v?.status==='corrected'?' · 内容更正':'')));details.append(summary);
+      if(r.mode==='backfill')details.append(node('strong','往期发布','date-fallback'));
+      details.append(node('p',effective.issuer),node('blockquote',effective.source_excerpt));
+      if(v?.note)details.append(node('p',(v.status==='corrected'?'更正：':'')+v.note));
       const link=node('a','查看官方原文 ↗');link.href=r.source_url;link.target='_blank';link.rel='noopener noreferrer';details.append(link);
-      if(v?.formal_id){const formal=node('a','查看已入库分析 →');formal.href='#/brief/'+v.formal_id;formal.className='wb-formal-link';details.append(formal);}
+      if(v?.formal_id){const formal=node('a','阅读分析 →');formal.href='#/brief/'+v.formal_id;formal.className='wb-formal-link';details.append(formal);}
       article.append(details);
     }
-    if(!rows.length&&state.status==='live')list.append(node('p','当前没有新的采集快讯。'));
+    if(!rows.length&&['live','offline'].includes(state.status))list.append(node('p','暂无新增快讯。'));
     if(state.status==='unavailable'&&!options.offline&&location.protocol!=='file:'&&!root.__YC_DATA__){const retry=node('button','重试快讯');retry.type='button';retry.onclick=()=>{retry.disabled=true;load(options,true).then(()=>render(container,options));};container.append(retry);}
   }
   function mount(container,options){render(container,options);load(options).then(()=>render(container,options));}
