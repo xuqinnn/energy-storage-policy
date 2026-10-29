@@ -61,8 +61,17 @@ def validate_snapshot(data):
     if demo.get('kind') != 'synthetic' or not demo.get('inputs'): errors.append('missing explicit synthetic example')
     if data.get('meta',{}).get('dataset')=='public-reviewed':
         validate_core_analyses(data)
+        validate_daily_analysis(data)
     if errors: raise ValueError('; '.join(errors))
     return copy.deepcopy(data)
+
+
+def validate_daily_analysis(data):
+    rows=[b for b in data.get('briefs',[]) if b.get('编号')=='ZCGJ182']
+    if len(rows)!=1:raise ValueError('daily analysis: missing or duplicated identity')
+    if hashlib.sha256(json.dumps(rows[0],ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()).hexdigest()!='ccba3f88ea59d5e277ce8503be9675b126873aafa1ca3c3a94f33ae5ca825901':raise ValueError('daily analysis: reviewed body changed')
+    d=data['docs']['ZCGJ182']
+    if (d.get('date'),d.get('published'),d.get('prov'))!=('2026-10-14','2026-10-28','南方区域'):raise ValueError('daily analysis: dates or regional boundary changed')
 
 
 def validate_core_analyses(data):
@@ -162,10 +171,11 @@ def validate_reply_insights(path):
     return validate_reply_schema(json.loads(Path(path).read_text(encoding='utf-8')))
 
 
-CONTENT_LAYER_SHA = 'd935b83861a8bb76633803f08d65ed6efe5089b8b0ad3a119c142478c13362b8'
+CONTENT_LAYER_SHA = '261dbc4fd9e38d632040420f9adb98216c0ca3df7c52cef5820d65c0dc3551db'
 CORE_ANALYSIS_IDS = {'ZCGJ13','ZCGJ120','ZCGJ03','ZCGJ04'}
 CORE_ANALYSES_SHA = '2771497116d19595f252645ff8ca8074395fdd71fbaf8093a452b9a1cf494dd1'
-CONTENT_CLASS_IDS = CORE_ANALYSIS_IDS | {'ZCGJ45','ZCGJ110','ZCSN34','ZCGX34','ZCHEB52','ZCLN37','ZCSD45','ZCAH63','ZCTJ19','ZCSH43','ZCSD53','ZCXJ32'}
+DAILY_REVIEW_IDS = {'ZCGJ182','YJC485','YJC486','YJC487'}
+CONTENT_CLASS_IDS = DAILY_REVIEW_IDS | CORE_ANALYSIS_IDS | {'ZCGJ45','ZCGJ110','ZCSN34','ZCGX34','ZCHEB52','ZCLN37','ZCSD45','ZCAH63','ZCTJ19','ZCSH43','ZCSD53','ZCXJ32'}
 NOTICE_FIELDS = {'id','content_type','subtype','title','issuer','importance','importance_reason','issued_at','published_at','publication_date_basis','first_publication_date','event_at','summary','our_analysis','quote','source_url','source_access_note','corroborating_url','boundary','region_scope','verified_region_codes','policy_ids','cited_document_number','cited_document_verification'}
 SOURCE_ROLES = {'ORIGINAL_PUBLICATION_OR_ATTACHMENT','ORIGINAL_EXPLANATORY_ATTACHMENT','OFFICIAL_RELEASE_REPORT','OFFICIAL_INSTITUTION_REPRINT','OFFICIAL_INTERPRETATION','OFFICIAL_REPRINT_ATTACHMENT','OFFICIAL_ANALYSIS_MENTION_ONLY'}
 
@@ -196,24 +206,24 @@ def validate_content_schema(layer):
         code=item['id']
         if code in seen or code not in CONTENT_CLASS_IDS or code!=item['canonical_document_id']:raise ValueError('content layer schema: duplicate or unknown identity')
         seen.add(code)
-        if item['content_type']!=('policy' if code in ({'ZCAH63','ZCSH43','ZCSD53','ZCXJ32'} | CORE_ANALYSIS_IDS) else 'notice') or type(item['importance']) is not int or not 1<=item['importance']<=5:
+        if item['content_type']!=('policy' if code in ({'ZCAH63','ZCSH43','ZCSD53','ZCXJ32','ZCGJ182'} | CORE_ANALYSIS_IDS) else 'notice') or type(item['importance']) is not int or not 1<=item['importance']<=5:
             raise ValueError('content layer schema: unreviewed classification or rating')
         if not all(isinstance(item[k],str) and item[k].strip() for k in ('subtype','importance_reason','classification_basis','evidence_scope')):raise ValueError('content layer schema: missing classification boundary')
     if seen!=CONTENT_CLASS_IDS:raise ValueError('content layer schema: incomplete reviewed labels')
-    expected_ratings={'ZCGJ13':3,'ZCGJ120':4,'ZCGJ03':5,'ZCGJ04':5,'ZCGJ45':5,'ZCGJ110':4,'ZCSN34':4,'ZCGX34':4,'ZCHEB52':3,'ZCLN37':3,'ZCSD45':4,'ZCAH63':4,'ZCTJ19':3,'ZCSH43':4,'ZCSD53':4,'ZCXJ32':4}
+    expected_ratings={'ZCGJ182':5,'YJC485':4,'YJC486':3,'YJC487':3,'ZCGJ13':3,'ZCGJ120':4,'ZCGJ03':5,'ZCGJ04':5,'ZCGJ45':5,'ZCGJ110':4,'ZCSN34':4,'ZCGX34':4,'ZCHEB52':3,'ZCLN37':3,'ZCSD45':4,'ZCAH63':4,'ZCTJ19':3,'ZCSH43':4,'ZCSD53':4,'ZCXJ32':4}
     if {x['id']:x['importance'] for x in layer['classifications']}!=expected_ratings:raise ValueError('content layer schema: unreviewed importance revision')
     gaps=layer['source_gaps']
     if len(gaps)!=1 or not isinstance(gaps[0],dict) or set(gaps[0])!={'id','boundary'} or gaps[0]['id']!='ZCMD22' or not isinstance(gaps[0]['boundary'],str) or not gaps[0]['boundary'].strip():raise ValueError('content layer schema: held source gap missing or changed identity')
     seen=set();original=0
     for link in layer['source_links']:
         if not isinstance(link,dict) or set(link)!={'policy_id','url','role'}:raise ValueError('content layer schema: source fields')
-        if link['policy_id'] in seen or not re.fullmatch(r'ZC[A-Z]+\d+',link['policy_id']):raise ValueError('content layer schema: duplicate source identity')
+        if link['policy_id'] in seen or not (re.fullmatch(r'ZC[A-Z]+\d+',link['policy_id']) or link['policy_id'] in {'YJC485','YJC486','YJC487'}):raise ValueError('content layer schema: duplicate source identity')
         seen.add(link['policy_id'])
         if link['role'] not in SOURCE_ROLES or not isinstance(link['url'],str) or not re.match(r'^https?://',link['url']):raise ValueError('content layer schema: source role or URL')
         original+=link['role'].startswith('ORIGINAL_')
         if link['policy_id'] in {'ZCAH14','ZCAH16','ZCAH17','ZCAH18','ZCGJ175','ZCHEB60'} and link['role'].startswith('ORIGINAL_'):
             raise ValueError('content layer schema: related source promoted to original')
-    if len(seen)!=31 or original!=25:raise ValueError('content layer schema: expected 25 original / 6 related links')
+    if len(seen)!=35 or original!=29:raise ValueError('content layer schema: expected 29 original / 6 related links')
     text=json.dumps(layer,ensure_ascii=False)
     if any(token in text for token in ('/Users/','file://','source_path','source_raw_sha256','raw_path','workbook_written')) or re.search(r'<[!/a-zA-Z]',text):
         raise ValueError('content layer schema: private fields or unsafe markup')

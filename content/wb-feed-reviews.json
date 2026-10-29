@@ -1,1 +1,39 @@
-{"schema":1,"reviews":[]}
+{
+  "schema": 1,
+  "reviews": [
+    {
+      "id": "wb_a971a0079deb97fabce4",
+      "record_sha256": "8759112a7b6fa5fe57c9dae9752f4649ebe345d1a7111312b220802d3cc1c57a",
+      "status": "corrected",
+      "formal_id": "ZCGJ182",
+      "note": "按复函原文补全两部门发文机关，并归入政策；10月14日成文、10月28日该页公开，适用南方区域。",
+      "correction": {
+        "title": "关于同意南方区域电力市场转入正式运行的复函",
+        "issuer": "国家发展改革委办公厅、国家能源局综合司",
+        "category": "policy"
+      }
+    },
+    {
+      "id": "wb_dc4c3bdacd95c038bbd5",
+      "record_sha256": "eb5bf1270c453bff5f8227f1f07dfb493a613be8b2ddb8ec9b3bdf86a198ba34",
+      "status": "corrected",
+      "note": "标题为1—9月累计统计；引文为9月单月数据，两者同比口径不同。",
+      "correction": {
+        "title": "2026年1—9月全国电力市场交易电量同比增长18.9%",
+        "source_excerpt": "2026年9月，全国各电力交易机构完成交易电量6737亿千瓦时，同比增长17.5%。"
+      }
+    },
+    {
+      "id": "wb_4400257b579014981599",
+      "record_sha256": "e1772e7ba2276d65ddecb26915b272ead54614244fc9cac50f34ee5e1401f65a",
+      "status": "accepted",
+      "note": "该消息为抽水蓄能监管调研动态，不能据此认定具体项目已投产。"
+    },
+    {
+      "id": "wb_590b59d4133f9efd4d36",
+      "record_sha256": "23a8661d910cfa5b28ecc4c80b89a6ae5f8c28d77563d45c8bde18988c0e6cb7",
+      "status": "accepted",
+      "note": "该消息为保供监管部署；定性供需判断不能代替量化预测。"
+    }
+  ]
+}

@@ -130,16 +130,24 @@ def date_in_text(date,s):
 PROOF_FIELDS={'source_sha256_declared','source_sha256_fetched','bytes_changed','fetched_bytes','match'}
 MATCH='normalized whitespace and HTML entities; title exact heading'
 RECORD_EXTRA={'record_sha256','gate_checked_at','review_state','mode','source_check'}
+# Applied only to reader-facing fields. Protocol IDs/SHA and private receipt reasons
+# retain their own validators; ordinary policy 回执/验收流程/待核 remain legitimate.
+PROCESS = re.compile(r'WB[·_ -]?(?:任务书|交付|派发|接单|流水|回执|调度)|WorkBuddy|Codex.{0,8}(?:验收|复核|任务|流程|额度)|(?:任务书.{0,8}(?:派发|派单|接单|转发|低峰|调度)|交付流水|派单回执|验收流水)|(?:batch[_ -]?id|record[_ -]?sha256|input[_ -]?sha256|source[_ -]?sha256)|wb_[a-f0-9]{20}|(?<![a-f0-9])[a-f0-9]{64}(?![a-f0-9])|(?:batch|hash|sha-?256)\s*[:：=]|(?:Hy4\s*preview|gpt-6[\w.-]*|DeepSeek-V4[\w.-]*)|(?:额度|token).{0,8}(?:耗尽|上限|重置|不足|切换|已用)|(?:已用|剩余).{0,8}(?:额度|token)|/(?:private/tmp|tmp|var/folders|Volumes|mnt)/',re.I)
 
 def plain(value, maximum=300, minimum=1):
     if not isinstance(value,str) or not minimum<=len(value)<=maximum or BAD.search(value) or any(unicodedata.category(c) in ('Cc','Cf','Cs') for c in value):
         raise ValueError('invalid plain text or prohibited content')
     return value
 
+def public_plain(value, maximum=300, minimum=1):
+    plain(value,maximum,minimum)
+    if PROCESS.search(value):raise ValueError('private process marker in reader text')
+    return value
+
 def item_shape(item):
     if not isinstance(item,dict) or set(item)!=FIELDS:raise ValueError('item fields')
     for v in item.values():plain(v)
-    plain(item['title'],minimum=8);plain(item['issuer'],minimum=4);plain(item['source_excerpt'],160,10)
+    public_plain(item['title'],minimum=8);public_plain(item['issuer'],minimum=4);public_plain(item['source_excerpt'],160,10);public_plain(item['publication_evidence'])
     if not re.search(r'储能|电力|电价|电网|新能源|虚拟电厂|需求响应|绿电直连|零碳园区|零碳工厂|绿证|能源保供|绿色算力|算电协同',item['title']+item['source_excerpt']):raise ValueError('outside energy relevance vocabulary')
     url=urlcheck(item['source_url'])
     if url!=item['source_url'] or item['id']!='wb_'+digest(url.encode())[:20]:raise ValueError('noncanonical URL or ID')
@@ -283,14 +291,14 @@ def validate_reviews(reviews,formal_ids=None):
         k=(r['id'],r['record_sha256'])
         if k in seen:raise ValueError('duplicate version review')
         seen.add(k)
-        if 'note' in r:plain(r['note'])
+        if 'note' in r:public_plain(r['note'])
         if r['status']!='accepted' and not r.get('note'):raise ValueError('correction/withdrawal requires note')
         if 'formal_id' in r and (not isinstance(r['formal_id'],str) or not re.fullmatch(r'ZC[A-Z0-9]{2,20}',r['formal_id']) or formal_ids is not None and r['formal_id'] not in formal_ids):raise ValueError('unknown formal reference')
         if r['status']=='corrected':
             c=r.get('correction')
             if not isinstance(c,dict) or not c or set(c)-{'title','issuer','published_date','source_excerpt','category'}:raise ValueError('correction fields')
             for key,value in c.items():
-                plain(value,160 if key=='source_excerpt' else 300)
+                public_plain(value,160 if key=='source_excerpt' else 300)
                 if key=='category' and value not in ('policy','notice'):raise ValueError('correction category')
                 if key=='published_date' and dt.date.fromisoformat(value).isoformat()!=value:raise ValueError('correction date')
         elif 'correction' in r:raise ValueError('correction on other status')

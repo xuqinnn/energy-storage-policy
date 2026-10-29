@@ -168,7 +168,7 @@ class GitIntegration(unittest.TestCase):
   with self.assertRaises(ValueError):self.process()
   self.assertIsNone(r.remote_head(clone,r.LIVE,self.env))
  def test_concurrent_push_and_real_non_fast_forward(self):
-  one=self.submit();clone=self.path/'clone1';stale=r.commit_data(clone,r.INBOX,one['inbox_commit'],{r.SUB:batch(number=3)},self.env);self.submit(2,batch(number=2))
+  one=self.submit();clone=self.path/'clone1';stale=r.commit_data(clone,r.INBOX,one['inbox_commit'],{r.SUB:batch(number=3)},self.env);self.process();self.submit(2,batch(number=2))
   with self.assertRaises(RuntimeError):r.push_fixed(clone,r.INBOX,one['inbox_commit'],stale,self.env)
   rejected=r.git('push','origin',stale+':refs/heads/'+r.INBOX,cwd=clone,env=self.env,check=False);self.assertNotEqual(rejected.returncode,0)
  def test_submit_shape_wrong_remote_and_no_arbitrary_flags(self):
@@ -198,5 +198,90 @@ class WorkflowContract(unittest.TestCase):
   with patch.dict(os.environ,env,clear=True),self.assertRaises(ValueError):r.action_env()
  def test_build_empty_snapshot_and_reviews_version_fields(self):
   self.assertEqual(json.loads((ROOT/'content/wb-feed-snapshot.json').read_text())['records'],[]);g.validate_reviews(json.loads((ROOT/'content/wb-feed-reviews.json').read_text()))
+
+
+BLOCKED_READER_TEXT=['WB任务书已派发，请下一棒继续。', '任务书已派发，下一棒继续。', 'WB交付流水已经完成。', 'Codex验收流程已通过。', 'batch_id=WB-20261029-001', 'hash：abc123', 'record_sha256=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'input_sha256=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'source_sha256=cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', 'wb_dddddddddddddddddddd', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', '实际模型Hy4 preview', 'gpt-6.1-sol/high执行完成。', 'DeepSeek-V4.1-Flash额度不足。', '模型额度已用80%。', '额度已重置，继续处理。', '/private/tmp/private-source.html', '/Volumes/private/内部材料.md']
+ALLOWED_READER_TEXT=['应取得接入批复和验收回执。', '科技专项任务书应明确项目验收要求。', '模型计算采用容量上限，适用条件待核。', '项目验收流程及确认回执详见附件。', '储能容量上限按接入批复执行。', '模型测算结果尚需核对。', '本文件尚未施行，适用日期待核。', '分类更正为公告，成文与公开日期分列。', '原文未采集，具体适用条件待核。', '申请人应按规定填写回执并盖章。']
+
+class InboxAcknowledgement(unittest.TestCase):
+ setUp=GitIntegration.setUp
+ tearDown=GitIntegration.tearDown
+ submit=GitIntegration.submit
+ process=GitIntegration.process
+ def head(self):return r.remote_head(self.path/'clone1',r.INBOX,self.env)
+ def seed_live(self,state,public=None):
+  g.validate_live(state)
+  public=public if public is not None else {'records':state['records']}
+  clone=self.path/'clone1';old=r.remote_head(clone,r.LIVE,self.env)
+  commit=r.commit_data(clone,r.LIVE,old,{r.STATE:state,r.OUT:public},self.env)
+  r.push_fixed(clone,r.LIVE,old,commit,self.env)
+ def assert_blocked(self,b,number=2,exception=ValueError):
+  old=self.head();self.src.write_bytes(g.canonical(b));before=self.src.read_bytes()
+  with self.assertRaises(exception):self.submit(number)
+  self.assertEqual(self.head(),old);self.assertEqual(self.src.read_bytes(),before)
+ def test_unprocessed_batch_cannot_be_overwritten_and_private_file_survives(self):
+  self.submit();self.assert_blocked(batch(number=2));self.assertIsNone(r.remote_head(self.path/'clone1',r.LIVE,self.env))
+ def test_identical_submission_is_idempotent_without_live_ack(self):
+  first=self.submit();second=self.submit(2);self.assertEqual(second['status'],'unchanged');self.assertEqual(first['inbox_commit'],second['inbox_commit'])
+ def test_passed_ack_allows_next_batch(self):
+  first=self.submit();self.process();second=self.submit(2,batch(number=2));self.assertEqual(second['status'],'submitted');self.assertNotEqual(first['inbox_commit'],second['inbox_commit'])
+ def test_partial_and_rejected_receipts_are_processed(self):
+  for index,status in enumerate(('partial','rejected'),1):
+   bad=item('https://www.gov.cn/other.html',title=TITLE+'未获原页印证')
+   b=batch([item(),bad] if status=='partial' else [bad]);src=self.path/f'status{index}.json';src.write_bytes(g.canonical(b))
+   remote=self.path/f'status{index}.git';r.git('init','--bare',str(remote));r.create_submit(self.path/f'status{index}-1',src,True,origin=str(remote),env=self.env,now=NOW)
+   receipt=r.process(origin=str(remote),env=self.env,now=NOW,known={},fetcher=lambda url:(DATA,'utf-8'));self.assertEqual(receipt['status'],status)
+   src.write_bytes(g.canonical(batch(number=2)));new=r.create_submit(self.path/f'status{index}-2',src,True,origin=str(remote),env=self.env,now=NOW);self.assertEqual(new['status'],'submitted')
+ def test_same_id_new_content_never_borrows_old_ack(self):
+  self.submit();self.process();self.assert_blocked(batch([item(source_excerpt=EXCERPT+'补充。')]))
+ def test_wrong_sha_receipt_does_not_ack_current_batch(self):
+  self.submit();state,_=run(batch());state['receipts'][0]['input_sha256']='f'*64;self.seed_live(state);self.assert_blocked(batch(number=2))
+ def test_wrong_batch_id_receipt_does_not_ack_current_batch(self):
+  self.submit();state,_=run(batch());state['receipts'][0]['batch_id']='WB-20261028-007';self.seed_live(state);self.assert_blocked(batch(number=2))
+ def test_prior_slot_same_id_changed_content_not_covered_by_original_ack(self):
+  self.submit();self.process();clone=self.path/'clone1';old=self.head();altered=batch([item(source_excerpt=EXCERPT+'已变。')]);commit=r.commit_data(clone,r.INBOX,old,{r.SUB:altered},self.env);r.push_fixed(clone,r.INBOX,old,commit,self.env);self.assert_blocked(batch(number=2))
+ def test_python_bool_int_equality_is_not_exact_content_idempotence(self):
+  self.submit();clone=self.path/'clone1';old=self.head();altered=batch();altered['schema']=True
+  self.assertEqual(altered,batch());self.assertNotEqual(g.canonical(altered),g.canonical(batch()))
+  commit=r.commit_data(clone,r.INBOX,old,{r.SUB:altered},self.env);r.push_fixed(clone,r.INBOX,old,commit,self.env);self.assert_blocked(batch())
+ def test_live_fetch_failure_keeps_inbox_and_no_push_attempt(self):
+  self.submit();fetch=r.fetch_head
+  def read(path,branch,env=None):
+   if branch==r.LIVE:raise RuntimeError('synthetic live fetch failure')
+   return fetch(path,branch,env)
+  push=r.push_fixed
+  with patch.object(r,'fetch_head',side_effect=read),patch.object(r,'push_fixed',wraps=push) as pushes:
+   self.assert_blocked(batch(number=2),exception=RuntimeError);pushes.assert_not_called()
+ def test_state_public_drift_and_invalid_public_object_block(self):
+  self.submit();state,_=run(batch())
+  for number,public in [(2,{'records':[]}),(3,[])]:
+   self.seed_live(state,public);self.assert_blocked(batch(number=2),number=number)
+ def test_public_integer_zero_does_not_equal_state_boolean_false_or_push(self):
+  self.submit();state,_=run(batch());public={'records':copy.deepcopy(state['records'])}
+  self.assertIs(state['records'][0]['source_check']['bytes_changed'],False)
+  public['records'][0]['source_check']['bytes_changed']=0
+  self.assertEqual(public['records'],state['records']);self.assertNotEqual(g.canonical(public['records']),g.canonical(state['records']))
+  self.seed_live(state,public)
+  with patch.object(r,'push_fixed',wraps=r.push_fixed) as pushes:
+   self.assert_blocked(batch(number=2));pushes.assert_not_called()
+
+class ReaderProcessText(unittest.TestCase):
+ def test_known_internal_markers_rejected_in_all_public_text_slots(self):
+  for value in BLOCKED_READER_TEXT:
+   with self.subTest(value=value):
+    with self.assertRaises(ValueError):g.public_plain(value)
+    for field in ('title','issuer','source_excerpt','publication_evidence'):
+     with self.assertRaises(ValueError):g.item_shape(item(**{field:'政策电力内容'+value}))
+    for status in ('accepted','withdrawn','corrected'):
+     review={'id':item()['id'],'record_sha256':'a'*64,'status':status,'note':value}
+     if status=='corrected':review['correction']={'category':'notice'}
+     with self.assertRaises(ValueError):g.validate_reviews({'schema':1,'reviews':[review]})
+    review={'id':item()['id'],'record_sha256':'a'*64,'status':'corrected','note':'更正内容如下。','correction':{'source_excerpt':value}}
+    with self.assertRaises(ValueError):g.validate_reviews({'schema':1,'reviews':[review]})
+ def test_policy_receipts_pending_and_capacity_limits_are_valid(self):
+  for value in ALLOWED_READER_TEXT:
+   with self.subTest(value=value):self.assertEqual(g.public_plain(value),value)
+ def test_private_protocol_and_matching_audit_are_preserved(self):
+  self.assertEqual(g.plain('a'*64),'a'*64);state,_=run(batch());self.assertEqual(state['records'][0]['source_check']['match'],g.MATCH)
 
 if __name__=='__main__':unittest.main()

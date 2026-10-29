@@ -18,5 +18,15 @@ async function reject(v,msg){await A.rejects(()=>W.validatePayload(v,NOW),undefi
  for(const review of [{...old,record_sha256:r.record_sha256,status:'corrected',note:'缺少更正正文'},{...old,record_sha256:r.record_sha256,status:'withdrawn'},{...old,formal_id:'ZCUNKNOWN00'},{...old,note:'<script>unsafe</script>'},{...old,correction:{source_url:'https://evil.com/'}}]){A.throws(()=>W.validateReviews({schema:1,reviews:[review]},{}));checks++;}
  check(W.URL_FIXED==='https://raw.githubusercontent.com/xuqinnn/energy-storage-policy/wb-feed-live/feed/live.json','fixed endpoint');
  const fs=require('fs'),source=fs.readFileSync(path.join(__dirname,'../assets/wb-feed.js'),'utf8');check(!source.includes('.innerHTML'),'feed text must never use HTML injection');check(!source.includes('localStorage'),'no stale unsigned cache');check(source.includes("redirect:'error'")&&source.includes("credentials:'omit'"),'no redirects or credentials');check(source.includes("location.protocol==='file:'"),'offline guard');
+
+ const blocked=["WB任务书已派发，请下一棒继续。", "任务书已派发，下一棒继续。", "WB交付流水已经完成。", "Codex验收流程已通过。", "batch_id=WB-20261029-001", "hash：abc123", "record_sha256=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "input_sha256=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "source_sha256=cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "wb_dddddddddddddddddddd", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "实际模型Hy4 preview", "gpt-6.1-sol/high执行完成。", "DeepSeek-V4.1-Flash额度不足。", "模型额度已用80%。", "额度已重置，继续处理。", "/private/tmp/private-source.html", "/Volumes/private/内部材料.md"],allowed=["应取得接入批复和验收回执。", "科技专项任务书应明确项目验收要求。", "模型计算采用容量上限，适用条件待核。", "项目验收流程及确认回执详见附件。", "储能容量上限按接入批复执行。", "模型测算结果尚需核对。", "本文件尚未施行，适用日期待核。", "分类更正为公告，成文与公开日期分列。", "原文未采集，具体适用条件待核。", "申请人应按规定填写回执并盖章。"];
+ for(const value of blocked){
+   for(const key of ['title','issuer','source_excerpt','publication_evidence']){const c=record();c[key]='政策电力内容'+value;c.record_sha256=sha(W.canonical(Object.fromEntries(W.FIELDS.map(k=>[k,c[k]]))));await reject(pack(c),'re-signed private '+key);}
+   for(const status of ['accepted','withdrawn','corrected']){const review={id:r.id,record_sha256:r.record_sha256,status,note:value,...(status==='corrected'?{correction:{category:'notice'}}:{})};A.throws(()=>W.validateReviews({schema:1,reviews:[review]},{}));checks++;}
+   A.throws(()=>W.validateReviews({schema:1,reviews:[{id:r.id,record_sha256:r.record_sha256,status:'corrected',note:'更正内容如下。',correction:{source_excerpt:value}}]},{}));checks++;
+ }
+ for(const value of allowed){W.validateReviews({schema:1,reviews:[{id:r.id,record_sha256:r.record_sha256,status:'accepted',note:value}]},{});checks++;}
+ check(!source.includes('原文短引按空白与HTML实体归一化核对。'),'per-card implementation detail removed');
+ check(source.includes("normalized whitespace and HTML entities; title exact heading"),'source matching audit remains validated');
  console.log(JSON.stringify({checks,failed:0}));
 })().catch(e=>{console.error(e);process.exitCode=1;});

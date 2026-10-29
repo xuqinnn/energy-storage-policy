@@ -188,6 +188,46 @@
       "importance_reason": "沿用当前条目的编辑重要性，不因补完整分析自动升分；不表示法律效力或项目资格。",
       "classification_basis": "国家层面的制度机制、发展安排与责任要求，适用于其限定对象；区别于答复、个案公告和研究文章。",
       "evidence_scope": "完整分析、所列原件物理页及适用边界经独立回读；国家方向或目标不证明项目资格、已实现量或保底收益，互链答复不提升政策效力。"
+    },
+    {
+      "id": "ZCGJ182",
+      "canonical_document_id": "ZCGJ182",
+      "content_type": "policy",
+      "subtype": "正式运行复函",
+      "importance": 5,
+      "importance_reason": "区域电力市场正式运行，影响参与方式、规则衔接和监管。",
+      "classification_basis": "两部门原则同意南方区域电力市场转入正式运行，要求一体化建设运营、完善交易细则与批发零售监管。具体主体的准入和结算仍依适用规则，复函没有新增储能补偿价格。",
+      "evidence_scope": "已核复函全文五项和落款；适用南方区域，未新增项目收益参数。"
+    },
+    {
+      "id": "YJC485",
+      "canonical_document_id": "YJC485",
+      "content_type": "notice",
+      "subtype": "官方市场统计",
+      "importance": 4,
+      "importance_reason": "全国市场交易规模及同比口径的官方统计。",
+      "classification_basis": "1—9月全国市场交易电量58536亿千瓦时，同比增长18.9%；9月单月6737亿千瓦时，同比增长17.5%。累计与单月分别比较，不能混用期间或据此推定项目收入。",
+      "evidence_scope": "已核官方统计正文；单月、累计及两种交易分解口径分别读取。"
+    },
+    {
+      "id": "YJC486",
+      "canonical_document_id": "YJC486",
+      "content_type": "notice",
+      "subtype": "监管工作动态",
+      "importance": 3,
+      "importance_reason": "抽水蓄能监管活动的区域资料。",
+      "classification_basis": "东北能源监管局围绕抽水蓄能规划建设、调度运行和现场监管开展调研。该消息反映监管活动，未逐项目认定投产或给出新增补偿标准。",
+      "evidence_scope": "已核工作动态正文；不等于项目投产认定。"
+    },
+    {
+      "id": "YJC487",
+      "canonical_document_id": "YJC487",
+      "content_type": "notice",
+      "subtype": "监管工作动态",
+      "importance": 3,
+      "importance_reason": "区域能源保供监管动态。",
+      "classification_basis": "云南部署今冬明春能源保供监管，关注来水、存煤、机组运行及民生供电保障。“供需总体平衡”为当次动态的定性判断，不能代替量化供需预测。",
+      "evidence_scope": "已核监管工作动态正文；未量化的表述不生成测算参数。"
     }
   ],
   "source_links": [
@@ -344,6 +384,26 @@
     {
       "policy_id": "ZCAH20",
       "url": "https://hdj.nea.gov.cn/xxgk/fdzdgknr/gfxwj/hdnyjgfxwj/202311/P020231103398677809081.pdf",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCGJ182",
+      "url": "https://www.ndrc.gov.cn/xxgk/zcfb/tz/202610/t20261028_1408423.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "YJC485",
+      "url": "https://www.nea.gov.cn/20261027/2dd59df92bb2438aaee1e3896444e6cc/c.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "YJC486",
+      "url": "https://www.nea.gov.cn/20261027/e76fac6ffdad40988c6fddeaca7b07b9/c.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "YJC487",
+      "url": "https://www.nea.gov.cn/20261027/0a16980ac4b14810b99d4e8769f1542a/c.html",
       "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
     }
   ],

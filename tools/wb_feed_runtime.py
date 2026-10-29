@@ -8,7 +8,7 @@ from pathlib import Path
 import re
 import subprocess
 import tempfile
-from wb_feed_guard import (SH,check_batch,canonical,validate_live,empty_state,
+from wb_feed_guard import (SH,check_batch,canonical,digest,validate_live,empty_state,
                            batch_shape,item_shape,trusted_identities,validate_reviews)
 
 ORIGIN='https://github.com/xuqinnn/energy-storage-policy.git'
@@ -116,6 +116,18 @@ def materialize_inbox(path,commit,env=None):
     assert_clean(path,env)
     if git('branch','--show-current',cwd=path,env=env).stdout.strip()!=INBOX:raise ValueError('wrong local inbox branch')
 
+def require_processed_inbox(path,prior,env=None):
+    """Only fixed trusted live/state can acknowledge the complete prior JSON object."""
+    if not isinstance(prior,dict) or not isinstance(prior.get('batch_id'),str) or not re.fullmatch(r'WB-\d{8}-\d{3}',prior['batch_id']):raise ValueError('previous inbox identity invalid; keep submission private')
+    live=fetch_head(path,LIVE,env)
+    if live is None:raise ValueError('previous inbox has no live receipt; keep submission private')
+    files=read_branch(path,live,{STATE,OUT},{STATE:20*1024*1024,OUT:2*1024*1024},env)
+    state=validate_live(files[STATE])
+    if not isinstance(files[OUT],dict) or canonical(files[OUT].get('records'))!=canonical(state['records']):raise ValueError('live/state drift; keep submission private')
+    prior_sha=digest(canonical(prior))
+    if not any(r['batch_id']==prior['batch_id'] and r['input_sha256']==prior_sha for r in state['receipts']):
+        raise ValueError('previous inbox lacks exact-content processing receipt; keep submission private')
+
 def create_submit(path,submission,apply=False,*,origin=ORIGIN,env=None,now=None):
     path=Path(path).absolute();src=Path(submission)
     if src.is_symlink() or not src.is_file() or src.stat().st_size>100000:raise ValueError('submission must be bounded regular file')
@@ -133,9 +145,12 @@ def create_submit(path,submission,apply=False,*,origin=ORIGIN,env=None,now=None)
     old=fetch_head(path,INBOX,env)
     if old:
         prior=read_branch(path,old,{SUB},{SUB:100000},env)
-        if prior[SUB]==batch:
+        if canonical(prior[SUB])==canonical(batch):
             materialize_inbox(path,old,env)
             return {'status':'unchanged','inbox_commit':old,'published':False}
+        if not isinstance(prior[SUB],dict):raise ValueError('previous inbox identity invalid; keep submission private')
+        if prior[SUB].get('batch_id')==batch['batch_id']:raise ValueError('batch id reused with different content; keep submission private')
+        require_processed_inbox(path,prior[SUB],env)
     commit=commit_data(path,INBOX,old,{SUB:batch},env);materialize_inbox(path,commit,env);push_fixed(path,INBOX,old,commit,env)
     return {'status':'submitted','inbox_commit':commit,'inbox_url':'https://github.com/xuqinnn/energy-storage-policy/commit/'+commit,'published':False,'site_feed_published':False,'workbook_written':False,'content_acceptance':False}
 
