@@ -76,7 +76,7 @@
     if (!st) return 'none';
     if (/已替代|已过期|重复作废/.test(st)) return 'stale';
     if (/已废止/.test(st)) return 'bad';
-    if (/征求/.test(st)) return 'draft';
+    if (/征求|已公布未施行|已公布尚未施行|已印发·待施行/.test(st)) return 'draft';
     if (/试行/.test(st)) return 'trial';
     if (/参考/.test(st)) return 'ref';
     if (/现行|正式/.test(st)) return 'ok';
@@ -258,7 +258,7 @@
       <p class="note">${esc(contentTypeLabel(classified))}${classified?.importance!==null&&classified?.importance!==undefined?` · 编辑重要性 ${classified.importance}级`:''}</p>
       ${b?.分析验收==='完整'?'<p class="note analysis-coverage">完整分析 · 原文事实、研究解释与项目核对分列</p>':''}${!b?`<p class="note analysis-coverage">${sum?(replyItems.some(r=>r.policy_ids.includes(code))?'政策摘要与关联答复':'文件摘要与来源'):'文件索引与来源'} · 完整分析待补</p>`:''}
       ${!held && (d.no || (b && b.文号)) ? `<div class="docno">${esc((b && b.文号) || d.no)}</div>` : ''}
-      <div class="dates">${held?`<span>旧索引日期 ${esc(d.date||'未载')}（公告日期未核）</span>`:''}${!held && ((b && b.发文日期) || d.date) ? `<span>成文 <b>${esc((b && b.发文日期) || d.date)}</b></span>` : ''}${!held && d.published && d.published !== ((b && b.发文日期) || d.date) ? `<span>公开 <b>${esc(d.published)}</b></span>` : ''}${b && b.生效日期 ? `<span>生效 <b>${esc(b.生效日期)}</b></span>` : ''}</div>
+      <div class="dates">${held?`<span>旧索引日期 ${esc(d.date||'未载')}（公告日期未核）</span>`:''}${!held && ((b && b.发文日期) || d.date) ? `<span>成文 <b>${esc((b && b.发文日期) || d.date)}</b></span>` : ''}${!held && d.published && d.published !== ((b && b.发文日期) || d.date) ? `<span>公开 <b>${esc(d.published)}</b></span>` : ''}${(b && b.生效日期) || d.effective ? `<span>施行 <b>${esc((b && b.生效日期) || d.effective)}</b></span>` : ''}</div>
       ${sum ? `<p class="summary">${citeHTML(sum)}</p>` : ''}${mainTagsOf(code).length ? `<div class="chips">${mainTagsOf(code).map(tagLink).join('')}</div>` : ''}</div>`;
     const blk = [];
     if(!held)blk.push(contentSourcesHTML(code));
@@ -360,7 +360,7 @@
     if (id) { const el = document.getElementById('m-' + id); if (el) { el.scrollIntoView({ block: 'center' }); el.classList.add('flash'); } }
   }
   // ---------- 政策库（信息架构第 3 步）：①表全部文件，分面筛选（省份、分类、状态、机制标签、年份、关键词），条件写在地址里可分享 ----------
-  const STG = st => /已替代|重复作废/.test(st) ? '已替代' : /废止|失效|过期/.test(st) ? '已废止' : /征求/.test(st) ? '征求稿' : /参考/.test(st) ? '参考' : '施行中';
+  const STG = st => /已替代|重复作废/.test(st) ? '已替代' : /废止|失效|过期/.test(st) ? '已废止' : /已公布未施行|已公布尚未施行|已印发·待施行/.test(st) ? '已公布未施行' : /征求/.test(st) ? '征求稿' : /参考/.test(st) ? '参考' : /现行|施行中/.test(st) ? '施行中' : '未判定';
   const tagSet = () => { const m = {}; Object.entries(D.tagdocs || {}).forEach(([k, v]) => v.主.forEach(c => (m[c] = m[c] || []).push(k))); return m; };
   function libPage(qs) {
     const P=new URLSearchParams(qs||''),TM=tagSet(),legacy=new Map((D.lib||[]).map(r=>[r[0],r]));
@@ -371,7 +371,7 @@
     const vals=x=>x.map(v=>[v,v]),N=Math.max(1,Math.min(3000,Number(P.get('n'))||120));
     $('#app').innerHTML=`<section class="hero"><div><div class="eyebrow">统一资料检索</div><h1>查政策、公告与研究资料</h1><p class="lede">已公开内容可按标题、文号、机构、主题、摘要与已公开正文检索；旧记录未逐件分类，研究资料中包含标准等其他材料。</p></div></section>
       ${contentCountsHTML()}${analysisWorkspaceHTML()}
-      <section class="card"><div class="facets">${opt('type',Object.entries(EnergyContent.TYPES),'内容类型')}${opt('prov',vals(uniq(5).sort((a,b)=>a.localeCompare(b,'zh'))),'省份')}${opt('cat',vals(uniq(6).sort((a,b)=>a.localeCompare(b,'zh'))),'原目录主题')}${opt('st',vals(['施行中','征求稿','已替代','已废止','参考']),'原状态')}${opt('tag',vals((D.tags||[]).map(t=>t.标签)),'机制标签')}${opt('yr',vals(uniq(4).map(x=>x.slice(0,4)).filter((x,i,a)=>/^\d{4}$/.test(x)&&a.indexOf(x)===i).sort().reverse()),'年份')}
+      <section class="card"><div class="facets">${opt('type',Object.entries(EnergyContent.TYPES),'内容类型')}${opt('prov',vals(uniq(5).sort((a,b)=>a.localeCompare(b,'zh'))),'省份')}${opt('cat',vals(uniq(6).sort((a,b)=>a.localeCompare(b,'zh'))),'原目录主题')}${opt('st',vals(['施行中','已公布未施行','征求稿','已替代','已废止','参考','未判定']),'原状态')}${opt('tag',vals((D.tags||[]).map(t=>t.标签)),'机制标签')}${opt('yr',vals(uniq(4).map(x=>x.slice(0,4)).filter((x,i,a)=>/^\d{4}$/.test(x)&&a.indexOf(x)===i).sort().reverse()),'年份')}
       <label class="fc grow"><span>关键词</span><input data-f="q" value="${esc(f.q)}" placeholder="名称、机构、文号或正文"></label></div>
       ${f.important?'<p class="note">仅显示已审重要公告（4、5级） · <a href="#/lib?type=notice">查看全部公告</a></p>':''}<p class="sub" data-search-count="${rows.length}">${rows.length} 条结果${Object.values(f).some(Boolean)?' · <a href="#/lib">清除筛选</a>':''}</p>
       <div class="bcards">${rows.slice(0,N).map(contentCardHTML).join('')||'<p class="note">当前筛选无结果，不代表没有相关规定。</p>'}</div>
@@ -1440,7 +1440,7 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
     $('#app').innerHTML = `<section class="hero"><div><div class="eyebrow">口径与来源</div><h1>这些数从哪里来、怎么读</h1></div></section>
       <div class="card"><ul class="rules">
         <li><b>来源：</b>本机政策研究库（库 ${esc(D.meta.version)}，快照 ${esc(D.meta.exported)}）的${PUB() ? '储能政策参数表与研究线结论卡' : '⑧储能收益测算、②储能参数对照表'}；每个数可悬停查看依据文件、文号、日期与当前状态。</li>
-        <li><b>状态必显：</b>依据标签颜色＝文件当前状态（绿 现行／正式，琥珀 征求意见稿，灰色删除线 已替代或已过期，红 已废止）。征求意见稿尚未生效。</li>
+        <li><b>状态必显：</b>依据标签颜色＝文件当前状态（绿 现行／正式，琥珀 征求意见稿／已公布未施行，灰色删除线 已替代或已过期，红 已废止）。征求意见稿尚未生效；已公布未施行不作为现行适用依据，日期到达也须结合届时现行文件判断。</li>
         <li><b>「未采集」不等于「无规定」：</b>表中「—」或「未采集」只说明库里还没有这项数据。</li>
         ${PUB() ? '' : `<li><b>投资分级：</b>优先／储备／谨慎三档，综合容量电价（补偿）是否出台、现货市场成熟度、收益确定性与退坡风险，由研究库逐省校核。</li>`}
         <li><b>容量收益：</b>＝ 本省容量电价基数 × min(1, 储能时长 ÷ 本省最长净负荷高峰持续时长)；山东、蒙西、蒙东按放电量或市场化补偿。省份看板的计算器可调时长与保守口径。</li>
@@ -1511,7 +1511,7 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
       if(location.hash!=='#/park-demo')return;
       if(demo.kind!=='synthetic_fixed_examples'||demo.cases.length!==8)throw Error('合成样例格式不符');
       const num=x=>Number(x).toLocaleString('zh-CN',{maximumFractionDigits:3});
-      const notes={削峰:'20小时负荷10 MW、4小时30 MW。效率为1；充电也占接网容量。容量权重100万元/MW·本24小时时段仅为构造目标权重，不是日价。',套利:'全天负荷10 MW，低价200元/MWh、高价800或240元/MWh各12小时；单程效率均为0.9，往返效率0.81，放电损耗费10元/MWh。价差须覆盖损耗与费用。',消纳:'全天负荷10 MW，4小时绿电20 MW；电价500元/MWh、效率为1，放电损耗费10元/MWh。绿电利用率包含储能损耗，不追踪电源归属，不能当作政策自用比例。'};
+      const notes={削峰:'20小时负荷10 MW、4小时30 MW。效率为1；充电也占接网容量。容量权重100万元/MW·本24小时时段仅为构造目标权重，不是日价。',套利:'全天负荷10 MW，低价200元/MWh、高价800或240元/MWh各12小时；单程效率均为0.9，往返效率0.81，放电磨损费10元/MWh。价差须覆盖损耗与费用。',消纳:'全天负荷10 MW，4小时绿电20 MW；电价500元/MWh、效率为1，放电磨损费10元/MWh。绿电利用率包含储能损耗，不追踪电源归属，不能当作政策自用比例。'};
       const row=c=>{const r=c.result;return `<tr><td>${esc(c.label)}</td><td>${num(c.input.storage_energy_mwh)}</td><td>${num(r.grid_capacity_mw)}</td><td>${num(r.grid_import_mwh)}</td><td>${num(r.curtailment_mwh)}</td><td>${num(r.energy_cost_yuan)}</td></tr>`;};
       $('#app').innerHTML=`<section class="hero"><div><div class="eyebrow">免费园区演示 · 全部为构造场景</div><h1>储能如何改变接网、用电与弃电</h1><p class="lede">${esc(demo.notice)}循环日允许电网充电、禁止反送电。未含投资、融资、税费等，不代表项目利润或准入结论。</p></div></section><section class="card"><h2>选择一个固定场景</h2><div class="synthetic-grid"><label>查看输入与结果<select id="park-case">${['削峰','套利','消纳'].map(group=>`<optgroup label="${group}">${demo.cases.filter(c=>c.group===group).map(c=>`<option value="${esc(c.id)}">${esc(c.label)}</option>`).join('')}</optgroup>`).join('')}</select></label></div><p id="park-explanation"></p><div id="park-selected" aria-live="polite"></div></section><section class="card" style="margin-top:20px"><h2>8个场景对照</h2><p>${esc(demo.schedule_notice)}</p><div class="tbl park-comparison"><table><thead><tr><th>场景</th><th>储能 MWh</th><th>该调度峰值 MW</th><th>下网 MWh</th><th>弃电 MWh</th><th>电量费 元</th></tr></thead><tbody>${demo.cases.map(row).join('')}</tbody></table></div></section><section class="card" style="margin-top:20px"><h2>复现与实际应用</h2><p><a href="examples/park-scenarios.json" download>下载完整合成输入与结果</a> · <a href="tools/park_examples.py" download>下载复现脚本（Python标准库）</a></p><p>运行 python tools/park_examples.py 可重建8例。逐时调度可能不唯一；显示值经过舍入，复验使用JSON完整精度。这里没有对任意输入运行优化求解器。</p><p><a href="#/topic/零碳园区">阅读园区规划与项目条件</a> · <a href="#/tools">容量及充电费用算术</a> · <a href="#/services">实际问题可自愿咨询</a></p></section>`;
       const select=$('#park-case');
@@ -1522,6 +1522,8 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
         const selected=$('#park-selected');selected.dataset.case=c.id;selected.dataset.utilization=r.renewable_utilization_fraction===null?'not-applicable':String(r.renewable_utilization_fraction);
         selected.innerHTML=`<div class="kpis">${[['该调度峰值',num(r.grid_capacity_mw)+' MW'],['下网电量',num(r.grid_import_mwh)+' MWh'],['弃电量',num(r.curtailment_mwh)+' MWh'],['绿电利用率',utilization]].map(([k,v])=>`<div class="kpi"><div class="k">${k}</div><div class="v park-value">${v}</div></div>`).join('')}</div><p>储能 ${num(x.storage_energy_mwh)} MWh / ${num(x.storage_power_mw)} MW；步长1小时，共24小时。充/放电效率 ${num(x.charge_efficiency)} / ${num(x.discharge_efficiency)}；往返效率 ${num(x.charge_efficiency*x.discharge_efficiency)}。</p><div class="park-detail-grid"><div class="tbl park-fees"><table><thead><tr><th>费用分项（元/本24小时时段）</th><th>金额</th></tr></thead><tbody>${feeRows.map(([k,v])=>`<tr><td>${k}</td><td>${num(v)}</td></tr>`).join('')}</tbody></table></div><p>能量核对：下网 ${num(r.grid_import_mwh)} ＋可用绿电 ${num(r.renewable_mwh)} −弃电 ${num(r.curtailment_mwh)} ＝负荷 ${num(r.load_mwh)} ＋储能损耗 ${num(r.storage_loss_mwh)} MWh；残差 ${num(r.energy_balance_residual_mwh)} MWh。循环首末SOC为0。</p></div><details><summary>展开24小时输入与调度</summary><div class="tbl park-hourly"><table><thead><tr><th>小时</th><th>负荷 MW</th><th>绿电 MW</th><th>购电价 元/MWh</th><th>下网 MW</th><th>充电 MW</th><th>放电 MW</th><th>弃电 MW</th><th>期末SOC MWh</th></tr></thead><tbody>${x.load_mw.map((_,h)=>`<tr><td>${h}—${h+1}</td>${[x.load_mw[h],x.renewable_mw[h],x.import_price_yuan_per_mwh[h],d.grid_import_mw[h],d.charge_mw[h],d.discharge_mw[h],d.curtailment_mw[h],d.soc_end_mwh[h]].map(v=>`<td>${num(v)}</td>`).join('')}</tr>`).join('')}</tbody></table></div></details>`;
       };select.addEventListener('change',render);render();
+      const pairGuide=(D.public_guides||[]).find(g=>g.id==='park-comparison');
+      if(pairGuide)$('#app').insertAdjacentHTML('beforeend',`<section class="card prose-topic" style="margin-top:20px"><details id="park-comparison-explained"><summary>消纳配置对比：条件、能量账与费用边界</summary>${mdHTML(pairGuide.md)}<p><a href="#/topics?topic=零碳园区">回到园区专题</a> · <a href="#/methods/park-comparison">打开可分享的解释页</a></p></details></section>`);
       mountReadingNotes('park');
     } catch(error) {if(location.hash==='#/park-demo')$('#app').innerHTML=`<section class="card"><h1>园区样例暂未加载</h1><p>${esc(error.message)}</p><a href="#/tools">返回算术工具</a></section>`;}
   }

@@ -1,11 +1,11 @@
 {
   "schema": 1,
   "timezone": "Asia/Shanghai",
-  "snapshot_version": "v456",
-  "snapshot_built_at": "2026-10-29 11:19",
+  "snapshot_version": "v457",
+  "snapshot_built_at": "2026-11-02 14:47",
   "scope": "仅已审公开政策与公告；该页公开日不等于最早首发；成文/收录索引不计今日新发。",
   "counts": {
-    "policy": 9,
+    "policy": 10,
     "notice": 14,
     "important_notice": 7
   },
@@ -124,6 +124,29 @@
       "issued_at": "2026-10-24",
       "published_at": "2026-10-24",
       "event_at": "2026-10-24"
+    },
+    {
+      "id": "ZCGJ183",
+      "canonical_document_id": "ZCGJ183",
+      "type": "policy",
+      "renderer": "policy",
+      "subtype": "部门规章",
+      "title": "能源保供中长期合同管理办法（试行）",
+      "summary": "50号令公布能源保供中长期合同管理办法，2026年12月1日起施行。省内电力保供中长期合同价格通过市场交易形成，鼓励浮动机制，各地不得强制要求签订固定价格；施行前不作为现行适用依据，也不据此推定储能资格或收益。",
+      "analysis_state": "full",
+      "importance": 4,
+      "status": "已公布未施行",
+      "region": "全国",
+      "source_url": "https://www.ndrc.gov.cn/xxgk/zcfb/fzggwl/202610/t20261023_1408364.html",
+      "source_label": "官方原发布页/附件",
+      "route": "#/brief/ZCGJ183",
+      "display_date": "2026-10-23",
+      "date_basis": "published",
+      "date_label": "该页公开日",
+      "publication_verified": true,
+      "issued_at": "2026-10-19",
+      "published_at": "2026-10-23",
+      "event_at": ""
     },
     {
       "id": "ZCSH43",
