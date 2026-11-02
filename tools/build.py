@@ -44,7 +44,7 @@ def validate_snapshot(data):
     else:
         ids=[]
         for guide in guides:
-            if not isinstance(guide,dict) or set(guide)!={'id','title','md'} or guide.get('id') not in ('read-policy','capacity-cost','services','park-comparison') or not isinstance(guide.get('md'),str) or len(guide.get('md',''))<10: errors.append('unreviewed public guide schema')
+            if not isinstance(guide,dict) or set(guide)!={'id','title','md'} or guide.get('id') not in ('read-policy','capacity-cost','services','park-comparison','path-storage','path-direct-power','direct-power-evidence-brief') or not isinstance(guide.get('md'),str) or len(guide.get('md',''))<10: errors.append('unreviewed public guide schema')
             else: ids.append(guide['id'])
         if len(ids)!=len(set(ids)):errors.append('duplicate public guide')
     docs = data.get('docs', {})
