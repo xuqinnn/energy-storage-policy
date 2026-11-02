@@ -34,6 +34,84 @@
       "record_sha256": "23a8661d910cfa5b28ecc4c80b89a6ae5f8c28d77563d45c8bde18988c0e6cb7",
       "status": "accepted",
       "note": "该消息为保供监管部署；定性供需判断不能代替量化预测。"
+    },
+    {
+      "id": "wb_95e838d07a6d7bed64b7",
+      "record_sha256": "9727975b0acc75ad7148b9e4845d0425754a5cbda819161090dcd22d0056706f",
+      "status": "corrected",
+      "note": "来源为国家能源局。9月绿证核发、可交易与成交数量分别反映不同统计环节。",
+      "correction": {
+        "title": "国家能源局发布2026年9月全国可再生能源绿色电力证书核发及交易数据",
+        "issuer": "国家能源局"
+      }
+    },
+    {
+      "id": "wb_aa715e2c94b5da49883c",
+      "record_sha256": "cac875258407c7d3365280feeb7788d57c1a06cb96908c63e069aef7e047505e",
+      "status": "corrected",
+      "note": "来源为福建能源监管办。44兆瓦时为本次省间互济成交电量，不是装机功率或收益。",
+      "correction": {
+        "title": "福建能源监管办推动独立新型储能首次参与华东省间互济交易探索省间互济新模式",
+        "issuer": "福建能源监管办"
+      }
+    },
+    {
+      "id": "wb_ac0509a12f85aea4ca9e",
+      "record_sha256": "e2980e16379a1b67589efc9c777e712a1d112c913fb0bdecb106d680ea23b397",
+      "status": "corrected",
+      "note": "来源为国家能源局新闻发布会文字实录。新型储能装机统计截至9月底，功率和能量应分列。",
+      "correction": {
+        "title": "国家能源局新闻发布会文字实录",
+        "issuer": "国家能源局"
+      }
+    },
+    {
+      "id": "wb_8c91c290f16604a8509e",
+      "record_sha256": "f0df23b27fde67f4aae843d225a2c7fce2f5aa924a97251d523fd93817b9c82a",
+      "status": "withdrawn",
+      "note": "本文为新华网报道的转载，应按媒体文章阅读，不属于国家能源局发布的政策或机关公告。"
+    },
+    {
+      "id": "wb_75d343286535fb634bce",
+      "record_sha256": "a66ccc9e07b5d9dfa7590e5e569e27d0e9222542e75607e45832003b57522ea9",
+      "status": "withdrawn",
+      "note": "本文来源为经济日报，属于媒体报道转载，相关统计应与电力交易机构原始资料核对。"
+    },
+    {
+      "id": "wb_c889ac6f06e9e581aa90",
+      "record_sha256": "d85a19611f35d6163ebda1092a6492a3122eb5409cbf8168dc533cc8582c8cfb",
+      "status": "withdrawn",
+      "note": "本文为人民日报海外版解读文章的转载；具体适用条件请以煤电与新能源融合实施意见原文为准。"
+    },
+    {
+      "id": "wb_618ee6e5e76302b73743",
+      "record_sha256": "d84345b2c3d04f5b67d4761c6d51b99a5b7c142f42973b1282088226df1b1905",
+      "status": "corrected",
+      "note": "来源为甘肃能源监管办。本文记录赴湖南开展的监管调研，不属于新增市场规则。",
+      "correction": {
+        "title": "甘肃能源监管办赴湖南开展电力市场监管情况调研",
+        "issuer": "甘肃能源监管办"
+      }
+    },
+    {
+      "id": "wb_6afb78e16887dc160974",
+      "record_sha256": "713b422796de6f267b1fb7e0ffe3a78cfd1f9530271a6c9b9576661075a31d97",
+      "status": "corrected",
+      "note": "来源为湖南能源监管办。5类风险与18个案例属于本次会议内容，不代表新增处罚规则。",
+      "correction": {
+        "title": "湖南能源监管办组织召开电力市场风险分析会",
+        "issuer": "湖南能源监管办"
+      }
+    },
+    {
+      "id": "wb_8c7eec4d4fa6dc95ea1a",
+      "record_sha256": "559b39a574c26fc365376750967bcdd2d3c62679ef0f5ad194d55541b1caa0b2",
+      "status": "corrected",
+      "note": "来源为新疆能源监管办。本文是迎峰度冬保供会议消息，不提供新增储能补偿参数。",
+      "correction": {
+        "title": "新疆能源监管办组织召开迎峰度冬电力保供运行方式汇报会议",
+        "issuer": "新疆能源监管办"
+      }
     }
   ]
 }

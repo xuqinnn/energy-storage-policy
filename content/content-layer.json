@@ -238,6 +238,36 @@
       "importance_reason": "能源保供合同制度；施行前可读但不作现行依据，不自动生成项目参数。",
       "classification_basis": "国家发展改革委第50号令公布正式办法，非征求稿、研报或一般公告。",
       "evidence_scope": "令文、所核公开页与第十七/十八/二十三/二十四/四十四条；版本边界及未施行限定。"
+    },
+    {
+      "id": "YJC488",
+      "canonical_document_id": "YJC488",
+      "content_type": "notice",
+      "subtype": "官方绿证统计",
+      "importance": 4,
+      "importance_reason": "官方统计或独立储能省间交易实践，对绿证、调节资源与市场边界有研究价值；编辑分级。",
+      "classification_basis": "机关统计公告",
+      "evidence_scope": "核发与交易期间2026年9月；本期核发主要对应2026年8月电量（原文93.95%）。 核发月不等电量生产月，亦不能把可交易占比60.45%当作已售出比例。按电量生产年份分组的单独交易均价不代表所有绿证统一价格。"
+    },
+    {
+      "id": "YJC489",
+      "canonical_document_id": "YJC489",
+      "content_type": "notice",
+      "subtype": "省间互济事件",
+      "importance": 4,
+      "importance_reason": "官方统计或独立储能省间交易实践，对绿证、调节资源与市场边界有研究价值；编辑分级。",
+      "classification_basis": "监管机关事件新闻稿",
+      "evidence_scope": "页面公开2026-10-30，事件9月30日，按当年上下文理解为2026年；事件原句本身未写年份。 44兆瓦时是成交电量，不是装机功率或收益。首次限定原文福建独立新型储能参与华东省间互济交易事件；未据此认定全国统一准入、结算价或所有项目适用。"
+    },
+    {
+      "id": "YJC490",
+      "canonical_document_id": "YJC490",
+      "content_type": "notice",
+      "subtype": "机关发布会实录",
+      "importance": 4,
+      "importance_reason": "官方统计或独立储能省间交易实践，对绿证、调节资源与市场边界有研究价值；编辑分级。",
+      "classification_basis": "机关新闻发布会文字实录",
+      "evidence_scope": "2026年前三季度；储能装机截至9月底。 功率与能量单位分列。原句将同比增长63%连在装机规模之后，未明确拆分功率和能量同比，因此不把63%同时套给两者；2.61小时是平均储能时长，约915小时是等效利用小时数，两者不可互换。"
     }
   ],
   "source_links": [
@@ -419,6 +449,21 @@
     {
       "policy_id": "ZCGJ183",
       "url": "https://www.ndrc.gov.cn/xxgk/zcfb/fzggwl/202610/t20261023_1408364.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "YJC488",
+      "url": "https://www.nea.gov.cn/20261029/07750da8d7d641d0a50071cdccd3c7e5/c.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "YJC489",
+      "url": "https://www.nea.gov.cn/20261030/da83889a06c94618bdb77a5afd656fc8/c.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "YJC490",
+      "url": "https://www.nea.gov.cn/20261030/dd2b15f04b92441aa59f839a1a3413ba/c.html",
       "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
     }
   ],

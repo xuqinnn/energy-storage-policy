@@ -32,6 +32,8 @@
       while (walker.nextNode()) nodes.push(walker.currentNode);
       for (const node of nodes) {
         const value = node.nodeValue.replace(/【?(?<![A-Za-z])(?:ZC|YJC?|FG|NY)[A-Z]*\d+(?:·[^】]*)?】?/g, '');
+        // Leave ordinary inline text nodes untouched: trimming each node joins English words across bold/links.
+        if (value === node.nodeValue && !/[（(][^（）()]*无(?:独立)?文号[^（）()]*[）)]/.test(value)) continue;
         const display = value.replace(/[（(][^（）()]*无(?:独立)?文号[^（）()]*[）)]/g, '').replace(/^[ ·・、]+|[ ·・、]+$/g, '');
         if (display !== node.nodeValue) node.nodeValue = display;
       }
@@ -608,7 +610,7 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
   }
   function mdHTML(md) {
     const out = []; let list = null, para = [], tbl = [];
-    const flush = () => { if (para.length) { out.push(`<p>${inlineMD(para.join(''))}</p>`); para = []; } if (list) { out.push(`<${list.t}>${list.items.map(x => `<li>${inlineMD(x)}</li>`).join('')}</${list.t}>`); list = null; }
+    const flush = () => { if (para.length) { out.push(`<p>${inlineMD(para.join('\n'))}</p>`); para = []; } if (list) { out.push(`<${list.t}>${list.items.map(x => `<li>${inlineMD(x)}</li>`).join('')}</${list.t}>`); list = null; }
       if (tbl.length) { const rows = tbl.filter(r => !/^\|?\s*:?-{2,}/.test(r)).map(r => r.replace(/^\||\|$/g, '').split('|').map(c => c.trim()));
         out.push(`<div class="tbl"><table><thead><tr>${rows[0].map(c => `<th>${inlineMD(c)}</th>`).join('')}</tr></thead><tbody>${rows.slice(1).map(r => `<tr>${r.map(c => `<td>${inlineMD(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`); tbl = []; } };
     md.split('\n').forEach(l => {

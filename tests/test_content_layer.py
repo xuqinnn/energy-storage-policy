@@ -48,7 +48,12 @@ class ContentProjectionTest(unittest.TestCase):
 
     def test_final_nine_fields_source_hold_and_scores_are_enforced(self):
         layer=self.layer()
-        self.assertEqual(len(layer['classifications']),21)
+        self.assertEqual(len(layer['classifications']),24)
+        for code in ('YJC488','YJC489','YJC490'):
+            record=next(c for c in layer['classifications'] if c['id']==code)
+            self.assertEqual((record['content_type'],record['importance']),('notice',4))
+            bad=copy.deepcopy(layer);next(c for c in bad['classifications'] if c['id']==code)['content_type']='policy'
+            with self.subTest(code=code),self.assertRaises(ValueError):builder.validate_content_schema(bad)
         self.assertNotIn('ZCMD22',{c['id'] for c in layer['classifications']})
         for modify in [lambda d:d.update(source_gaps=[]),
                        lambda d:d['source_gaps'][0].update(id='OTHER'),
