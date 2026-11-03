@@ -1,15 +1,38 @@
 {
   "schema": 1,
   "timezone": "Asia/Shanghai",
-  "snapshot_version": "v461",
-  "snapshot_built_at": "2026-11-03 19:54",
+  "snapshot_version": "v463",
+  "snapshot_built_at": "2026-11-03 23:09",
   "scope": "仅已审公开政策与公告；该页公开日不等于最早首发；成文/收录索引不计今日新发。",
   "counts": {
-    "policy": 13,
+    "policy": 14,
     "notice": 17,
     "important_notice": 10
   },
   "items": [
+    {
+      "id": "ZCJL42",
+      "canonical_document_id": "ZCJL42",
+      "type": "policy",
+      "renderer": "policy",
+      "subtype": "吉林多用户绿电直连方案",
+      "title": "吉林省多用户绿电直连项目开发建设实施方案（试行）",
+      "summary": "吉林明确多用户直连的主体、源荷比例、交易费用与申报条件。30%/35%与60%的分母不同，新增与存量负荷上网规则分开；满3年不是自动转公用电站，旧单用户项目按衔接条款处理。",
+      "analysis_state": "full",
+      "importance": 5,
+      "status": "现行有效(试行)",
+      "region": "吉林",
+      "source_url": "http://fgw.siping.gov.cn/zdzt/nyfz/202611/t20261103_779551.html",
+      "source_label": "官方原发布页/附件",
+      "route": "#/brief/ZCJL42",
+      "display_date": "2026-11-03",
+      "date_basis": "published",
+      "date_label": "该页公开日",
+      "publication_verified": true,
+      "issued_at": "2026-10-29",
+      "published_at": "2026-11-03",
+      "event_at": ""
+    },
     {
       "id": "ZCGJ184",
       "canonical_document_id": "ZCGJ184",

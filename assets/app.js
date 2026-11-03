@@ -246,9 +246,10 @@
   /* 简析 v2.2 边际信号：加码／放宽／转向用强调色，首提／重申／延续中性；不表示利好利空 */
   const sigChip = b => b && b.边际信号 && b.边际信号 !== '待定' ? `<span class="chip sig${/加码|放宽|转向/.test(b.边际信号) ? ' hot' : ''}" title="边际信号：与前值相比的变化方向，不表示利好利空">${esc(b.边际信号)}</span>` : '';
   function stChip(st) { return st ? `<span class="st ${statusClass(st)}">${esc(st)}</span>` : ''; }
+  const evidencePlace=e=>[Number.isInteger(e.页)&&e.页>0?`物理p${e.页}`:'',e.条款||''].filter(Boolean).join(' ');
   function completeAnalysisHTML(b){
     const body=b?.完整分析;if(b?.分析验收!=='完整'||!body)return '';
-    return `<article class="complete-analysis" data-complete-analysis="${esc(b.编号)}"><h3>${esc(body.导读标题)}</h3><p class="note">${esc(body.日期说明)}</p>${body.章节.map(section=>`<section class="analysis-section"><h4>${esc(section.标题)}</h4><span class="analysis-kind">${esc(section.性质)}</span>${section.段落.map(p=>`<p>${esc(p)}</p>`).join('')}<p class="analysis-evidence">依据：${[...new Set(section.依据索引.map(i=>`物理p${b.依据[i].页} ${b.依据[i].条款}`))].map(esc).join('；')}</p></section>`).join('')}<section class="analysis-section"><h4>适用边界</h4><ul>${body.边界.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></section><section class="analysis-section"><h4>下一步核对</h4><ol>${body.核对清单.map(x=>`<li>${esc(x)}</li>`).join('')}</ol><div class="analysis-methods">${body.方法链接.map(href=>`<a href="${esc(href)}">${href.includes('capacity-cost')?'容量与费用核对方法':'政策阅读方法'} →</a>`).join('')}</div></section></article>`;
+    return `<article class="complete-analysis" data-complete-analysis="${esc(b.编号)}"><h3>${esc(body.导读标题)}</h3><p class="note">${esc(body.日期说明)}</p>${body.章节.map(section=>`<section class="analysis-section"><h4>${esc(section.标题)}</h4><span class="analysis-kind">${esc(section.性质)}</span>${section.段落.map(p=>`<p>${esc(p)}</p>`).join('')}<p class="analysis-evidence">依据：${[...new Set(section.依据索引.map(i=>evidencePlace(b.依据[i])))].map(esc).join('；')}</p></section>`).join('')}<section class="analysis-section"><h4>适用边界</h4><ul>${body.边界.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></section><section class="analysis-section"><h4>下一步核对</h4><ol>${body.核对清单.map(x=>`<li>${esc(x)}</li>`).join('')}</ol><div class="analysis-methods">${body.方法链接.map(href=>`<a href="${esc(href)}">${href.includes('capacity-cost')?'容量与费用核对方法':'政策阅读方法'} →</a>`).join('')}</div></section></article>`;
   }
   function sheetHTML(code, hitAt) {
     const classified=contentModel?.records.get(code),held=!!classified?.review_hold;
@@ -285,7 +286,7 @@
       blk.push(`<div class="block"><h4>横向 · 与他省</h4><p class="cap">口径：${esc(b.横向.口径)}；单位：${esc(b.横向.单位)}</p><div class="bars">${it.map(e => `<div class="bar ${e.本件 ? 'me' : ''}"><div>${esc(e.省)}<small>${esc(e.算法 || '')}</small></div><div class="track"><div class="fill" style="width:${((+e.值 || 0) / max * 100).toFixed(1)}%"></div></div><div class="v">${esc(e.值)}</div></div>`).join('')}</div>
         <p class="cap">${it.filter(e => !e.本件).map(e => `${esc(e.省)} <button type="button" class="cite ${statusClass((D.docs[e.编号] || {}).status)}" data-code="${esc(e.编号)}">${esc(e.编号)}</button> ${esc(e.年月)}${e.备注 ? '，' + esc(e.备注) : ''}`).join('；')}</p></div>`);
     } else if (b && b.横向 && typeof b.横向 === 'string' && b.脉络 && !externalSite()) blk.push(`<div class="block"><h4>横向 · 与他省</h4><p>${citeHTML(b.横向)}</p></div>`);
-    if (b && (b.依据 || []).length) blk.push(`<details><summary>依据原文（${b.依据.length} 条）</summary>${b.分析验收==='完整'?'<p class="note">引文按阅读版整理字形与换行，物理页均可回原件核对。</p>':''}<div class="ev">${b.依据.map(e => `<div><span class="src">${b.分析验收==='完整'?esc(`物理p${e.页} ${e.条款||''}`):`${esc(e.编号)} ${esc(e.条款 || (e.页 ? "p" + e.页 : ""))}`}</span>${esc(e.原句)}</div>`).join('')}</div></details>`);
+    if (b && (b.依据 || []).length) blk.push(`<details><summary>依据原文（${b.依据.length} 条）</summary>${b.分析验收==='完整'?'<p class="note">引文按阅读版整理字形与换行，物理页均可回原件核对。</p>':''}<div class="ev">${b.依据.map(e => `<div><span class="src">${b.分析验收==='完整'?esc(evidencePlace(e)):`${esc(e.编号)} ${esc(e.条款 || (e.页 ? "p" + e.页 : ""))}`}</span>${esc(e.原句)}</div>`).join('')}</div></details>`);
 
     if(replyItems.some(r=>r.policy_ids.includes(code)))blk.push(relatedReplyBlock(code));
     return head + `<div class="sbody">${blk.join('')}</div>`;
@@ -1122,7 +1123,7 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
   }
   function contentSourcesHTML(id) {
     const sources=contentLayer.source_links.filter(s=>s.policy_id===id),legacy=D.docs[id]?.url;
-    const extra=(briefOf(id)?.补充来源||[]).filter(s=>typeof s.label==='string'&&(/^https:\/\/(?:[A-Za-z0-9-]+\.)*gov\.cn(?:\/|$)/.test(s.url||'')||/^http:\/\/www\.gzpec\.cn\/law\/jygz\/202611\/P02026110363551(?:1247366|1679588|2042468)\.pdf$/.test(s.url||'')));
+    const extra=(briefOf(id)?.补充来源||[]).filter(s=>typeof s.label==='string'&&(/^https?:\/\/(?:[A-Za-z0-9-]+\.)*gov\.cn(?:\/|$)/.test(s.url||'')||/^http:\/\/www\.gzpec\.cn\/law\/jygz\/202611\/P02026110363551(?:1247366|1679588|2042468)\.pdf$/.test(s.url||'')));
     if(!sources.length&&/^https?:\/\//.test(legacy||''))return `<div class="block"><a class="btn" href="${esc(legacy)}" target="_blank" rel="noopener noreferrer" data-source-link>查看官方发布页 ↗</a></div>`;
     return sources.map(s=>`<div class="block"><a class="btn" href="${esc(s.url)}" target="_blank" rel="noopener noreferrer" data-source-link data-source-role="${esc(s.role)}">${esc(EnergyContent.SOURCE_LABELS[s.role])} ↗</a>${!s.role.startsWith('ORIGINAL_')?'<p class="note">关联来源，不替代原文件发布页；未据此扩展政策参数核验。</p>':''}</div>`).join('')+(extra.length?`<div class="block">${extra.map(s=>`<a data-supplementary-source href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.label)} ↗</a>`).join(' · ')}</div>`:'');
   }

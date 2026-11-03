@@ -48,7 +48,7 @@ class ContentProjectionTest(unittest.TestCase):
 
     def test_final_nine_fields_source_hold_and_scores_are_enforced(self):
         layer=self.layer()
-        self.assertEqual(len(layer['classifications']),28)
+        self.assertEqual(len(layer['classifications']),29)
         for code in ('YJC488','YJC489','YJC490'):
             record=next(c for c in layer['classifications'] if c['id']==code)
             self.assertEqual((record['content_type'],record['importance']),('notice',4))
@@ -58,7 +58,7 @@ class ContentProjectionTest(unittest.TestCase):
         self.assertEqual(next(c for c in layer['classifications'] if c['id']=='ZCGJ184')['content_type'],'policy')
         self.assertEqual(next(c for c in layer['classifications'] if c['id']=='ZCHUN45')['content_type'],'policy')
         self.assertEqual(next(c for c in layer['classifications'] if c['id']=='YJC491')['content_type'],'article_report')
-        for code,wrong in [('ZCNF36','notice'),('ZCGJ184','notice'),('ZCHUN45','notice'),('YJC491','policy'),('YJC491','notice')]:
+        for code,wrong in [('ZCJL42','notice'),('ZCNF36','notice'),('ZCGJ184','notice'),('ZCHUN45','notice'),('YJC491','policy'),('YJC491','notice')]:
             bad=copy.deepcopy(layer);next(c for c in bad['classifications'] if c['id']==code)['content_type']=wrong
             with self.subTest(code=code),self.assertRaises(ValueError):builder.validate_content_schema(bad)
         for modify in [lambda d:d.update(source_gaps=[]),

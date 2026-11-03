@@ -308,6 +308,16 @@
       "importance_reason": "南方区域经营主体注册及披露的正式执行规则，涉及储能、虚拟电厂和绿电直连。",
       "classification_basis": "广州电力交易中心225号正式印发两细则，确认对应2025版两分件废止；官网发布时间、实施日期和通知落款均为2026-10-12。",
       "evidence_scope": "主体注册、两项规则换版及实施日期；具体市场品种还须核对应规则与技术证明，不推定补贴或收入。"
+    },
+    {
+      "id": "ZCJL42",
+      "canonical_document_id": "ZCJL42",
+      "content_type": "policy",
+      "subtype": "吉林多用户绿电直连方案",
+      "importance": 5,
+      "importance_reason": "明确省内多用户直连适用条件、源荷分母、市场费用和退出与旧批复衔接。",
+      "classification_basis": "吉林省能源局、省发改委正式印发方案，四平市发改委转载页及绑定DOCX可回核；成文/施行10月29日，该页公开11月3日。",
+      "evidence_scope": "六章正文的条件分析；比例按分母、负荷性质和投产时点区分，许可豁免及转公用条件保留，不推收益或普遍资格。"
     }
   ],
   "source_links": [
@@ -519,6 +529,11 @@
     {
       "policy_id": "ZCNF36",
       "url": "http://www.gzpec.cn/law/jygz/202611/t20261103_37341.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCJL42",
+      "url": "http://fgw.siping.gov.cn/zdzt/nyfz/202611/t20261103_779551.html",
       "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
     }
   ],
