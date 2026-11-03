@@ -178,7 +178,7 @@ def validate_reply_insights(path):
     return validate_reply_schema(json.loads(Path(path).read_text(encoding='utf-8')))
 
 
-CONTENT_LAYER_SHA = '30ec16755dcc2da620542b33aa5bf73fe2650e8331b84793c969140561c1202d'
+CONTENT_LAYER_SHA = '78efb7df39741e19094f44771aec920c81eb642d88f1d24de19e6b2086805445'
 CORE_ANALYSIS_IDS = {'ZCGJ13','ZCGJ120','ZCGJ03','ZCGJ04'}
 CORE_ANALYSES_SHA = '2771497116d19595f252645ff8ca8074395fdd71fbaf8093a452b9a1cf494dd1'
 DAILY_REVIEW_IDS = {'ZCGJ182','YJC485','YJC486','YJC487','YJC488','YJC489','YJC490','ZCGJ184','ZCHUN45'}
@@ -213,7 +213,7 @@ def validate_content_schema(layer):
         code=item['id']
         if code in seen or code not in CONTENT_CLASS_IDS or code!=item['canonical_document_id']:raise ValueError('content layer schema: duplicate or unknown identity')
         seen.add(code)
-        expected_type='article_report' if code=='YJC491' else 'policy' if code in ({'ZCAH63','ZCSH43','ZCSD53','ZCXJ32','ZCGJ182','ZCGJ183','ZCHUN45'} | CORE_ANALYSIS_IDS) else 'notice'
+        expected_type='article_report' if code=='YJC491' else 'policy' if code in ({'ZCAH63','ZCSH43','ZCSD53','ZCXJ32','ZCGJ182','ZCGJ183','ZCHUN45','ZCGJ184'} | CORE_ANALYSIS_IDS) else 'notice'
         if item['content_type']!=expected_type or type(item['importance']) is not int or not 1<=item['importance']<=5:
             raise ValueError('content layer schema: unreviewed classification or rating')
         if not all(isinstance(item[k],str) and item[k].strip() for k in ('subtype','importance_reason','classification_basis','evidence_scope')):raise ValueError('content layer schema: missing classification boundary')

@@ -1,7 +1,7 @@
 /* Public content identities and search. Classification never changes legal status or parameters. */
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.EnergyContent=api;})(typeof globalThis!=='undefined'?globalThis:this,function(){
   'use strict';
-  const TYPES={policy:'政策',notice:'公告',article_report:'文章研报',research_material:'研究资料（待分类）',unclassified:'待分类资料'};
+  const TYPES={policy:'政策',notice:'公告',article_report:'文章研报',research_material:'研究资料',unclassified:'其他资料'};
   const SOURCE_LABELS={ORIGINAL_PUBLICATION_OR_ATTACHMENT:'官方原发布页／附件',ORIGINAL_EXPLANATORY_ATTACHMENT:'原件配套起草说明',OFFICIAL_RELEASE_REPORT:'政府发布消息（关联来源）',OFFICIAL_INSTITUTION_REPRINT:'官方机构转载（关联来源）',OFFICIAL_INTERPRETATION:'官方政策解读（关联来源）',OFFICIAL_REPRINT_ATTACHMENT:'政府转载附件（关联来源）',OFFICIAL_ANALYSIS_MENTION_ONLY:'官方分析引用（关联来源）'};
   function validate(layer){
     if(!layer||Object.keys(layer).sort().join(',')!=='classifications,notices,schema,source_gaps,source_links'||layer.schema!==1||!['notices','classifications','source_links','source_gaps'].every(k=>Array.isArray(layer[k])))throw Error('内容分类清单格式不符');

@@ -1112,7 +1112,7 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
   function contentCountsHTML() {
     if(contentLoadError)return '<p class="note" role="status" data-content-load-error>公告与分类暂未加载，旧资料索引仍可使用。<button type="button" data-content-retry>重试加载</button></p>';
     const c=EnergyContent.stats(contentModel);
-    return `<p class="note" data-classification-stats data-notices="${c.notices}" data-important="${c.important}">已审分类范围：政策 ${c.policy} 件 · 公告共 ${c.notices} 件，其中重要公告 ${c.important} 件、未评分 ${c.unscored} 件。${replyLoadError?'答复样例暂未加载。':''}文章研报尚未逐件分类，其余 ${c.classification_pending} 条旧资料保留待分类；不代表全站分类已完成。</p>`;
+    return `<p class="note" data-classification-stats data-notices="${c.notices}" data-important="${c.important}">政策 ${c.policy} 件 · 公告 ${c.notices} 件（重要公告 ${c.important} 件） · 文章研报 ${c.article_report} 件。${replyLoadError?'答复内容暂未加载。':''}<a href="#/lib">检索其他资料 →</a></p>`;
   }
   function contentCardHTML(r) {
     if(r.kind==='reply')return replyCardHTML(r);
@@ -1122,8 +1122,9 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
   }
   function contentSourcesHTML(id) {
     const sources=contentLayer.source_links.filter(s=>s.policy_id===id),legacy=D.docs[id]?.url;
+    const extra=(briefOf(id)?.补充来源||[]).filter(s=>typeof s.label==='string'&&/^https:\/\/(?:[A-Za-z0-9-]+\.)*gov\.cn(?:\/|$)/.test(s.url||''));
     if(!sources.length&&/^https?:\/\//.test(legacy||''))return `<div class="block"><a class="btn" href="${esc(legacy)}" target="_blank" rel="noopener noreferrer" data-source-link>查看官方发布页 ↗</a></div>`;
-    return sources.map(s=>`<div class="block"><a class="btn" href="${esc(s.url)}" target="_blank" rel="noopener noreferrer" data-source-link data-source-role="${esc(s.role)}">${esc(EnergyContent.SOURCE_LABELS[s.role])} ↗</a>${!s.role.startsWith('ORIGINAL_')?'<p class="note">关联来源，不替代原文件发布页；未据此扩展政策参数核验。</p>':''}</div>`).join('');
+    return sources.map(s=>`<div class="block"><a class="btn" href="${esc(s.url)}" target="_blank" rel="noopener noreferrer" data-source-link data-source-role="${esc(s.role)}">${esc(EnergyContent.SOURCE_LABELS[s.role])} ↗</a>${!s.role.startsWith('ORIGINAL_')?'<p class="note">关联来源，不替代原文件发布页；未据此扩展政策参数核验。</p>':''}</div>`).join('')+(extra.length?`<div class="block">${extra.map(s=>`<a data-supplementary-source href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.label)} ↗</a>`).join(' · ')}</div>`:'');
   }
   function shareContentHTML(id) {
     const record=contentModel?.records.get(id),route=record?.content_type==='notice'?'#/notice/':'#/brief/';

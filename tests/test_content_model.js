@@ -6,7 +6,7 @@ const replies=JSON.parse(fs.readFileSync(path.join(root,'content/reply-insights.
 if(data.meta.dataset==='synthetic'){console.log('Synthetic-only build: real classification contract not applicable.');process.exit(0);}
 const before=JSON.stringify(data),model=M.create(data,layer,replies),stats=M.stats(model);
 assert.strictEqual(JSON.stringify(data),before,'classification must not change source statuses, dates or parameters');
-assert.deepStrictEqual([stats.policy,stats.notices,stats.important,stats.unscored],[11,18,11,2]);
+assert.deepStrictEqual([stats.policy,stats.notices,stats.important,stats.unscored],[12,17,10,2]);
 assert.strictEqual(model.records.size,new Set([...Object.keys(data.docs),...layer.notices.map(n=>n.id),...replies.map(r=>r.id)]).size);
 for(const id of ['ZCHEB52','ZCLN37']){assert.strictEqual(M.query(model,{q:id,type:'notice'})[0].importance,3);}
 assert(M.query(model,{q:'广州电力交易中心 正式运行',type:'notice'}).some(r=>r.id==='NTF-GZPEC-20261024-FORMAL'));

@@ -272,12 +272,12 @@
     {
       "id": "ZCGJ184",
       "canonical_document_id": "ZCGJ184",
-      "content_type": "notice",
-      "subtype": "行动方案印发通知（事实）",
+      "content_type": "policy",
+      "subtype": "产品碳足迹标准体系建设行动方案",
       "importance": 4,
-      "importance_reason": "五部门联合印发，涉及重点产品碳足迹标准体系建设。",
-      "classification_basis": "五部门印发2026—2028年重点产品碳足迹标准体系建设行动方案。本文介绍通知的印发事实，不据此给出具体标准指标、产品清单或合规义务。",
-      "evidence_scope": "只接受通知身份、署名、文号、日期与印发事实；不把通知摘要当方案全文或具体指标。"
+      "importance_reason": "涉及储能产品碳足迹标准研制，以及绿证核算标准与供应链数据协调。",
+      "classification_basis": "五部门部署产品碳足迹国家标准建设，涵盖输配电与储能，并研究绿证纳入产品碳足迹核算的相关标准。研制计划不等于标准已经发布，也不直接确认绿证的产品碳核算效力。",
+      "evidence_scope": "仅讨论相关标准研制安排和清单第30、143行；计划目标不等已发布标准或项目资格。"
     },
     {
       "id": "ZCHUN45",
@@ -498,7 +498,7 @@
     },
     {
       "policy_id": "ZCGJ184",
-      "url": "https://www.miit.gov.cn/xwfb/gxdt/sjdt/art/2026/art_41fe313f626d4f38a93efe757a7eee99.html",
+      "url": "https://www.samr.gov.cn/cms_files/filemanager/1647978232/attach/202610/88a94acc7d604d2a97a5668e2a11e28a.pdf",
       "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
     },
     {
