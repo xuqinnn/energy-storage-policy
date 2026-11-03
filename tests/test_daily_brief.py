@@ -33,6 +33,12 @@ class DailyBriefTest(unittest.TestCase):
         d=json.loads((ROOT/'data/storage.json').read_text());l=json.loads((ROOT/'content/content-layer.json').read_text());r=json.loads((ROOT/'content/reply-insights.json').read_text())['items'];out=B.assemble_daily(d,l,r)
         if d['meta']['dataset']=='public-reviewed':
             self.assertEqual(len(out['items']),len({x['canonical_document_id'] for x in out['items']}));self.assertNotIn('ZCMD22',{x['id'] for x in out['items']})
+            hunan=next(x for x in out['items'] if x['id']=='ZCHUN45')
+            self.assertEqual((hunan['display_date'],hunan['date_basis'],hunan['publication_verified']),('2026-10-22','issued',False))
+            self.assertEqual(d['docs']['ZCHUN45']['effective'],'2026-10-22')
+            notice=next(x for x in out['items'] if x['id']=='ZCGJ184')
+            self.assertEqual((notice['type'],notice['published_at'],notice['analysis_state']),('notice','2026-11-02','summary'))
+            self.assertNotIn('YJC491',{x['id'] for x in out['items']})
         d['meta']['dataset']='synthetic';self.assertEqual(B.assemble_daily(d,l,r)['items'],[])
     def test_full_analysis_cannot_be_a_label_or_missing_body(self):
         d,l=self.inputs();d['briefs']=[{'编号':'P1','概述':'有摘要','分析验收':'完整','依据':[1]}]

@@ -1,15 +1,38 @@
 {
   "schema": 1,
   "timezone": "Asia/Shanghai",
-  "snapshot_version": "v458",
-  "snapshot_built_at": "2026-11-02 21:33",
+  "snapshot_version": "v459",
+  "snapshot_built_at": "2026-11-03 12:58",
   "scope": "仅已审公开政策与公告；该页公开日不等于最早首发；成文/收录索引不计今日新发。",
   "counts": {
-    "policy": 10,
-    "notice": 17,
-    "important_notice": 10
+    "policy": 11,
+    "notice": 18,
+    "important_notice": 11
   },
   "items": [
+    {
+      "id": "ZCGJ184",
+      "canonical_document_id": "ZCGJ184",
+      "type": "notice",
+      "renderer": "policy",
+      "subtype": "行动方案印发通知（事实）",
+      "title": "重点产品碳足迹标准体系建设行动方案（2026—2028年）印发通知",
+      "summary": "五部门印发2026—2028年重点产品碳足迹标准体系建设行动方案。本文介绍通知的印发事实，不据此给出具体标准指标、产品清单或合规义务。",
+      "analysis_state": "summary",
+      "importance": 4,
+      "status": "参考资料",
+      "region": "全国",
+      "source_url": "https://www.miit.gov.cn/xwfb/gxdt/sjdt/art/2026/art_41fe313f626d4f38a93efe757a7eee99.html",
+      "source_label": "官方原发布页/附件",
+      "route": "#/notice/ZCGJ184",
+      "display_date": "2026-11-02",
+      "date_basis": "published",
+      "date_label": "该页公开日",
+      "publication_verified": true,
+      "issued_at": "2026-10-19",
+      "published_at": "2026-11-02",
+      "event_at": ""
+    },
     {
       "id": "YJC490",
       "canonical_document_id": "YJC490",
@@ -215,6 +238,29 @@
       "publication_verified": true,
       "issued_at": "2026-10-19",
       "published_at": "2026-10-23",
+      "event_at": ""
+    },
+    {
+      "id": "ZCHUN45",
+      "canonical_document_id": "ZCHUN45",
+      "type": "policy",
+      "renderer": "policy",
+      "subtype": "湖南六张网建设举措",
+      "title": "关于加快推进“六张网”建设的若干举措",
+      "summary": "湖南支持算力项目优先采用源网荷储、绿电直连供电，鼓励算力设施参与电力市场。余电上网比例可适当放宽；自发自用电量暂免的是政策性交叉补贴新增损益，不能理解为全部电费免征。",
+      "analysis_state": "full",
+      "importance": 4,
+      "status": "现行有效",
+      "region": "湖南",
+      "source_url": "https://www.hunan.gov.cn/hnszf/xxgk/wjk/szfbgt/202611/t20261103_34093689.html",
+      "source_label": "官方原发布页/附件",
+      "route": "#/brief/ZCHUN45",
+      "display_date": "2026-10-22",
+      "date_basis": "issued",
+      "date_label": "成文/索引日（公开日未核）",
+      "publication_verified": false,
+      "issued_at": "2026-10-22",
+      "published_at": "",
       "event_at": ""
     },
     {

@@ -268,6 +268,36 @@
       "importance_reason": "官方统计或独立储能省间交易实践，对绿证、调节资源与市场边界有研究价值；编辑分级。",
       "classification_basis": "机关新闻发布会文字实录",
       "evidence_scope": "2026年前三季度；储能装机截至9月底。 功率与能量单位分列。原句将同比增长63%连在装机规模之后，未明确拆分功率和能量同比，因此不把63%同时套给两者；2.61小时是平均储能时长，约915小时是等效利用小时数，两者不可互换。"
+    },
+    {
+      "id": "ZCGJ184",
+      "canonical_document_id": "ZCGJ184",
+      "content_type": "notice",
+      "subtype": "行动方案印发通知（事实）",
+      "importance": 4,
+      "importance_reason": "五部门联合印发，涉及重点产品碳足迹标准体系建设。",
+      "classification_basis": "五部门印发2026—2028年重点产品碳足迹标准体系建设行动方案。本文介绍通知的印发事实，不据此给出具体标准指标、产品清单或合规义务。",
+      "evidence_scope": "只接受通知身份、署名、文号、日期与印发事实；不把通知摘要当方案全文或具体指标。"
+    },
+    {
+      "id": "ZCHUN45",
+      "canonical_document_id": "ZCHUN45",
+      "content_type": "policy",
+      "subtype": "湖南六张网建设举措",
+      "importance": 4,
+      "importance_reason": "湖南将算力绿色用能、绿电直连及数算电协同纳入省级支持措施。",
+      "classification_basis": "湖南支持算力项目优先采用源网荷储、绿电直连供电，鼓励算力设施参与电力市场。余电上网比例可适当放宽；自发自用电量暂免的是政策性交叉补贴新增损益，不能理解为全部电费免征。",
+      "evidence_scope": "正文及三（八）、四（十二）、施行有效期的条件分析；不量化未给比例/费率，不用网址推公开日。"
+    },
+    {
+      "id": "YJC491",
+      "canonical_document_id": "YJC491",
+      "content_type": "article_report",
+      "subtype": "媒体报道·区域储能运行",
+      "importance": 3,
+      "importance_reason": "蒙西储能运行规模与应急调用的区域背景资料，数据为媒体转引企业消息。",
+      "classification_basis": "内蒙古日报署名报道，经内蒙古电力集团网站媒体关注栏目转载；作为文章研报资料。",
+      "evidence_scope": "仅独立摘要、报道身份/日期、区域装机与调用的单位和时段边界；媒体全文不分发，未核排名和收益不接受。"
     }
   ],
   "source_links": [
@@ -464,6 +494,16 @@
     {
       "policy_id": "YJC490",
       "url": "https://www.nea.gov.cn/20261030/dd2b15f04b92441aa59f839a1a3413ba/c.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCGJ184",
+      "url": "https://www.miit.gov.cn/xwfb/gxdt/sjdt/art/2026/art_41fe313f626d4f38a93efe757a7eee99.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCHUN45",
+      "url": "https://www.hunan.gov.cn/hnszf/xxgk/wjk/szfbgt/202611/t20261103_34093689.html",
       "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
     }
   ],

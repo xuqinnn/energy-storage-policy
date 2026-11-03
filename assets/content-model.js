@@ -7,7 +7,7 @@
     if(!layer||Object.keys(layer).sort().join(',')!=='classifications,notices,schema,source_gaps,source_links'||layer.schema!==1||!['notices','classifications','source_links','source_gaps'].every(k=>Array.isArray(layer[k])))throw Error('内容分类清单格式不符');
     const ids=new Set();
     for(const n of layer.notices){if(!n.id||ids.has(n.id)||n.content_type!=='notice'||!Number.isInteger(n.importance)||n.importance<1||n.importance>5||!Array.isArray(n.verified_region_codes)||!Array.isArray(n.policy_ids)||!/^https:\/\//.test(n.source_url))throw Error('通知记录格式不符');ids.add(n.id);}
-    for(const c of layer.classifications){if(!c.id||c.id==='ZCMD22'||ids.has(c.id)||c.id!==c.canonical_document_id||!['notice','policy'].includes(c.content_type)||!Number.isInteger(c.importance)||c.importance<1||c.importance>5)throw Error('分类映射有重复、待核项或格式不符');ids.add(c.id);}
+    for(const c of layer.classifications){if(!c.id||c.id==='ZCMD22'||ids.has(c.id)||c.id!==c.canonical_document_id||!['notice','policy','article_report'].includes(c.content_type)||!Number.isInteger(c.importance)||c.importance<1||c.importance>5)throw Error('分类映射有重复、待核项或格式不符');ids.add(c.id);}
     for(const gap of layer.source_gaps){if(!gap.id||ids.has(gap.id)||typeof gap.boundary!=='string'||!gap.boundary.trim())throw Error('来源缺口与已审分类重叠或格式不符');ids.add(gap.id);}
     for(const s of layer.source_links){if(!s.policy_id||!SOURCE_LABELS[s.role]||!/^https?:\/\//.test(s.url))throw Error('来源角色或链接格式不符');}
     return layer;
