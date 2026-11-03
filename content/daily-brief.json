@@ -2,10 +2,10 @@
   "schema": 1,
   "timezone": "Asia/Shanghai",
   "snapshot_version": "v461",
-  "snapshot_built_at": "2026-11-03 17:54",
+  "snapshot_built_at": "2026-11-03 19:54",
   "scope": "仅已审公开政策与公告；该页公开日不等于最早首发；成文/收录索引不计今日新发。",
   "counts": {
-    "policy": 12,
+    "policy": 13,
     "notice": 17,
     "important_notice": 10
   },
@@ -376,6 +376,29 @@
       "publication_verified": true,
       "issued_at": "2026-10-10",
       "published_at": "2026-10-13",
+      "event_at": ""
+    },
+    {
+      "id": "ZCNF36",
+      "canonical_document_id": "ZCNF36",
+      "type": "policy",
+      "renderer": "policy",
+      "subtype": "南方市场注册与信息披露规则",
+      "title": "南方区域电力市场注册与信息披露实施细则（2026年V1.0版）",
+      "summary": "南方区域正式修订注册与信息披露两项细则，明确储能、虚拟电厂和绿电直连的注册条件与材料要求。对应2025版两细则废止；注册不等于自动获得所有交易资格。",
+      "analysis_state": "full",
+      "importance": 5,
+      "status": "现行有效",
+      "region": "南方区域",
+      "source_url": "http://www.gzpec.cn/law/jygz/202611/t20261103_37341.html",
+      "source_label": "官方原发布页/附件",
+      "route": "#/brief/ZCNF36",
+      "display_date": "2026-10-12",
+      "date_basis": "published",
+      "date_label": "该页公开日",
+      "publication_verified": true,
+      "issued_at": "2026-10-12",
+      "published_at": "2026-10-12",
       "event_at": ""
     },
     {

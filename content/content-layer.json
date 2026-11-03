@@ -298,6 +298,16 @@
       "importance_reason": "蒙西储能运行规模与应急调用的区域背景资料，数据为媒体转引企业消息。",
       "classification_basis": "内蒙古日报署名报道，经内蒙古电力集团网站媒体关注栏目转载；作为文章研报资料。",
       "evidence_scope": "仅独立摘要、报道身份/日期、区域装机与调用的单位和时段边界；媒体全文不分发，未核排名和收益不接受。"
+    },
+    {
+      "id": "ZCNF36",
+      "canonical_document_id": "ZCNF36",
+      "content_type": "policy",
+      "subtype": "南方市场注册与信息披露规则",
+      "importance": 5,
+      "importance_reason": "南方区域经营主体注册及披露的正式执行规则，涉及储能、虚拟电厂和绿电直连。",
+      "classification_basis": "广州电力交易中心225号正式印发两细则，确认对应2025版两分件废止；官网发布时间、实施日期和通知落款均为2026-10-12。",
+      "evidence_scope": "主体注册、两项规则换版及实施日期；具体市场品种还须核对应规则与技术证明，不推定补贴或收入。"
     }
   ],
   "source_links": [
@@ -504,6 +514,11 @@
     {
       "policy_id": "ZCHUN45",
       "url": "https://www.hunan.gov.cn/hnszf/xxgk/wjk/szfbgt/202611/t20261103_34093689.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCNF36",
+      "url": "http://www.gzpec.cn/law/jygz/202611/t20261103_37341.html",
       "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
     }
   ],

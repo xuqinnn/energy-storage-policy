@@ -39,6 +39,9 @@ class DailyBriefTest(unittest.TestCase):
             notice=next(x for x in out['items'] if x['id']=='ZCGJ184')
             self.assertEqual((notice['type'],notice['published_at'],notice['analysis_state']),('policy','2026-10-30','full'))
             self.assertNotIn('YJC491',{x['id'] for x in out['items']})
+            southern=next(x for x in out['items'] if x['id']=='ZCNF36')
+            self.assertEqual((southern['type'],southern['published_at'],southern['analysis_state']),('policy','2026-10-12','full'))
+            self.assertNotEqual(southern['display_date'],'2026-11-03')
         d['meta']['dataset']='synthetic';self.assertEqual(B.assemble_daily(d,l,r)['items'],[])
     def test_full_analysis_cannot_be_a_label_or_missing_body(self):
         d,l=self.inputs();d['briefs']=[{'编号':'P1','概述':'有摘要','分析验收':'完整','依据':[1]}]

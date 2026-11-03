@@ -1122,7 +1122,7 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
   }
   function contentSourcesHTML(id) {
     const sources=contentLayer.source_links.filter(s=>s.policy_id===id),legacy=D.docs[id]?.url;
-    const extra=(briefOf(id)?.补充来源||[]).filter(s=>typeof s.label==='string'&&/^https:\/\/(?:[A-Za-z0-9-]+\.)*gov\.cn(?:\/|$)/.test(s.url||''));
+    const extra=(briefOf(id)?.补充来源||[]).filter(s=>typeof s.label==='string'&&(/^https:\/\/(?:[A-Za-z0-9-]+\.)*gov\.cn(?:\/|$)/.test(s.url||'')||/^http:\/\/www\.gzpec\.cn\/law\/jygz\/202611\/P02026110363551(?:1247366|1679588|2042468)\.pdf$/.test(s.url||'')));
     if(!sources.length&&/^https?:\/\//.test(legacy||''))return `<div class="block"><a class="btn" href="${esc(legacy)}" target="_blank" rel="noopener noreferrer" data-source-link>查看官方发布页 ↗</a></div>`;
     return sources.map(s=>`<div class="block"><a class="btn" href="${esc(s.url)}" target="_blank" rel="noopener noreferrer" data-source-link data-source-role="${esc(s.role)}">${esc(EnergyContent.SOURCE_LABELS[s.role])} ↗</a>${!s.role.startsWith('ORIGINAL_')?'<p class="note">关联来源，不替代原文件发布页；未据此扩展政策参数核验。</p>':''}</div>`).join('')+(extra.length?`<div class="block">${extra.map(s=>`<a data-supplementary-source href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.label)} ↗</a>`).join(' · ')}</div>`:'');
   }
