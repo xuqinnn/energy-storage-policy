@@ -39,6 +39,8 @@ class DailyBriefTest(unittest.TestCase):
             notice=next(x for x in out['items'] if x['id']=='ZCGJ184')
             self.assertEqual((notice['type'],notice['published_at'],notice['analysis_state']),('policy','2026-10-30','full'))
             self.assertNotIn('YJC491',{x['id'] for x in out['items']})
+            for code in ['YJC492','YJC493','YJC494','YJC495','YJC496']:
+                self.assertNotIn(code,{x['id'] for x in out['items']})
             southern=next(x for x in out['items'] if x['id']=='ZCNF36')
             self.assertEqual((southern['type'],southern['published_at'],southern['analysis_state']),('policy','2026-10-12','full'))
             self.assertNotEqual(southern['display_date'],'2026-11-03')

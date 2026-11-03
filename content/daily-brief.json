@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "timezone": "Asia/Shanghai",
-  "snapshot_version": "v463",
-  "snapshot_built_at": "2026-11-03 23:09",
+  "snapshot_version": "v465",
+  "snapshot_built_at": "2026-11-03 23:51",
   "scope": "仅已审公开政策与公告；该页公开日不等于最早首发；成文/收录索引不计今日新发。",
   "counts": {
     "policy": 14,

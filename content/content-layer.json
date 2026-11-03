@@ -318,6 +318,56 @@
       "importance_reason": "明确省内多用户直连适用条件、源荷分母、市场费用和退出与旧批复衔接。",
       "classification_basis": "吉林省能源局、省发改委正式印发方案，四平市发改委转载页及绑定DOCX可回核；成文/施行10月29日，该页公开11月3日。",
       "evidence_scope": "六章正文的条件分析；比例按分母、负荷性质和投产时点区分，许可豁免及转公用条件保留，不推收益或普遍资格。"
+    },
+    {
+      "id": "YJC492",
+      "canonical_document_id": "YJC492",
+      "content_type": "article_report",
+      "subtype": "媒体转载文章",
+      "importance": 2,
+      "importance_reason": "专题背景资料，编辑评2；不作为政策效力、项目资格或收益确认。",
+      "classification_basis": "国家能源局网站转载新华社报道：截至2026年9月底，全国风电和太阳能发电累计装机20.1亿千瓦。装机规模描述设备容量，不能直接等同发电量或可靠供电能力。",
+      "evidence_scope": "媒体转载页题名、署名、日期与有界原创摘要；统计/事件时点分别保留，非原件全文分发。"
+    },
+    {
+      "id": "YJC493",
+      "canonical_document_id": "YJC493",
+      "content_type": "article_report",
+      "subtype": "媒体转载文章",
+      "importance": 2,
+      "importance_reason": "专题背景资料，编辑评2；不作为政策效力、项目资格或收益确认。",
+      "classification_basis": "经济日报援引新疆电力交易中心消息：2026年前三季度新疆外送电量1307.72亿千瓦时，其中新能源534.68亿千瓦时。外送新能源电量不等于绿电或绿证成交量。",
+      "evidence_scope": "媒体转载页题名、署名、日期与有界原创摘要；统计/事件时点分别保留，非原件全文分发。"
+    },
+    {
+      "id": "YJC494",
+      "canonical_document_id": "YJC494",
+      "content_type": "article_report",
+      "subtype": "媒体转载文章",
+      "importance": 2,
+      "importance_reason": "专题背景资料，编辑评2；不作为政策效力、项目资格或收益确认。",
+      "classification_basis": "人民日报海外版介绍煤电与新能源融合的运行场景及实施条件。报道中的专家意见与政策要求应分别阅读；资金支持限定符合条件的项目。",
+      "evidence_scope": "媒体转载页题名、署名、日期与有界原创摘要；统计/事件时点分别保留，非原件全文分发。"
+    },
+    {
+      "id": "YJC495",
+      "canonical_document_id": "YJC495",
+      "content_type": "article_report",
+      "subtype": "媒体转载文章",
+      "importance": 2,
+      "importance_reason": "专题背景资料，编辑评2；不作为政策效力、项目资格或收益确认。",
+      "classification_basis": "能源中国客户端报道，中核田湾海上光伏项目并网容量突破百万千瓦。规划200万千瓦、截至9月底安装150万千瓦和当前并网规模属于不同阶段；年发电22亿千瓦时为全面建成后的预计值。",
+      "evidence_scope": "媒体转载页题名、署名、日期与有界原创摘要；统计/事件时点分别保留，非原件全文分发。"
+    },
+    {
+      "id": "YJC496",
+      "canonical_document_id": "YJC496",
+      "content_type": "article_report",
+      "subtype": "媒体转载文章",
+      "importance": 2,
+      "importance_reason": "专题背景资料，编辑评2；不作为政策效力、项目资格或收益确认。",
+      "classification_basis": "经济日报报道绿氨加注与绿色燃料产业发展。1000吨绿氨是一次加注事件，不能作年产能；预测需求、已建产能与具体燃料实物吨数须分别使用。",
+      "evidence_scope": "媒体转载页题名、署名、日期与有界原创摘要；统计/事件时点分别保留，非原件全文分发。"
     }
   ],
   "source_links": [

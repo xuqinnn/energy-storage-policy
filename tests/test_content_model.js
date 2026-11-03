@@ -17,13 +17,13 @@ assert.strictEqual(model.records.get('ZCGJ110').body,'','do not inherit a separa
 assert.strictEqual(M.query(model,{type:'notice',prov:'广东'}).some(r=>r.id==='NTF-GZPEC-20261024-FORMAL'),false);
 assert.strictEqual(M.query(model,{type:'notice',prov:'安徽'}).filter(r=>r.kind==='reply').length,1);
 assert.strictEqual(M.query(model,{type:'notice',yr:'2026-10'}).filter(r=>r.kind==='reply').length,0,'June replies are not October additions');
-assert.deepStrictEqual(M.query(model,{type:'article_report'}).map(r=>r.id),['YJC491'],'only the accepted media article is classified; legacy research stays pending');
+assert.deepStrictEqual(M.query(model,{type:'article_report'}).map(r=>r.id).sort(),['YJC491','YJC492','YJC493','YJC494','YJC495','YJC496'],'only independently accepted media articles are classified; legacy research stays pending');
 assert.strictEqual(M.query(model,{q:'YJC491',type:'policy'}).length,0);
 assert.strictEqual(M.query(model,{q:'YJC491',type:'notice'}).length,0);
 assert(stats.classification_pending>0);
 for(const [id,date] of [['YJC488','2026-10-29'],['YJC489','2026-10-30'],['YJC490','2026-10-30']]){assert.strictEqual(model.records.get(id).content_type,'notice');assert.strictEqual(model.records.get(id).sortDate,date);assert.strictEqual(M.query(model,{q:id,type:'policy'}).length,0);}
 for(const id of ['ZCSN34','ZCSD45','ZCAH63'])assert.strictEqual(model.records.get(id).importance,4);
-assert.strictEqual(layer.classifications.length,29);
+assert.strictEqual(layer.classifications.length,34);
 for(const [id,province,published] of [['ZCSH43','上海','2026-10-20'],['ZCSD53','山东','2026-10-15']]){
   assert.strictEqual(M.query(model,{q:id,type:'policy',prov:province})[0].id,id);
   assert.strictEqual(M.query(model,{q:id,type:'notice'}).length,0,'policy wording is not a notice event');
@@ -57,3 +57,5 @@ assert(data.provinces['新疆']['②c5'].staleCites.includes('ZCXJ24'));
 
 for(const id of ['ZCGJ13','ZCGJ120','ZCGJ03','ZCGJ04']){assert.strictEqual(M.query(model,{q:id,type:'policy'}).length,1);const b=data.briefs.find(b=>b.编号===id);assert.strictEqual(b.分析验收,'完整');assert(b.完整分析.章节.length>=5);}
 assert.strictEqual(M.query(model,{q:'ZCGJ03 未开展评估',type:'policy'})[0].id,'ZCGJ03','full analysis body is searchable');
+
+for(const id of ['YJC492','YJC493','YJC494','YJC495','YJC496']){assert.strictEqual(M.query(model,{q:id,type:'policy'}).length,0);assert.strictEqual(M.query(model,{q:id,type:'notice'}).length,0);assert.strictEqual(model.records.get(id).sortDate,'2026-10-30');assert.strictEqual(model.records.get(id).importance,2);}
