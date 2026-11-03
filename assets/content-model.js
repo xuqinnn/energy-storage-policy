@@ -68,9 +68,52 @@
   }
   function dailyQuery(d,f={},now=today()){
     const mode=f.range||'day',day=f.date||now,days=mode==='30' ? 30 : 7;
+    const tokens=String(f.q||'').toLocaleLowerCase().trim().split(/\s+/).filter(Boolean);
     if(!validDate(day))return [];
     return d.items.filter(r=>(!f.type||r.type===f.type)&&(!f.prov||r.region===f.prov)&&(!f.important||(r.type==='notice'&&r.importance!==null&&r.importance>=4))&&
+      tokens.every(t=>[r.title,r.summary,r.issuer,r.subtype,r.region,r.search_text,r.source_excerpt].join(' ').toLocaleLowerCase().includes(t))&&
       (mode==='index'?!r.publication_verified:r.publication_verified&&!!r.display_date&&(mode==='all'||mode==='day'?mode==='all'||r.display_date===day:Math.round((Date.parse(day)-Date.parse(r.display_date))/864e5)>=0&&Math.round((Date.parse(day)-Date.parse(r.display_date))/864e5)<days)));
   }
-  return {TYPES,SOURCE_LABELS,validate,create,query,stats,today,validDate,validateDaily,dailyQuery};
+  // View projection only: feed objects must already pass WBFeed validation and version-bound overlay.
+  // It never changes the formal snapshot, classification counts, legal status or parameters.
+  function mergeDaily(d,feedRows=[],model=null){
+    const items=(d?.items||[]).map(r=>({...r,issuer:model?.records.get(r.id)?.issuer||'',search_text:model?.records.get(r.id)?.body||'',collection_only:false}));
+    const byId=new Map(items.map(r=>[r.id,r])),sources=new Map(),corrections=[];
+    const title=s=>String(s||'').replace(/---国家能源局$/,'').trim();
+    const identity=r=>JSON.stringify([r.source_url,title(r.title),r.published_at||r.display_date]);
+    for(const row of items){const key=identity(row);sources.set(key,[...(sources.get(key)||[]),row]);}
+    for(const {record,review} of feedRows){
+      // A stale acceptance must not be applied to a changed version, even for direct callers.
+      const v=review?.id===record.id&&review.record_sha256===record.record_sha256?review:null;
+      const r={...record,...(v?.correction||{})};
+      if(v?.status==='withdrawn'){
+        corrections.push({id:r.id,title:'来源类型更正',note:v.note,date:r.published_date,source_url:r.source_url});continue;
+      }
+      if(!['policy','notice'].includes(r.category))continue;
+      let original=v?.formal_id?byId.get(v.formal_id):null;
+      if(!original&&v){
+        const candidates=sources.get(JSON.stringify([r.source_url,title(r.title),r.published_date]))||[];
+        // A shared URL is insufficient. Require title/date and compatible original publisher.
+        const same=candidates.filter(x=>x.type===r.category&&x.issuer&&x.issuer===r.issuer);
+        if(same.length===1)original=same[0];
+      }
+      if(original){
+        original.source_excerpt=r.source_excerpt;
+        original.source_correction=v?.note||'';
+        original.feed_aliases=[...(original.feed_aliases||[]),record.id];
+        continue;
+      }
+      const source={id:r.id,canonical_document_id:r.id,type:r.category,renderer:'source',title:r.title,issuer:r.issuer,
+        summary:r.source_excerpt,source_excerpt:r.source_excerpt,source_correction:v?.note||'',subtype:'原文摘录',analysis_state:'source',
+        importance:null,status:'',region:'',source_url:r.source_url,source_label:'来源原文',published_at:r.published_date,
+        display_date:r.published_date,date_basis:'published',date_label:'该页公开日',publication_verified:true,collection_only:true,
+        route:'#/policy?'+new URLSearchParams({date:r.published_date,range:'all',entry:r.id})};
+      // Two source URLs of uncertain equivalence remain separate; no title-only merge.
+      if(!byId.has(source.id)){items.push(source);byId.set(source.id,source);}
+    }
+    const depth={full:0,summary:1,index:2,source:3};
+    items.sort((a,b)=>String(b.display_date||'').localeCompare(String(a.display_date||''))||(depth[a.analysis_state]??2)-(depth[b.analysis_state]??2)||a.id.localeCompare(b.id));
+    return {items,corrections,counts:d?.counts||null};
+  }
+  return {TYPES,SOURCE_LABELS,validate,create,query,stats,today,validDate,validateDaily,dailyQuery,mergeDaily};
 });

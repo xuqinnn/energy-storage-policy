@@ -70,5 +70,11 @@
     if(state.status==='unavailable'&&!options.offline&&location.protocol!=='file:'&&!root.__YC_DATA__){const retry=node('button','重试快讯');retry.type='button';retry.onclick=()=>{retry.disabled=true;load(options,true).then(()=>render(container,options));};container.append(retry);}
   }
   function mount(container,options){render(container,options);load(options).then(()=>render(container,options));}
-  const api={URL_FIXED,FIELDS,canonical,validatePayload,validateReviews,overlay,mount,EMPTY};root.WBFeed=api;if(typeof module!=='undefined')module.exports=api;
+  function connect(options,onUpdate,force=false){
+    let active=true;
+    const notify=()=>{if(active)onUpdate({rows:overlay(state.pack,state.reviews),status:state.status});};
+    notify();load(options,force).then(notify);
+    return ()=>{active=false;};
+  }
+  const api={URL_FIXED,FIELDS,canonical,validatePayload,validateReviews,overlay,mount,connect,EMPTY};root.WBFeed=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);
