@@ -368,6 +368,36 @@
       "importance_reason": "专题背景资料，编辑评2；不作为政策效力、项目资格或收益确认。",
       "classification_basis": "经济日报报道绿氨加注与绿色燃料产业发展。1000吨绿氨是一次加注事件，不能作年产能；预测需求、已建产能与具体燃料实物吨数须分别使用。",
       "evidence_scope": "媒体转载页题名、署名、日期与有界原创摘要；统计/事件时点分别保留，非原件全文分发。"
+    },
+    {
+      "id": "ZCGD50",
+      "canonical_document_id": "ZCGD50",
+      "content_type": "policy",
+      "subtype": "差别化电价征求意见稿",
+      "importance": 4,
+      "importance_reason": "与工业电价或零碳工厂/园区研究直接相关，编辑评4；不表示政策生效、名单最终认定或项目收益确认。",
+      "classification_basis": "广东征求重点行业差别化电价方案意见至11月9日。草案拟按未达能耗限定值的工段或生产线用电加价0.10元/千瓦时，并细化整改、名单报送、执行及退出返还程序；尚不能作为现行加价依据。",
+      "evidence_scope": "母页身份/各日期及限定范围分析；官方附件和计数范围分别保留，不给未核具体资格或参数结论。"
+    },
+    {
+      "id": "YJC497",
+      "canonical_document_id": "YJC497",
+      "content_type": "notice",
+      "subtype": "省级入围名单公示",
+      "importance": 4,
+      "importance_reason": "与工业电价或零碳工厂/园区研究直接相关，编辑评4；不表示政策生效、名单最终认定或项目收益确认。",
+      "classification_basis": "江苏公示2026年度省级零碳、近零碳工厂入围名单。附件分别列71项和20项，公示正文载明期间为10月23日至29日；入围公示与后续认定应分别核对。",
+      "evidence_scope": "母页身份/各日期及限定范围分析；官方附件和计数范围分别保留，不给未核具体资格或参数结论。"
+    },
+    {
+      "id": "YJC498",
+      "canonical_document_id": "YJC498",
+      "content_type": "notice",
+      "subtype": "省级入围名单公示",
+      "importance": 4,
+      "importance_reason": "与工业电价或零碳工厂/园区研究直接相关，编辑评4；不表示政策生效、名单最终认定或项目收益确认。",
+      "classification_basis": "江苏公示2026年度绿色工厂、绿色工业园区等入围名单：通则1058项、重点行业240项、园区27项，更名企业另列2项。正文公示期为10月22日至28日；更名名单不计作新增入围单位。",
+      "evidence_scope": "母页身份/各日期及限定范围分析；官方附件和计数范围分别保留，不给未核具体资格或参数结论。"
     }
   ],
   "source_links": [
@@ -584,6 +614,21 @@
     {
       "policy_id": "ZCJL42",
       "url": "http://fgw.siping.gov.cn/zdzt/nyfz/202611/t20261103_779551.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCGD50",
+      "url": "https://drc.gd.gov.cn/snyj/tzgg/content/post_4973015.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "YJC497",
+      "url": "https://gxt.jiangsu.gov.cn/art/2026/10/22/art_6281_11845445.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "YJC498",
+      "url": "https://gxt.jiangsu.gov.cn/art/2026/10/21/art_6281_11844835.html",
       "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
     }
   ],
