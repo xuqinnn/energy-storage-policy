@@ -428,6 +428,86 @@
       "importance_reason": "涉及容量补偿或储能项目布局和场景配置，保留效力、对象及结算边界；不代表项目收益。",
       "classification_basis": "四川部署2026—2028年新增新型储能超1300万千瓦/2600万千瓦时，分电源侧、电网侧及多场景推进。园区与算力配置按各自负荷口径提出鼓励安排；容量电价机制尚未给补偿标准，不能由规划目标推项目收益。",
       "evidence_scope": "官方正文及所列附件的有界条款；具体电站核定容量、收益及清单合计不推定。"
+    },
+    {
+      "id": "ZCGJ185",
+      "canonical_document_id": "ZCGJ185",
+      "content_type": "policy",
+      "subtype": "政策简述",
+      "importance": 4,
+      "importance_reason": "已核普通政策或相关通知，按对象与作用分型；摘要不代表完整分析、认定或收益。",
+      "classification_basis": "五部门印发全面节约战略行动方案，推进能源、水、粮食、土地、矿产及原材料节约集约利用，强化项目节能审查和碳排放评价、重点领域改造及存量园区用地盘活。全国资源效率目标不直接等同单个项目门槛或补贴资格，仍须对应行业与实施文件。",
+      "evidence_scope": "官方身份/日期/摘要与必要边界；具体项目、完整附件参数与收益不扩充接受。"
+    },
+    {
+      "id": "ZCHUN46",
+      "canonical_document_id": "ZCHUN46",
+      "content_type": "policy",
+      "subtype": "政策简述",
+      "importance": 4,
+      "importance_reason": "已核普通政策或相关通知，按对象与作用分型；摘要不代表完整分析、认定或收益。",
+      "classification_basis": "湖南印发“十五五”电力发展规划，部署电网结构优化、清洁电源、电力保障和系统调节，提出源储调节能力增长40%以上。该指标是调节能力口径，不是储能装机增幅；规划目标与单个项目准入、价格和收益应分别判断。",
+      "evidence_scope": "官方身份/日期/摘要与必要边界；具体项目、完整附件参数与收益不扩充接受。"
+    },
+    {
+      "id": "ZCGD52",
+      "canonical_document_id": "ZCGD52",
+      "content_type": "policy",
+      "subtype": "政策简述",
+      "importance": 4,
+      "importance_reason": "已核普通政策或相关通知，按对象与作用分型；摘要不代表完整分析、认定或收益。",
+      "classification_basis": "广东部署“十五五”公共机构节能降碳，推进分布式光伏、用能电气化、合同能源管理及虚拟电厂等模式。强度目标针对公共机构，不直接适用全部工业园区；项目仍须核建筑安全、用能与并网条件，方向性支持不等于已获资金。",
+      "evidence_scope": "官方身份/日期/摘要与必要边界；具体项目、完整附件参数与收益不扩充接受。"
+    },
+    {
+      "id": "ZCHEB62",
+      "canonical_document_id": "ZCHEB62",
+      "content_type": "policy",
+      "subtype": "政策简述",
+      "importance": 4,
+      "importance_reason": "已核普通政策或相关通知，按对象与作用分型；摘要不代表完整分析、认定或收益。",
+      "classification_basis": "河北部署2026年秋冬季负荷管理，优先组织节约用电、资源调节与需求响应，在仍不能平衡时依法实施有序用电；鼓励储能、充电设施和虚拟电厂入市。方案按保限分类执行，调用须履行相应程序，未给可直接套用的响应补偿单价。",
+      "evidence_scope": "官方身份/日期/摘要与必要边界；具体项目、完整附件参数与收益不扩充接受。"
+    },
+    {
+      "id": "ZCHEB63",
+      "canonical_document_id": "ZCHEB63",
+      "content_type": "policy",
+      "subtype": "政策简述",
+      "importance": 3,
+      "importance_reason": "已核普通政策或相关通知，按对象与作用分型；摘要不代表完整分析、认定或收益。",
+      "classification_basis": "河北调整部分“千乡万村驭风行动”试点项目，第一、二批并网时限分别调整至2027年12月底和2028年6月底。取消项目保留接入空间，可按程序重新申报2026年项目；具体取消和核减对象以两份附件为准，保留空间不等于自动获得新的建设资格。",
+      "evidence_scope": "官方身份/日期/摘要与必要边界；具体项目、完整附件参数与收益不扩充接受。"
+    },
+    {
+      "id": "YJC499",
+      "canonical_document_id": "YJC499",
+      "content_type": "notice",
+      "subtype": "年度推荐组织通知",
+      "importance": 3,
+      "importance_reason": "已核普通政策或相关通知，按对象与作用分型；摘要不代表完整分析、认定或收益。",
+      "classification_basis": "陕西组织2026年度国家绿色算力设施推荐，申报主体经自评、属地审核及省级评审后择优推荐，市级材料报送截止10月30日，现已截止。推荐不等认定，机架规模对智算设施有例外，不能依据后发报道判断申报仍开放。",
+      "evidence_scope": "官方身份/日期/摘要与必要边界；具体项目、完整附件参数与收益不扩充接受。"
+    },
+    {
+      "id": "ZCHEB64",
+      "canonical_document_id": "ZCHEB64",
+      "content_type": "policy",
+      "subtype": "政策简述",
+      "importance": 4,
+      "importance_reason": "已核普通政策或相关通知，按对象与作用分型；摘要不代表完整分析、认定或收益。",
+      "classification_basis": "河北明确抽水蓄能容量电价、电量电价及市场收益分享，单独核价与统一标杆两类分别执行，现货连续运行前后电量价格口径不同。文件自8月1日起实施；适用于抽水蓄能，不能外推电化学独立储能，具体电站价格与共用分摊按原件和专门通知核对。",
+      "evidence_scope": "官方身份/日期/摘要与必要边界；具体项目、完整附件参数与收益不扩充接受。"
+    },
+    {
+      "id": "YJC500",
+      "canonical_document_id": "YJC500",
+      "content_type": "notice",
+      "subtype": "自主实施项目公示",
+      "importance": 4,
+      "importance_reason": "已核普通政策或相关通知，按对象与作用分型；摘要不代表完整分析、认定或收益。",
+      "classification_basis": "陕西公示首批电网侧独立储能自主实施项目，正文列15项、216.76万千瓦/558.93万千瓦时，公示期10月30日至11月6日。自主实施类不享容量电价补偿，公示不等最终清单或已投产，项目状态和具体结算仍须分别核对。",
+      "evidence_scope": "官方身份/日期/摘要与必要边界；具体项目、完整附件参数与收益不扩充接受。"
     }
   ],
   "source_links": [
@@ -674,6 +754,46 @@
     {
       "policy_id": "ZCSC55",
       "url": "https://fgw.sc.gov.cn/sfgw/qtwj/2026/11/4/83232dee2f5f4cf2918646be3872ce8e.shtml",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCGJ185",
+      "url": "https://www.ndrc.gov.cn/xxgk/zcfb/tz/202611/t20261103_1408504.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCHUN46",
+      "url": "https://fgw.hunan.gov.cn/fgw/xxgk_70899/ghjh/202610/t20261030_34092040.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCGD52",
+      "url": "https://drc.gd.gov.cn/snyj/tzgg/content/post_4974928.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCHEB62",
+      "url": "https://hbdrc.hebei.gov.cn/xxgk_2232/zc/wzcwj/202611/t20261103_141223.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCHEB63",
+      "url": "https://hbdrc.hebei.gov.cn/xxgk_2232/zc/wzcwj/202611/t20261103_141228.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "YJC499",
+      "url": "https://gxt.shaanxi.gov.cn/xw/tzgg/202610/t20261019_3704835.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCHEB64",
+      "url": "https://fgw.sjz.gov.cn/attachments/1/202611/03/%E3%80%8A%E6%B2%B3%E5%8C%97%E7%9C%81%E5%8F%91%E5%B1%95%E5%92%8C%E6%94%B9%E9%9D%A9%E5%A7%94%E5%91%98%E4%BC%9A%E5%85%B3%E4%BA%8E%E6%88%91%E7%9C%81%E6%8A%BD%E6%B0%B4%E5%82%A8%E8%83%BD%E7%94%B5%E4%BB%B7%E6%94%BF%E7%AD%96%E5%8F%8A%E6%9C%89%E5%85%B3%E4%BA%8B%E9%A1%B9%E7%9A%84%E9%80%9A%E7%9F%A5%E3%80%8B%EF%BC%88%E5%86%80%E5%8F%91%E6%94%B9%E8%83%BD%E4%BB%B7%E3%80%942026%E3%80%951037%E5%8F%B7%EF%BC%8920261103145958195.pdf?sid=2b775bf9-8b78-4477-ab3f-b7c1b9fbc952",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "YJC500",
+      "url": "https://sndrc.shaanxi.gov.cn/sy/xwxx/gggg/202610/t20261030_3708326.html",
       "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
     }
   ],

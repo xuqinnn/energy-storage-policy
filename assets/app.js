@@ -281,6 +281,7 @@
         const nm = n.编号 && n.编号 !== code ? `<button type="button" class="cite ${statusClass((D.docs[n.编号] || {}).status)}" data-code="${esc(n.编号)}">${esc(n.编号)}</button> ${esc(n.文号 || '')}` : esc(n.文号 || '');
         return `<div class="node ${cls}"><div class="nhead"><span class="ndate">${esc(n.日期 || '')}</span><span class="nrel">${esc(n.关系)}</span><span class="ntitle">${nm}</span></div>${(n.要点 || []).length ? `<ul>${n.要点.map(p => `<li>${citeHTML(p)}</li>`).join('')}</ul>` : ''}</div>`;
       }).join('')}</div>${b && b.观察点 && b.观察点.length ? `<div class="watch"><strong>下一个观察点</strong>${b.观察点.map(o => `<span>${citeHTML(o)}</span>`).join('')}</div>` : ''}</div>`);
+    if (!ml.length && b?.观察点?.length) blk.push(`<div class="block" data-summary-boundary><h4>适用边界</h4>${b.观察点.map(o => `<p>${citeHTML(o)}</p>`).join('')}</div>`);
     if (b && b.横向 && typeof b.横向 === 'object' && (b.横向.条目 || []).length) {
       const it = b.横向.条目, max = Math.max(...it.map(e => +e.值 || 0)) || 1;
       blk.push(`<div class="block"><h4>横向 · 与他省</h4><p class="cap">口径：${esc(b.横向.口径)}；单位：${esc(b.横向.单位)}</p><div class="bars">${it.map(e => `<div class="bar ${e.本件 ? 'me' : ''}"><div>${esc(e.省)}<small>${esc(e.算法 || '')}</small></div><div class="track"><div class="fill" style="width:${((+e.值 || 0) / max * 100).toFixed(1)}%"></div></div><div class="v">${esc(e.值)}</div></div>`).join('')}</div>
