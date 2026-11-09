@@ -178,12 +178,12 @@ def validate_reply_insights(path):
     return validate_reply_schema(json.loads(Path(path).read_text(encoding='utf-8')))
 
 
-CONTENT_LAYER_SHA = '134f98207faf07025074074a8430d4c58ab119428df33e56ec9ab64fe8575760'
+CONTENT_LAYER_SHA = '3a091ee028f61b5140a3cbbe4acfb8d447d175543df52bd718151fe1f1c801f1'
 CORE_ANALYSIS_IDS = {'ZCGJ13','ZCGJ120','ZCGJ03','ZCGJ04'}
 CORE_ANALYSES_SHA = '2771497116d19595f252645ff8ca8074395fdd71fbaf8093a452b9a1cf494dd1'
 DAILY_REVIEW_IDS = {'ZCGJ182','YJC485','YJC486','YJC487','YJC488','YJC489','YJC490','ZCGJ184','ZCHUN45','ZCNF36','ZCJL42'}
 ARTICLE_REVIEW_IDS = {'YJC491','YJC492','YJC493','YJC494','YJC495','YJC496'}
-CONTENT_CLASS_IDS = {'ZCGD51','ZCGD50','YJC497','YJC498'} | ARTICLE_REVIEW_IDS | DAILY_REVIEW_IDS | CORE_ANALYSIS_IDS | {'ZCGJ45','ZCGJ110','ZCSN34','ZCGX34','ZCHEB52','ZCLN37','ZCSD45','ZCAH63','ZCTJ19','ZCSH43','ZCSD53','ZCXJ32','ZCGJ183','YJC491'}
+CONTENT_CLASS_IDS = {'ZCLN38','ZCSC55','ZCGD51','ZCGD50','YJC497','YJC498'} | ARTICLE_REVIEW_IDS | DAILY_REVIEW_IDS | CORE_ANALYSIS_IDS | {'ZCGJ45','ZCGJ110','ZCSN34','ZCGX34','ZCHEB52','ZCLN37','ZCSD45','ZCAH63','ZCTJ19','ZCSH43','ZCSD53','ZCXJ32','ZCGJ183','YJC491'}
 NOTICE_FIELDS = {'id','content_type','subtype','title','issuer','importance','importance_reason','issued_at','published_at','publication_date_basis','first_publication_date','event_at','summary','our_analysis','quote','source_url','source_access_note','corroborating_url','boundary','region_scope','verified_region_codes','policy_ids','cited_document_number','cited_document_verification'}
 SOURCE_ROLES = {'ORIGINAL_PUBLICATION_OR_ATTACHMENT','ORIGINAL_EXPLANATORY_ATTACHMENT','OFFICIAL_RELEASE_REPORT','OFFICIAL_INSTITUTION_REPRINT','OFFICIAL_INTERPRETATION','OFFICIAL_REPRINT_ATTACHMENT','OFFICIAL_ANALYSIS_MENTION_ONLY'}
 
@@ -214,7 +214,7 @@ def validate_content_schema(layer):
         code=item['id']
         if code in seen or code not in CONTENT_CLASS_IDS or code!=item['canonical_document_id']:raise ValueError('content layer schema: duplicate or unknown identity')
         seen.add(code)
-        expected_type='article_report' if code in ARTICLE_REVIEW_IDS else 'policy' if code in ({'ZCAH63','ZCSH43','ZCSD53','ZCXJ32','ZCGJ182','ZCGJ183','ZCHUN45','ZCGJ184','ZCNF36','ZCJL42','ZCGD50','ZCGD51'} | CORE_ANALYSIS_IDS) else 'notice'
+        expected_type='article_report' if code in ARTICLE_REVIEW_IDS else 'policy' if code in ({'ZCAH63','ZCSH43','ZCSD53','ZCXJ32','ZCGJ182','ZCGJ183','ZCHUN45','ZCGJ184','ZCNF36','ZCJL42','ZCGD50','ZCGD51','ZCLN38','ZCSC55'} | CORE_ANALYSIS_IDS) else 'notice'
         if item['content_type']!=expected_type or type(item['importance']) is not int or not 1<=item['importance']<=5:
             raise ValueError('content layer schema: unreviewed classification or rating')
         if not all(isinstance(item[k],str) and item[k].strip() for k in ('subtype','importance_reason','classification_basis','evidence_scope')):raise ValueError('content layer schema: missing classification boundary')
@@ -224,6 +224,7 @@ def validate_content_schema(layer):
     expected_ratings['YJC491']=3
     expected_ratings['ZCNF36']=5
     expected_ratings['ZCJL42']=5
+    expected_ratings.update({'ZCLN38':5,'ZCSC55':4})
     expected_ratings.update({code:4 for code in ['ZCGD51','ZCGD50','YJC497','YJC498']})
     if {x['id']:x['importance'] for x in layer['classifications']}!=expected_ratings:raise ValueError('content layer schema: unreviewed importance revision')
     gaps=layer['source_gaps']
@@ -237,7 +238,7 @@ def validate_content_schema(layer):
         original+=link['role'].startswith('ORIGINAL_')
         if link['policy_id'] in {'ZCAH14','ZCAH16','ZCAH17','ZCAH18','ZCGJ175','ZCHEB60'} and link['role'].startswith('ORIGINAL_'):
             raise ValueError('content layer schema: related source promoted to original')
-    if len(seen)!=47 or original!=41:raise ValueError('content layer schema: expected 41 original / 6 related links')
+    if len(seen)!=49 or original!=43:raise ValueError('content layer schema: expected 43 original / 6 related links')
     text=json.dumps(layer,ensure_ascii=False)
     if any(token in text for token in ('/Users/','file://','source_path','source_raw_sha256','raw_path','workbook_written')) or re.search(r'<[!/a-zA-Z]',text):
         raise ValueError('content layer schema: private fields or unsafe markup')

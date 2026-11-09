@@ -408,6 +408,26 @@
       "importance_reason": "涉及储能、绿电直供、零碳园区与算力设施的省级部署；不代表项目收益或资格成立。",
       "classification_basis": "广东部署2026—2028年能源领域节能降碳：支持建设25家零碳园区和零碳工厂，发展新型储能、绿电直连及虚拟电厂，推动算力设施合理配置储能、蓄冷和备用电源。相关条款未给储能配置比例或补偿标准。",
       "evidence_scope": "官方正文及储备清单身份/条目数量；项目投资进度与收益未核。"
+    },
+    {
+      "id": "ZCLN38",
+      "canonical_document_id": "ZCLN38",
+      "content_type": "policy",
+      "subtype": "可靠容量补偿正式通知",
+      "importance": 5,
+      "importance_reason": "涉及容量补偿或储能项目布局和场景配置，保留效力、对象及结算边界；不代表项目收益。",
+      "classification_basis": "辽宁公布发电侧可靠容量补偿机制，2027年1月1日起试行。2027年度标准370元/千瓦·年（含税）；实际电费还需可靠容量、供需系数和扣减核定。煤电联动选择的370/165两档不泛化为储能选档规则。",
+      "evidence_scope": "官方正文及所列附件的有界条款；具体电站核定容量、收益及清单合计不推定。"
+    },
+    {
+      "id": "ZCSC55",
+      "canonical_document_id": "ZCSC55",
+      "content_type": "policy",
+      "subtype": "新型储能三年行动",
+      "importance": 4,
+      "importance_reason": "涉及容量补偿或储能项目布局和场景配置，保留效力、对象及结算边界；不代表项目收益。",
+      "classification_basis": "四川部署2026—2028年新增新型储能超1300万千瓦/2600万千瓦时，分电源侧、电网侧及多场景推进。园区与算力配置按各自负荷口径提出鼓励安排；容量电价机制尚未给补偿标准，不能由规划目标推项目收益。",
+      "evidence_scope": "官方正文及所列附件的有界条款；具体电站核定容量、收益及清单合计不推定。"
     }
   ],
   "source_links": [
@@ -644,6 +664,16 @@
     {
       "policy_id": "ZCGD51",
       "url": "https://drc.gd.gov.cn/snyj/tzgg/content/post_4974903.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCLN38",
+      "url": "https://fgw.ln.gov.cn/fgw/index/tzgg/2026110915454278975/index.shtml",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCSC55",
+      "url": "https://fgw.sc.gov.cn/sfgw/qtwj/2026/11/4/83232dee2f5f4cf2918646be3872ce8e.shtml",
       "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
     }
   ],
