@@ -1,13 +1,13 @@
 {
   "schema": 1,
   "timezone": "Asia/Shanghai",
-  "snapshot_version": "v469",
-  "snapshot_built_at": "2026-11-09 22:57",
+  "snapshot_version": "v470",
+  "snapshot_built_at": "2026-11-09 23:20",
   "scope": "仅已审公开政策与公告；该页公开日不等于最早首发；成文/收录索引不计今日新发。",
   "counts": {
     "policy": 24,
-    "notice": 21,
-    "important_notice": 13
+    "notice": 23,
+    "important_notice": 15
   },
   "items": [
     {
@@ -31,6 +31,29 @@
       "publication_verified": true,
       "issued_at": "2026-11-09",
       "published_at": "2026-11-09",
+      "event_at": ""
+    },
+    {
+      "id": "YJC502",
+      "canonical_document_id": "YJC502",
+      "type": "notice",
+      "renderer": "policy",
+      "subtype": "储能推荐布局通知",
+      "title": "广州市新型储能电站推荐布局清单（2026年）",
+      "summary": "广州更新新型储能电站推荐布局，附件列电网侧集中式总推荐布点43个、需求规模505万千瓦；新增分布式储能建设引导，优先支持4小时及以上长时项目。推荐需求不等已建装机、核准或收益承诺，项目仍须办理备案、并网及调度手续，自主入市、自负盈亏。",
+      "analysis_state": "summary",
+      "importance": 4,
+      "status": "已公布",
+      "region": "广东",
+      "source_url": "https://fgw.gz.gov.cn/tzgg/content/post_11090864.html",
+      "source_label": "官方原发布页/附件",
+      "route": "#/notice/YJC502",
+      "display_date": "2026-11-06",
+      "date_basis": "published",
+      "date_label": "该页公开日",
+      "publication_verified": true,
+      "issued_at": "2026-11-05",
+      "published_at": "2026-11-06",
       "event_at": ""
     },
     {
@@ -122,6 +145,29 @@
       "date_label": "该页公开日",
       "publication_verified": true,
       "issued_at": "2026-11-03",
+      "published_at": "2026-11-04",
+      "event_at": ""
+    },
+    {
+      "id": "YJC501",
+      "canonical_document_id": "YJC501",
+      "type": "notice",
+      "renderer": "policy",
+      "subtype": "年度正式名单通知",
+      "title": "2026年度江苏省绿色工厂、绿色工业园区正式名单通知",
+      "summary": "江苏公布2026年度省级绿色工厂1298家、绿色工业园区27家，另对2家企业作名称变更；要求加强服务和动态管理，2027年度培育计划于次年2月28日前报送。正式公布与此前入围公示分别留档，更名不计新增，名单身份不等于自动获得补贴或国家级认定。",
+      "analysis_state": "summary",
+      "importance": 4,
+      "status": "已公布",
+      "region": "江苏",
+      "source_url": "https://gxt.jiangsu.gov.cn/art/2026/11/4/art_6281_11854550.html",
+      "source_label": "官方原发布页/附件",
+      "route": "#/notice/YJC501",
+      "display_date": "2026-11-04",
+      "date_basis": "published",
+      "date_label": "该页公开日",
+      "publication_verified": true,
+      "issued_at": "2026-11-04",
       "published_at": "2026-11-04",
       "event_at": ""
     },

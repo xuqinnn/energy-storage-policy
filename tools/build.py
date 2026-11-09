@@ -178,12 +178,12 @@ def validate_reply_insights(path):
     return validate_reply_schema(json.loads(Path(path).read_text(encoding='utf-8')))
 
 
-CONTENT_LAYER_SHA = '7e07c083e769e993c9906f7c96dd641610e8702b601d1839cb854c3f39cf8b6c'
+CONTENT_LAYER_SHA = '83c212f8fb3251e2b11c5cb57f011af62c9a50481b80e589bf28610993979f91'
 CORE_ANALYSIS_IDS = {'ZCGJ13','ZCGJ120','ZCGJ03','ZCGJ04'}
 CORE_ANALYSES_SHA = '2771497116d19595f252645ff8ca8074395fdd71fbaf8093a452b9a1cf494dd1'
 DAILY_REVIEW_IDS = {'ZCGJ182','YJC485','YJC486','YJC487','YJC488','YJC489','YJC490','ZCGJ184','ZCHUN45','ZCNF36','ZCJL42'}
 ARTICLE_REVIEW_IDS = {'YJC491','YJC492','YJC493','YJC494','YJC495','YJC496'}
-CONTENT_CLASS_IDS = {'ZCGJ185','ZCHUN46','ZCGD52','ZCHEB62','ZCHEB63','ZCHEB64','YJC499','YJC500','ZCLN38','ZCSC55','ZCGD51','ZCGD50','YJC497','YJC498'} | ARTICLE_REVIEW_IDS | DAILY_REVIEW_IDS | CORE_ANALYSIS_IDS | {'ZCGJ45','ZCGJ110','ZCSN34','ZCGX34','ZCHEB52','ZCLN37','ZCSD45','ZCAH63','ZCTJ19','ZCSH43','ZCSD53','ZCXJ32','ZCGJ183','YJC491'}
+CONTENT_CLASS_IDS = {'YJC501','YJC502','ZCGJ185','ZCHUN46','ZCGD52','ZCHEB62','ZCHEB63','ZCHEB64','YJC499','YJC500','ZCLN38','ZCSC55','ZCGD51','ZCGD50','YJC497','YJC498'} | ARTICLE_REVIEW_IDS | DAILY_REVIEW_IDS | CORE_ANALYSIS_IDS | {'ZCGJ45','ZCGJ110','ZCSN34','ZCGX34','ZCHEB52','ZCLN37','ZCSD45','ZCAH63','ZCTJ19','ZCSH43','ZCSD53','ZCXJ32','ZCGJ183','YJC491'}
 NOTICE_FIELDS = {'id','content_type','subtype','title','issuer','importance','importance_reason','issued_at','published_at','publication_date_basis','first_publication_date','event_at','summary','our_analysis','quote','source_url','source_access_note','corroborating_url','boundary','region_scope','verified_region_codes','policy_ids','cited_document_number','cited_document_verification'}
 SOURCE_ROLES = {'ORIGINAL_PUBLICATION_OR_ATTACHMENT','ORIGINAL_EXPLANATORY_ATTACHMENT','OFFICIAL_RELEASE_REPORT','OFFICIAL_INSTITUTION_REPRINT','OFFICIAL_INTERPRETATION','OFFICIAL_REPRINT_ATTACHMENT','OFFICIAL_ANALYSIS_MENTION_ONLY'}
 
@@ -225,7 +225,7 @@ def validate_content_schema(layer):
     expected_ratings['ZCNF36']=5
     expected_ratings['ZCJL42']=5
     expected_ratings.update({'ZCLN38':5,'ZCSC55':4})
-    expected_ratings.update({'ZCGJ185': 4, 'ZCHUN46': 4, 'ZCGD52': 4, 'ZCHEB62': 4, 'ZCHEB63': 3, 'ZCHEB64': 4, 'YJC499': 3, 'YJC500': 4})
+    expected_ratings.update({'ZCGJ185': 4, 'ZCHUN46': 4, 'ZCGD52': 4, 'ZCHEB62': 4, 'ZCHEB63': 3, 'ZCHEB64': 4, 'YJC499': 3, 'YJC500': 4, 'YJC501':4, 'YJC502':4})
     expected_ratings.update({code:4 for code in ['ZCGD51','ZCGD50','YJC497','YJC498']})
     if {x['id']:x['importance'] for x in layer['classifications']}!=expected_ratings:raise ValueError('content layer schema: unreviewed importance revision')
     gaps=layer['source_gaps']
@@ -233,13 +233,13 @@ def validate_content_schema(layer):
     seen=set();original=0
     for link in layer['source_links']:
         if not isinstance(link,dict) or set(link)!={'policy_id','url','role'}:raise ValueError('content layer schema: source fields')
-        if link['policy_id'] in seen or not (re.fullmatch(r'ZC[A-Z]+\d+',link['policy_id']) or link['policy_id'] in {'YJC485','YJC486','YJC487','YJC488','YJC489','YJC490','YJC497','YJC498','YJC499','YJC500'}):raise ValueError('content layer schema: duplicate source identity')
+        if link['policy_id'] in seen or not (re.fullmatch(r'ZC[A-Z]+\d+',link['policy_id']) or link['policy_id'] in {'YJC485','YJC486','YJC487','YJC488','YJC489','YJC490','YJC497','YJC498','YJC499','YJC500','YJC501','YJC502'}):raise ValueError('content layer schema: duplicate source identity')
         seen.add(link['policy_id'])
         if link['role'] not in SOURCE_ROLES or not isinstance(link['url'],str) or not re.match(r'^https?://',link['url']):raise ValueError('content layer schema: source role or URL')
         original+=link['role'].startswith('ORIGINAL_')
         if link['policy_id'] in {'ZCAH14','ZCAH16','ZCAH17','ZCAH18','ZCGJ175','ZCHEB60'} and link['role'].startswith('ORIGINAL_'):
             raise ValueError('content layer schema: related source promoted to original')
-    if len(seen)!=57 or original!=51:raise ValueError('content layer schema: expected 51 original / 6 related links')
+    if len(seen)!=59 or original!=53:raise ValueError('content layer schema: expected 53 original / 6 related links')
     text=json.dumps(layer,ensure_ascii=False)
     if any(token in text for token in ('/Users/','file://','source_path','source_raw_sha256','raw_path','workbook_written')) or re.search(r'<[!/a-zA-Z]',text):
         raise ValueError('content layer schema: private fields or unsafe markup')
