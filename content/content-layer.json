@@ -398,6 +398,16 @@
       "importance_reason": "与工业电价或零碳工厂/园区研究直接相关，编辑评4；不表示政策生效、名单最终认定或项目收益确认。",
       "classification_basis": "江苏公示2026年度绿色工厂、绿色工业园区等入围名单：通则1058项、重点行业240项、园区27项，更名企业另列2项。正文公示期为10月22日至28日；更名名单不计作新增入围单位。",
       "evidence_scope": "母页身份/各日期及限定范围分析；官方附件和计数范围分别保留，不给未核具体资格或参数结论。"
+    },
+    {
+      "id": "ZCGD51",
+      "canonical_document_id": "ZCGD51",
+      "content_type": "policy",
+      "subtype": "能源领域节能降碳行动计划",
+      "importance": 4,
+      "importance_reason": "涉及储能、绿电直供、零碳园区与算力设施的省级部署；不代表项目收益或资格成立。",
+      "classification_basis": "广东部署2026—2028年能源领域节能降碳：支持建设25家零碳园区和零碳工厂，发展新型储能、绿电直连及虚拟电厂，推动算力设施合理配置储能、蓄冷和备用电源。相关条款未给储能配置比例或补偿标准。",
+      "evidence_scope": "官方正文及储备清单身份/条目数量；项目投资进度与收益未核。"
     }
   ],
   "source_links": [
@@ -629,6 +639,11 @@
     {
       "policy_id": "YJC498",
       "url": "https://gxt.jiangsu.gov.cn/art/2026/10/21/art_6281_11844835.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCGD51",
+      "url": "https://drc.gd.gov.cn/snyj/tzgg/content/post_4974903.html",
       "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
     }
   ],

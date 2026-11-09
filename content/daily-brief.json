@@ -1,15 +1,38 @@
 {
   "schema": 1,
   "timezone": "Asia/Shanghai",
-  "snapshot_version": "v466",
-  "snapshot_built_at": "2026-11-04 13:09",
+  "snapshot_version": "v467",
+  "snapshot_built_at": "2026-11-09 16:21",
   "scope": "仅已审公开政策与公告；该页公开日不等于最早首发；成文/收录索引不计今日新发。",
   "counts": {
-    "policy": 15,
+    "policy": 16,
     "notice": 19,
     "important_notice": 12
   },
   "items": [
+    {
+      "id": "ZCGD51",
+      "canonical_document_id": "ZCGD51",
+      "type": "policy",
+      "renderer": "policy",
+      "subtype": "能源领域节能降碳行动计划",
+      "title": "广东省能源领域节能降碳行动计划（2026—2028年）",
+      "summary": "广东部署2026—2028年能源领域节能降碳：支持建设25家零碳园区和零碳工厂，发展新型储能、绿电直连及虚拟电厂，推动算力设施合理配置储能、蓄冷和备用电源。相关条款未给储能配置比例或补偿标准。",
+      "analysis_state": "full",
+      "importance": 4,
+      "status": "现行有效",
+      "region": "广东",
+      "source_url": "https://drc.gd.gov.cn/snyj/tzgg/content/post_4974903.html",
+      "source_label": "官方原发布页/附件",
+      "route": "#/brief/ZCGD51",
+      "display_date": "2026-11-04",
+      "date_basis": "published",
+      "date_label": "该页公开日",
+      "publication_verified": true,
+      "issued_at": "2026-11-03",
+      "published_at": "2026-11-04",
+      "event_at": ""
+    },
     {
       "id": "ZCJL42",
       "canonical_document_id": "ZCJL42",
