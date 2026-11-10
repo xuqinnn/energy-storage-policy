@@ -1,0 +1,22 @@
+/* UI navigation/date contracts. Node standard library; no DOM/browser simulation. */
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const EnergyContent=require('../assets/content-model.js');
+const ctx={window:{},document:{addEventListener(){}},URLSearchParams,EnergyContent};
+vm.createContext(ctx);vm.runInContext(fs.readFileSync(path.join(__dirname,'../assets/atlas.js'),'utf8'),ctx);
+const {readDailyFilters,dailyRoute}=ctx.window.EnergyAtlas;
+const read=q=>readDailyFilters(new URLSearchParams(q),'2026-11-10','');
+assert.equal(read('').range,'7','empty landing should show recent content rather than an unlabelled empty day');
+assert.equal(read('').date,'2026-11-10');
+assert.equal(read('date=2026-11-09').range,'day','shared date links must retain their single-day meaning');
+assert.equal(read('date=2026-11-09').date,'2026-11-09');
+assert.equal(read('date=not-a-date').date,'2026-11-10','invalid dates cannot become issue/publication dates');
+for(const range of ['day','7','30','all','index'])assert.equal(read('range='+range).range,range);
+const selected=read('range=30&prov=陕西&type=notice&q=结算&important=1');
+const route=dailyRoute(selected,'YJC505');
+const params=new URLSearchParams(route.split('?')[1]);
+for(const [key,value] of Object.entries({date:'2026-11-10',range:'30',prov:'陕西',type:'notice',q:'结算',important:'1',entry:'YJC505'}))assert.equal(params.get(key),value,'share/return must preserve '+key);
+const restored=readDailyFilters(params,'2026-11-10','');
+assert.equal(restored.q,'结算');assert.equal(restored.prov,'陕西');assert.equal(restored.important,true);
+assert.equal(new URLSearchParams(dailyRoute(read('')).split('?')[1]).has('entry'),false);
+assert.equal(new URLSearchParams(dailyRoute(read('')).split('?')[1]).has('important'),false);
+console.log('UI date and navigation contracts: passed');

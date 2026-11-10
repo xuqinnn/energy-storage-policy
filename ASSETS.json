@@ -22,7 +22,8 @@
         "assets/atlas.js",
         "assets/atlas-map.js",
         "assets/atlas.css",
-        "tests/test_atlas_model.js"
+        "tests/test_atlas_model.js",
+        "tests/test_interactions.js"
       ],
       "class": "B",
       "origin": "本项目Git历史可追溯的自有前台及本轮通用实现",

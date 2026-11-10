@@ -93,3 +93,9 @@ Controlled collection feed: see [WB-FEED.md](WB-FEED.md). Pending collection not
 The Chinese homepage integrates recent reviewed policy/notice records, topic links and the existing policy map. Research views at `#/view/province/辽宁`, `#/view/technology/液流` and `#/view/graph/储能` reuse the current public snapshot; no second frozen dataset is shipped. Province pages link to the existing parameter/development board. Topics, daily brief, calculators and service routes remain available. Keyword intersections are file locators, not policy ratings; the time chart is the distribution of indexed publication dates, not national publication volume. Quoted relationships retain their existing source identity and scope.
 
 Run `node tests/test_atlas_model.js` to check date, classification, source-gap, relation-evidence and input-mutation boundaries. Existing automated builds and live data updates use the same assets.
+
+### Consistent navigation and daily reading
+
+Chinese topic, daily, map, province, tool and service pages share the research navigation frame. Existing lessons and methods remain intact. Content opens in the selected card or nearby reading workspace, with return/focus restoration. The daily landing shows the most recent seven calendar days; explicit date links still mean one day, unknown dates remain in the separate index, filters apply directly and share links retain their filters. Search timers stop affecting a page after navigation.
+
+Run `node tests/test_interactions.js` for date defaults and share/return URL contracts. This UI update does not change collection schedules, source acceptance, formal policy counts or calculator parameters.

@@ -16,6 +16,7 @@
     if (!D) return;
     document.body.classList.toggle('external-site', externalSite());
     if (!externalSite()) return;
+    ensureWorkspaceFrame();
     if(document.querySelector('#analysis-workspace'))document.querySelectorAll('#app [data-code][aria-haspopup]').forEach(button=>{button.removeAttribute('aria-haspopup');button.setAttribute('aria-controls','analysis-workspace');});
     document.querySelectorAll('.cite[data-code]').forEach(button => {
       const rawDoc = D.docs[button.dataset.code], sourcePending=contentModel?.records.get(button.dataset.code)?.review_hold;
@@ -176,7 +177,7 @@
       <section class="hero">
         <div><div class="eyebrow">电网侧独立储能 · ${PUB() ? '政策地图' : '投资分级地图'}</div>
           <h1>${PUB() ? '投资分级地图' : '哪些省优先做、哪些省先储备'}</h1>
-          <p class="lede">${PUB() ? '看各省容量电价（补偿）是否出台、清单制、充电费用规则、现货市场阶段与退坡风险。' : '分级综合看容量电价（补偿）是否出台、现货市场成熟度、收益确定性与退坡风险。'}地图可切换着色维度、点图例筛选；点任一省进入它的「政策－开发－问题」看板。每个结论都能回到红头文件与页码。</p></div>
+          <p class="lede">${PUB() ? '切换政策维度，比较各省条件。' : '分级综合看容量电价（补偿）是否出台、现货市场成熟度、收益确定性与退坡风险。'}点图例筛选，点省份进入政策、开发、问题与通知看板；适用范围和依据在省份页核对。</p></div>
       </section>
       <section class="kpis">
         ${PUB() && D.score ? `<div class="kpi"><div class="k">投资分级·第一档</div><div class="v">${PROVS.filter(p => pgradeOf(p) === '第一档').length}</div><div class="n">第二档 ${PROVS.filter(p => pgradeOf(p) === '第二档').length} 省 · 第三档 ${PROVS.filter(p => pgradeOf(p) === '第三档').length} 省（公开方法）</div></div>` : PUB() ? `<div class="kpi"><div class="k">实行清单制管理</div><div class="v">${PROVS.filter(p => /^清单制/.test(listOf(p))).length}</div><div class="n">只有入清单的项目才享受容量电价（补偿）</div></div>`
@@ -692,7 +693,7 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
 
   function topicIndex(query=''){
     const params=new URLSearchParams(query),name=(D.topics||[]).some(t=>t.名===params.get('topic'))?params.get('topic'):(D.topics?.[0]?.名||'储能'),allLessons=params.get('section')==='learning';
-    $('#app').innerHTML=`<section class="hero"><div><div class="eyebrow">${tx('研究 · 学习 · 来源与方法','RESEARCH · LEARNING · SOURCES & METHODS')}</div><h1>${tx('重点专题研究','Research themes')}</h1><p class="lede">${tx('围绕同一个问题，接续阅读原理、适用条件、相关政策与核对方法。','Study the principles, conditions, related instruments and methods in one workspace.')}</p></div></section><div class="topic-switcher kb-theme-grid" role="group" aria-label="选择研究问题">${KNOWLEDGE_THEMES.filter(t=>(D.topics||[]).some(p=>p.名===t.name)).map(t=>themeCardHTML(t,t.name===name,true)).join('')}</div>${topicWorkspaceHTML(name,allLessons)}${researchContinuations()}`;
+    $('#app').innerHTML=`<div class="page-head"><div><h1>${tx('重点专题研究','Research themes')}</h1><p>${tx('选专题，在同一页阅读原理、政策、学习与地区条件。','Choose a theme; read its principles, instruments and regional conditions together.')}</p></div></div><div class="topic-switcher topic-choice-row" role="group" aria-label="选择研究专题">${KNOWLEDGE_THEMES.filter(t=>(D.topics||[]).some(p=>p.名===t.name)).map(t=>`<button type="button" class="chip ${t.name===name?'active':''}" data-topic-select="${esc(t.name)}" aria-pressed="${t.name===name}">${icon(t.icon)}${esc(tx(t.name,t.en))}</button>`).join('')}<a class="chip" href="#/view/topic/绿色算力">绿色算力 →</a></div>${topicWorkspaceHTML(name,allLessons)}${researchContinuations()}`;
     document.querySelectorAll('[data-topic-select]').forEach(button=>button.onclick=()=>{location.hash='#/topics?topic='+encodeURIComponent(button.dataset.topicSelect);});
     wireKnowledgeReading(name,allLessons);
     if(allLessons)requestAnimationFrame(()=>document.querySelector('#topic-learning')?.scrollIntoView({block:'start'}));
@@ -721,40 +722,58 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
     if(!dailyLoad)dailyLoad=(async()=>{try{let payload=window.__DAILY_BRIEF__;if(!payload){const response=await fetch('content/daily-brief.json',{cache:'no-store'});if(!response.ok)throw Error('速递未取得');payload=await response.json();}dailyBrief=EnergyContent.validateDaily(payload,contentModel,D.meta);dailyLoadError=false;}catch(error){dailyBrief=null;dailyLoadError=true;}})();return dailyLoad;
   }
   const analysisLabel = value => value==='full'?'完整分析':value==='summary'?'摘要与解析':'仅索引，解析待补';
-  function dailyItemHTML(r){
+  function dailyItemHTML(r,entryRoute=r.route){
     const attrs=r.renderer==='notice'?`data-notice-id="${esc(r.id)}"`:r.renderer==='reply'?`data-reply-id="${esc(r.id)}"`:`data-code="${esc(r.id)}"`;
-    return `<article class="daily-item"><button type="button" class="daily-open" ${attrs} data-daily-id="${esc(r.id)}" data-row-preview aria-describedby="tip" aria-controls="analysis-workspace" title="${esc(r.summary)}"><span class="daily-meta"><span>${r.type==='policy'?'政策':'公告'} · ${esc(r.subtype)}</span><span>${esc(r.date_label)} ${esc(r.display_date||'未确认')}</span></span><h2>${esc(r.title)}</h2><span class="daily-qualifiers">${r.region?`<span>${esc(r.region)}</span>`:''}${r.status?stChip(r.status):''}<span class="analysis-state">${analysisLabel(r.analysis_state)}</span>${r.importance!==null?`<span>编辑重要性 ${r.importance}级</span>`:'<span>未评分</span>'}</span><p>${esc(r.summary||'摘要待补，可查看文件索引。')}</p>${!r.publication_verified?'<strong class="date-fallback">非当日新发 · 仅按成文/收录索引定位</strong>':''}<span class="row-open-label">在本页阅读解析 →</span></button><footer>${r.source_url?`<a data-daily-source href="${esc(r.source_url)}" target="_blank" rel="noopener noreferrer">${esc(r.source_label)} ↗</a>`:'<span>原发布页待补</span>'}<a data-daily-share href="${esc(r.route)}">分享条目直达链接</a></footer></article>`;
+    return `<article class="daily-item"><button type="button" class="daily-open" ${attrs} data-daily-id="${esc(r.id)}" data-row-preview aria-describedby="tip" aria-controls="analysis-workspace" title="${esc(r.summary)}"><span class="daily-meta"><span>${r.type==='policy'?'政策':'公告'} · ${esc(r.subtype)}</span><span>${esc(r.date_label)} ${esc(r.display_date||'未确认')}</span></span><h2>${esc(r.title)}</h2><span class="daily-qualifiers">${r.region?`<span>${esc(r.region)}</span>`:''}${r.status?stChip(r.status):''}<span class="analysis-state">${analysisLabel(r.analysis_state)}</span>${r.importance!==null?`<span>编辑重要性 ${r.importance}级</span>`:'<span>未评分</span>'}</span><p>${esc(r.summary||'摘要待补，可查看文件索引。')}</p>${!r.publication_verified?'<strong class="date-fallback">非当日新发 · 仅按成文/收录索引定位</strong>':''}<span class="row-open-label">在本页阅读解析 →</span></button><footer>${r.source_url?`<a data-daily-source href="${esc(r.source_url)}" target="_blank" rel="noopener noreferrer">${esc(r.source_label)} ↗</a>`:'<span>原发布页待补</span>'}<a data-daily-share href="${esc(entryRoute)}">此条直达链接</a></footer></article>`;
   }
   function sourceFactsHTML(r){return r.source_excerpt?`<details class="daily-source-facts"><summary>来源事实摘录</summary><blockquote>${esc(r.source_excerpt)}</blockquote>${r.source_correction?`<p>${esc(r.source_correction)}</p>`:''}<p class="note">摘录反映来源所述事实；适用判断见分析，条件以正式原文为准。</p></details>`:'';}
-  function dailySourceHTML(r){
-    return `<article class="daily-item daily-source" data-daily-entry="${esc(r.id)}"><details><summary><span class="daily-meta"><span>${r.type==='policy'?'政策':'公告'} · 原文摘录</span><time>${esc(r.published_at)}</time></span><h2>${esc(r.title)}</h2><span class="daily-source-issuer">${esc(r.issuer)}</span><span class="analysis-state">来源事实</span><span class="daily-source-preview">${esc(r.source_excerpt)}</span></summary><blockquote>${esc(r.source_excerpt)}</blockquote>${r.source_correction?`<p>${esc(r.source_correction)}</p>`:''}<p class="note">仅呈来源摘录，未据此确定具体项目的适用条件、准入或收益。</p></details><footer><a data-daily-source href="${esc(r.source_url)}" target="_blank" rel="noopener noreferrer">查看来源原文 ↗</a><a data-daily-share href="${esc(r.route)}">分享此条目</a></footer></article>`;
+  function dailySourceHTML(r,entryRoute=r.route){
+    return `<article class="daily-item daily-source" data-daily-entry="${esc(r.id)}"><details><summary><span class="daily-meta"><span>${r.type==='policy'?'政策':'公告'} · 原文摘录</span><time>${esc(r.published_at)}</time></span><h2>${esc(r.title)}</h2><span class="daily-source-issuer">${esc(r.issuer)}</span><span class="analysis-state">来源事实</span><span class="daily-source-preview">${esc(r.source_excerpt)}</span></summary><blockquote>${esc(r.source_excerpt)}</blockquote>${r.source_correction?`<p>${esc(r.source_correction)}</p>`:''}<p class="note">仅呈来源摘录，未据此确定具体项目的适用条件、准入或收益。</p></details><footer><a data-daily-source href="${esc(r.source_url)}" target="_blank" rel="noopener noreferrer">查看来源原文 ↗</a><a data-daily-share href="${esc(entryRoute)}">此条直达链接</a></footer></article>`;
   }
   function policyPage(arg){
     dailyFeedDisconnect?.();dailyFeedDisconnect=null;
     const h=location.hash||'#/policy',P=new URLSearchParams(h.split('?')[1]||''),actualToday=EnergyContent.today();
     let legacy='';try{legacy=decodeURIComponent(h.split('?')[0].split('/')[2]||'');}catch(_){}
-    const f={date:EnergyContent.validDate(P.get('date'))?P.get('date'):actualToday,range:['7','30','all','index'].includes(P.get('range'))?P.get('range'):'day',type:['policy','notice'].includes(P.get('type'))?P.get('type'):'',prov:P.get('prov')||(TILES[legacy]?legacy:''),important:P.get('important')==='1',q:P.get('q')||''};
+    const f=window.EnergyAtlas.readDailyFilters(P,actualToday,TILES[legacy]?legacy:'');
     const share=new URL(location.href);share.hash='#/policy?'+new URLSearchParams(Object.entries({...f,important:f.important?'1':''}).filter(([,v])=>v));
     const initial=EnergyContent.mergeDaily(dailyBrief,[],contentModel),regions=[...new Set(initial.items.map(r=>r.region).filter(Boolean))].sort();
-    $('#app').innerHTML=`<section class="daily-board daily-workspace"><header class="daily-workspace-head"><div><h1>${tx('今日政策速递','Daily policy brief')}</h1><p>${tx('政策、公告与来源事实，在同一页查找和阅读。','Find policy, announcements and source facts in one workspace.')}</p></div><a href="#/topics">${tx('专题与学习','Research & learning')} ↗</a></header>${P.has('date')&&!EnergyContent.validDate(P.get('date'))?'<p class="note" role="alert">日期参数无效，已回到北京时间今天。</p>':''}<form id="daily-filters" class="daily-filters daily-unified-filters"><label class="daily-query">关键词<input type="search" name="q" value="${esc(f.q)}" placeholder="题名、来源或问题"></label><label>日期<input type="date" name="date" value="${esc(f.date)}"></label><label>范围<select name="range">${[['day','选定日'],['7','近7天'],['30','近30天'],['all','全部公开/事件日'],['index','成文/收录索引']].map(([v,t])=>`<option value="${v}"${v===f.range?' selected':''}>${t}</option>`).join('')}</select></label><label>地区<select name="prov"><option value="">全部地区</option>${[...new Set([...regions,...(f.prov?[f.prov]:[])])].map(v=>`<option${f.prov===v?' selected':''}>${esc(v)}</option>`).join('')}</select></label><label>类型<select name="type"><option value="">政策与公告</option><option value="policy"${f.type==='policy'?' selected':''}>政策</option><option value="notice"${f.type==='notice'?' selected':''}>公告</option></select></label><label class="daily-important"><input type="checkbox" name="important"${f.important?' checked':''}>重要公告</label><button type="submit" class="btn">查看</button><a href="#/policy?date=${actualToday}" class="daily-today">回到今天</a></form><div class="daily-list-heading"><h2>${f.range==='day'?esc(f.date):f.range==='index'?'成文与收录索引':'政策与公告'}</h2><span data-daily-count></span><a data-daily-filter-share href="${esc(share.href)}">分享筛选</a></div><p class="note daily-reading-key">分析与原文摘录分别标示。公开日、事件日与成文日分列；索引日期不作当日新发。</p><p class="note daily-feed-state" role="status" data-daily-feed-state></p>${analysisWorkspaceHTML()}<div id="wb-feed" class="daily-scroll daily-unified-list" role="region" tabindex="0" aria-label="政策与公告内容"></div><div data-daily-corrections></div><footer class="daily-more"><a href="#/lib">全部公开索引 →</a><a href="#/map">投资分级地图 →</a><a href="#/topics">专题与学习 →</a></footer></section>`;
+    $('#app').innerHTML=`<section class="daily-board daily-workspace"><header class="daily-workspace-head"><div><h1>${tx('今日政策速递','Daily policy brief')}</h1><p>${tx('政策、公告与来源事实，在同一页查找和阅读。','Find policy, announcements and source facts in one workspace.')}</p></div><a href="#/topics">${tx('专题与学习','Research & learning')} ↗</a></header>${P.has('date')&&!EnergyContent.validDate(P.get('date'))?'<p class="note" role="alert">日期参数无效，已回到北京时间今天。</p>':''}<form id="daily-filters" class="daily-filters daily-unified-filters"><label class="daily-query">关键词<input type="search" name="q" value="${esc(f.q)}" placeholder="题名、来源或问题"></label><label>日期 / 截至<input type="date" name="date" value="${esc(f.date)}"></label><label>范围<select name="range">${[['day','选定日'],['7','近7天'],['30','近30天'],['all','全部公开/事件日'],['index','成文/收录索引']].map(([v,t])=>`<option value="${v}"${v===f.range?' selected':''}>${t}</option>`).join('')}</select></label><label>地区<select name="prov"><option value="">全部地区</option>${[...new Set([...regions,...(f.prov?[f.prov]:[])])].map(v=>`<option${f.prov===v?' selected':''}>${esc(v)}</option>`).join('')}</select></label><label>类型<select name="type"><option value="">政策与公告</option><option value="policy"${f.type==='policy'?' selected':''}>政策</option><option value="notice"${f.type==='notice'?' selected':''}>公告</option></select></label><label class="daily-important"><input type="checkbox" name="important"${f.important?' checked':''}>重要公告</label><button type="button" class="chip" data-daily-reset>重置</button><a href="#/policy?date=${actualToday}&range=day" class="daily-today">只看今天</a></form><div class="daily-quick-ranges" role="group" aria-label="日期范围">${[['7','近7天'],['day','今天'],['30','近30天'],['all','全部日期'],['index','历史索引']].map(([v,n])=>`<button type="button" class="chip ${f.range===v?'active':''}" data-daily-quick="${v}" aria-pressed="${f.range===v}">${n}</button>`).join('')}</div><div class="daily-list-heading"><h2 data-daily-heading></h2><span data-daily-count></span><a data-daily-filter-share href="${esc(share.href)}">分享筛选</a></div><p class="note daily-reading-key">分析与原文摘录分别标示。公开日、事件日与成文日分列；索引日期不作当日新发。</p><p class="note daily-feed-state" role="status" data-daily-feed-state></p>${analysisWorkspaceHTML()}<div id="wb-feed" class="daily-scroll daily-unified-list" role="region" tabindex="0" aria-label="政策与公告内容"></div><div data-daily-corrections></div><footer class="daily-more"><a href="#/lib">全部公开索引 →</a><a href="#/map">投资分级地图 →</a><a href="#/topics">专题与学习 →</a></footer></section>`;
+    let latestFeed={},revealedEntry=false,visibleLimit=30;
     const list=$('#wb-feed'),count=document.querySelector('[data-daily-count]'),stateLabel=document.querySelector('[data-daily-feed-state]'),correctionBox=document.querySelector('[data-daily-corrections]');
+    const entryRoute=id=>window.EnergyAtlas.dailyRoute(f,id);
     const paint=({rows:feedRows=[],status='offline'}={})=>{
+      latestFeed={rows:feedRows,status};
       if(!list.isConnected)return;
       const merged=EnergyContent.mergeDaily(dailyBrief,feedRows,contentModel),rows=EnergyContent.dailyQuery(merged,f,actualToday);
       const latest=merged.items.filter(r=>r.publication_verified&&r.display_date<=actualToday).map(r=>r.display_date).sort().reverse()[0];
+      const heading=document.querySelector('[data-daily-heading]');heading.textContent=f.range==='day'?f.date:f.range==='index'?'成文与收录索引':f.range==='all'?'全部公开与事件日期':`截至 ${f.date} 的近${f.range}天`;
+      const todayCount=EnergyContent.dailyQuery(merged,{date:actualToday,range:'day'},actualToday).length;
+      document.querySelector('.daily-reading-key').textContent=`${actualToday} 全站已收录 ${todayCount} 条当日内容。分析与来源摘录分别标示；历史索引不作今日新发。`;
       count.dataset.dailyCount=String(rows.length);count.textContent=`${rows.length} 条 · 分析/索引 ${rows.filter(r=>!r.collection_only).length} · 原文摘录 ${rows.filter(r=>r.collection_only).length}`;
       list.dataset.feedStatus=status;
       stateLabel.textContent=status==='unavailable'?'来源摘录暂不可用，现有资料和分析仍可阅读。':status==='loading'?'正在载入来源摘录…':'';
-      let empty=dailyLoadError?'<p role="status">日报暂未加载，公开索引仍可检索。<button type="button" data-daily-retry>重试</button></p>':`<p role="status">${f.range==='day'?esc(f.date)+' 暂无符合筛选的内容。':'当前筛选没有结果。'}</p>${latest?`<a id="daily-latest" href="#/policy?date=${latest}">查看最近有内容日 ${latest} →</a>`:''}`;
-      list.innerHTML=rows.length?rows.map(r=>r.collection_only?dailySourceHTML(r):dailyItemHTML({...r,summary:r.analysis_state==='full'?(briefOf(r.id)?.概述||r.summary):r.summary}).replace('<article class="daily-item">',`<article class="daily-item" data-daily-entry="${esc(r.id)}">`).replace('<footer>',sourceFactsHTML(r)+'<footer>')).join(''):`<div class="daily-empty">${empty}</div>`;
+      let empty=dailyLoadError?'<p role="status">日报暂未加载，公开索引仍可检索。<button type="button" data-daily-retry>重试</button></p>':`<p role="status">${f.range==='day'?esc(f.date)+' 暂无符合筛选的内容。':'当前筛选没有结果。'}</p>${latest?`<a id="daily-latest" href="#/policy?date=${latest}">${f.q||f.prov||f.type||f.important?'清空筛选，':''}查看最近有内容日 ${latest} →</a>`:''}`;
+      const panel=document.querySelector('#analysis-workspace'),selected=panel&&!panel.hidden?inlineAnalysis.current:null;
+      if(panel&&list.contains(panel))list.before(panel);
+      list.innerHTML=rows.length?rows.slice(0,visibleLimit).map(r=>r.collection_only?dailySourceHTML(r,entryRoute(r.id)).replace('<article class="daily-item daily-source">',`<article class="daily-item daily-source" data-daily-entry="${esc(r.id)}">`):dailyItemHTML({...r,summary:r.analysis_state==='full'?(briefOf(r.id)?.概述||r.summary):r.summary},entryRoute(r.id)).replace('<article class="daily-item">',`<article class="daily-item" data-daily-entry="${esc(r.id)}">`).replace('<footer>',sourceFactsHTML(r)+'<footer>')).join('')+(rows.length>visibleLimit?`<button type="button" class="chip daily-more-items" data-daily-more>继续展开30条 · 共${rows.length}条</button>`:''):`<div class="daily-empty">${empty}</div>`;
+      if(selected){const card=list.querySelector(`[data-daily-entry="${CSS.escape(selected.id)}"]`),button=card?.querySelector('.daily-open');if(button){const original=inlineAnalysis.origin;showInlineAnalysis(selected.kind,selected.id,{opener:button,push:false,scroll:false});inlineAnalysis.origin=original;if(original)original.opener=button;}else closeInlineAnalysis();}
+
       const corrections=(f.prov||f.important||f.type==='policy')?[]:merged.corrections.filter(c=>EnergyContent.dailyQuery({items:[{type:'notice',title:c.title,summary:c.note,region:'',importance:null,publication_verified:true,display_date:c.date}]},{...f,type:'',prov:'',important:false},actualToday).length);
       correctionBox.innerHTML=corrections.length?`<details class="daily-corrections"><summary>来源更正 · ${corrections.length}</summary><ul>${corrections.map(c=>`<li><time>${esc(c.date)}</time><p>${esc(c.note)}</p></li>`).join('')}</ul></details>`:'';
       const entry=P.get('entry'),match=entry&&rows.find(r=>r.id===entry||r.feed_aliases?.includes(entry));
-      if(match){const card=list.querySelector(`[data-daily-entry="${CSS.escape(match.id)}"]`);if(card){const details=card.querySelector('details');if(details)details.open=true;card.scrollIntoView({block:'center'});}}
+      if(match&&!revealedEntry){revealedEntry=true;const card=list.querySelector(`[data-daily-entry="${CSS.escape(match.id)}"]`);if(card){const details=card.querySelector('details');if(details){details.open=true;card.scrollIntoView({block:'center'});}else{const button=card.querySelector('.daily-open');if(button)showInlineAnalysis(match.renderer==='reply'?'reply':match.renderer==='notice'?'notice':'policy',match.id,{opener:button,push:false});}}}
       document.querySelector('[data-daily-retry]')?.addEventListener('click',()=>{dailyLoad=null;loadDailyBrief().then(route);});
     };
     if(window.WBFeed?.connect)dailyFeedDisconnect=window.WBFeed.connect({docs:D.docs,offline:!!window.__YC_DATA__||D.meta.dataset==='synthetic'},paint);else paint();
-    $('#daily-filters').onsubmit=e=>{e.preventDefault();const values=new FormData(e.currentTarget),query=new URLSearchParams();for(const key of ['date','range','type','prov','q'])if(values.get(key))query.set(key,values.get(key));if(values.get('important'))query.set('important','1');location.hash='#/policy?'+query;};
+    const form=$('#daily-filters');let queryTimer;
+    const apply=()=>{if(!form.isConnected)return;const values=new FormData(form);if(!EnergyContent.validDate(String(values.get('date')||'')))return;for(const key of ['date','range','type','prov','q'])f[key]=String(values.get(key)||'');f.important=values.get('important')==='on';visibleLimit=30;revealedEntry=true;closeInlineAnalysis();const hash=entryRoute('');history.replaceState(null,'',location.pathname+location.search+hash);activeRoute=decodeURIComponent(hash);captureRoute();document.querySelector('[data-daily-filter-share]').href=hash;document.querySelectorAll('[data-daily-quick]').forEach(b=>{b.classList.toggle('active',b.dataset.dailyQuick===f.range);b.setAttribute('aria-pressed',String(b.dataset.dailyQuick===f.range));});paint(latestFeed);};
+    form.onsubmit=e=>{e.preventDefault();clearTimeout(queryTimer);apply();};
+    form.querySelector('[data-daily-reset]').onclick=()=>{clearTimeout(queryTimer);for(const key of ['q','type','prov'])form.elements[key].value='';form.elements.range.value='7';form.elements.date.value=actualToday;form.elements.important.checked=false;apply();};
+    form.addEventListener('change',e=>{if(e.target.name==='date')form.elements.range.value='day';clearTimeout(queryTimer);apply();});
+    form.elements.q.addEventListener('input',()=>{clearTimeout(queryTimer);queryTimer=setTimeout(apply,220);});
+    document.querySelector('.daily-quick-ranges').addEventListener('click',e=>{const b=e.target.closest('[data-daily-quick]');if(!b)return;form.elements.range.value=b.dataset.dailyQuick;if(b.dataset.dailyQuick==='day')form.elements.date.value=actualToday;clearTimeout(queryTimer);apply();});
+    list.addEventListener('click',e=>{if(e.target.closest('[data-daily-more]')){visibleLimit+=30;paint(latestFeed);}});
+
   }
   function policyProv() {
     const L = D.lib || [], n = {}, last = {};
@@ -1196,11 +1215,21 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
       panel=document.querySelector('#analysis-workspace');
     }
     if(!panel)return;
+    const source=options.opener;
+    if(source&&!panel.contains(source)){
+      const row=source.closest('.daily-item,.doc-row,.chain,.related-policy-row,.analysis-policy-link,.bcard');
+      const home=source.closest('.home-columns');
+      if(row&&row.tagName!=='BUTTON')row.append(panel);
+      else if(row)row.after(panel);
+      else if(home)home.after(panel);
+      else if(source.closest('.panel'))source.closest('.panel').after(panel);
+      else {const workspace=document.querySelector('#atlas-workspace');if(workspace)workspace.append(panel);}
+    }
     const route=decodeURIComponent(location.hash||'#/');
     if(inlineAnalysis.route!==route){Object.assign(inlineAnalysis,{route,current:null,history:[],origin:null});}
     const opener=options.opener||document.activeElement,inside=opener?.closest?.('#analysis-workspace'),dialog=document.querySelector('#bsheet');
     if(opener?.closest?.('#bsheet')&&dialog?.open&&D.docs[dialog.dataset.policyCode]){inlineAnalysis.history=[{kind:'policy',id:dialog.dataset.policyCode,y:scrollY}];inlineAnalysis.origin={y:scrollY,opener:bsOpener};}
-    else if(options.opener&&!inside){inlineAnalysis.history=[];inlineAnalysis.origin={y:scrollY,opener};}
+    else if(options.opener&&!inside){inlineAnalysis.history=[];inlineAnalysis.origin={y:scrollY,opener,list:opener?.closest('.daily-scroll'),listY:opener?.closest('.daily-scroll')?.scrollTop||0};}
     else if(inlineAnalysis.current&&options.push!==false)inlineAnalysis.history.push({...inlineAnalysis.current,y:scrollY});
     inlineAnalysis.current={kind,id,hitAt:options.hitAt||null};
     document.querySelector('#bsheet')?.close();renderInlineAnalysis();
@@ -1209,10 +1238,10 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
   function panelFocus(){document.querySelector('#analysis-workspace #analysis-title')?.focus({preventScroll:true});}
   function closeInlineAnalysis(back=false) {
     tip.hidden=true;
-    if(back&&inlineAnalysis.history.length){const previous=inlineAnalysis.history.pop();inlineAnalysis.current=previous;renderInlineAnalysis();panelFocus();scrollTo(0,previous.y);return;}
+    if(back&&inlineAnalysis.history.length){const previous=inlineAnalysis.history.pop();inlineAnalysis.current=previous;renderInlineAnalysis();panelFocus();scrollTo({top:previous.y,left:0,behavior:'instant'});return;}
     const panel=document.querySelector('#analysis-workspace'),origin=inlineAnalysis.origin;
-    if(panel)panel.hidden=true;inlineAnalysis.current=null;inlineAnalysis.history=[];
-    if(origin){scrollTo(0,origin.y);if(origin.opener?.isConnected)origin.opener.focus({preventScroll:true});}
+    if(panel)panel.hidden=true;inlineAnalysis.current=null;inlineAnalysis.history=[];inlineAnalysis.origin=null;
+    if(origin){if(origin.list?.isConnected)origin.list.scrollTop=origin.listY;scrollTo({top:origin.y,left:0,behavior:'instant'});if(origin.opener?.isConnected)origin.opener.focus({preventScroll:true});}
   }
   document.addEventListener('click',event=>{
     const notice=event.target.closest('[data-notice-id]');if(notice){event.preventDefault();showInlineAnalysis('notice',notice.dataset.noticeId,{opener:notice});return;}
@@ -1283,7 +1312,6 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
         <div class="card col" data-province-module="notices"><h2>${tx('通知（含答复）','Notices & replies')} <small>${tx('官方信息与研究线索','Official information & context')}</small></h2><div data-province-replies="${esc(p)}"><p class="note">正在读取已审通知。</p></div></div>
       </section>${analysisWorkspaceHTML(p)}`;
     drawCalc(p);wireProvincePolicyIndex(p);
-    const first=provincePolicyRows(p)[0];if(first)showInlineAnalysis('policy',first[0],{scroll:false,push:false});
     populateProvinceReplies(p);
   }
   const DEVK = [['K1', '清单制'], ['K2', '申报窗口'], ['K3', '准入门槛'], ['K4', '建设时限'], ['K5', '股权与投资主体锁定'], ['K6', '调出清单情形'], ['K7', '建设规模指标']];
@@ -1483,8 +1511,45 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
       </ul></div>`;
   }
 
+  function ensureWorkspaceFrame(){
+    if(!D||en()||!window.EnergyAtlas)return;
+    const app=$('#app');if(!app.childNodes.length||app.querySelector(':scope > .atlas-shell'))return;
+    const h=decodeURIComponent(location.hash||'#/'),section=sectionOf(h);
+    const view=/^#\/(p|dev)\//.test(h)?'province':section==='policy'?'daily':section==='topics'?'topic':section==='map'?'map':section==='tools'?'tools':section==='services'?'services':'home';
+    const object=view==='province'?h.split('/')[2]:view==='topic'?(app.querySelector('[data-topic]')?.dataset.topic||'专题与学习'):view==='daily'?(/^#\/policy/.test(h)?'按日期阅读':'政策分析'):view==='map'?'地区对照':'';
+    window.EnergyAtlas.wrap(D,contentLayer,replyItems,dailyBrief,view,object);
+  }
+  const routeViews=new Map();let activeRoute=null,restoringRoute=false;
+  function captureRoute(){
+    if(!activeRoute||restoringRoute)return;
+    const panel=document.querySelector('#analysis-workspace');
+    routeViews.set(activeRoute,{y:scrollY,version:D?.meta?.version,selection:panel&&!panel.hidden?inlineAnalysis.current:null,originY:inlineAnalysis.origin?.y,readerTop:panel&&!panel.hidden?panel.getBoundingClientRect().top:null});
+  }
+  addEventListener('scroll',captureRoute,{passive:true});
+  document.addEventListener('click',e=>{const a=e.target.closest('a[href^="#/"]');if(a&&!e.metaKey&&!e.ctrlKey&&!e.shiftKey&&!e.altKey&&e.button===0&&a.target!=='_blank'){captureRoute();if(a.hash!==location.hash)restoringRoute=true;}},true);
+  function route(){
+    dailyFeedDisconnect?.();dailyFeedDisconnect=null;
+    let hash=decodeURIComponent(location.hash||'#/');
+    if(hash.startsWith('#/topic/')){const name=hash.slice(8).split('/')[0];if((D.topics||[]).some(t=>t.名===name)){hash='#/topics?topic='+encodeURIComponent(name);history.replaceState(null,'',location.pathname+location.search+hash);}}
+    if(hash==='#/learning'){hash='#/topics?section=learning';history.replaceState(null,'',location.pathname+location.search+hash);}
+    activeRoute=decodeURIComponent(hash);const expected=activeRoute,saved=routeViews.get(activeRoute);restoringRoute=true;
+    Object.assign(inlineAnalysis,{route:null,current:null,history:[],origin:null});routeContent();ensureWorkspaceFrame();
+    requestAnimationFrame(()=>{
+      if(activeRoute!==expected)return;
+      if(saved?.version===D.meta.version&&saved.selection){const {kind,id}=saved.selection,code=CSS.escape(id),source=document.querySelector(`.daily-open[data-code="${code}"],.daily-open[data-notice-id="${code}"],.daily-open[data-reply-id="${code}"],[data-doc="${code}"],.related-policy-row[data-code="${code}"],[data-code="${code}"]`);if(source){showInlineAnalysis(kind,id,{opener:source,scroll:false,push:false});inlineAnalysis.origin={y:saved.originY??saved.y,opener:source};}}
+      const params=new URLSearchParams(location.hash.split('?')[1]||'');
+      const restorePosition=()=>{if(activeRoute!==expected)return;
+      if(saved){const panel=document.querySelector('#analysis-workspace'),y=saved.selection&&Number.isFinite(saved.readerTop)&&panel&&!panel.hidden?scrollY+panel.getBoundingClientRect().top-saved.readerTop:saved.y||0;scrollTo({top:y,left:0,behavior:'instant'});}
+      else if(params.get('section')==='learning')document.querySelector('#topic-learning')?.scrollIntoView({block:'start'});
+      else if(params.get('entry')&&inlineAnalysis.current)document.querySelector('#analysis-workspace')?.scrollIntoView({block:'start'});
+      else if(params.get('entry')&&document.querySelector('[data-daily-entry] details[open]'))document.querySelector('[data-daily-entry] details[open]').closest('article').scrollIntoView({block:'center'});
+      else scrollTo({top:0,left:0,behavior:'instant'});
+      };restorePosition();requestAnimationFrame(()=>{restorePosition();restoringRoute=false;captureRoute();});
+    });
+  }
+
   // ---------- 路由 ----------
-  function route() {
+  function routeContent() {
     const h = decodeURIComponent(location.hash || '#/');
     $('#app').classList.remove('atlas-host');
     $('.nav').classList.remove('mobile-open'); $('.menu-toggle').setAttribute('aria-expanded','false'); const more=document.querySelector('.nav-more');if(more)more.open=false;
@@ -1494,9 +1559,6 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
 
     if(h.startsWith('#/view/')){setActiveSection(h);window.EnergyAtlas.mount(D,contentLayer,replyItems,dailyBrief);return;}
     if (h.startsWith('#/analysis/')) { location.hash = '#/' + h.slice(11); return; }
-    const sec = (h.match(/^#\/([a-z]+)/) || [, 'home'])[1];
-    setActiveSection(h);
-    document.querySelectorAll('.nav a').forEach(a => a.classList.toggle('on', a.dataset.nav === sec || (a.dataset.nav==='tools'&&['explore','park-demo','rev'].includes(sec)) || (a.dataset.nav === 'tags' && sec === 'tag') || (a.dataset.nav === 'topics' && sec === 'topic') || (a.dataset.nav === 'policy' && ['lib', 'brief'].includes(sec)) || (a.dataset.nav === 'home' && (h === '#/' || h === ''))));
     setActiveSection(h);
     const m = h.match(/^#\/p\/(.+)$/);
     const dev = h.match(/^#\/dev\/(.+)$/);
@@ -1512,7 +1574,6 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
     if (h === '#/start') { startPage(); scrollTo(0,0); return; }
     if (h === '#/subscribe') { subscribePage(); scrollTo(0,0); return; }
     if (m) { province(m[1]); $('#app').insertAdjacentHTML('beforeend', provTopicsHTML(m[1])); } else if (h === '#/about') publicAbout(); else if (h === '#/tools') arithmeticPage(); else if (h === '#/park-demo') parkDemoPage(); else if (h === '#/services') servicesPage(); else if (h === '#/score' && !D.score) home(); else if (h === '#/rev') revenue(); else if (/^#\/brief/.test(h)) { briefPage(h.split('/')[2]); return; } else if (h === '#/tags') tagIndex(); else if (h.split('?')[0] === '#/topics') topicIndex(h.split('?')[1]); else if (/^#\/topic\//.test(h)) topicPage(h.slice(8)); else if (h === '#/policy/prov') policyProv(); else if (h === '#/policy/time') policyTime(); else if (/^#\/policy/.test(h)) policyPage(h.split('/')[2]); else if (/^#\/m\//.test(h)) { front(); const el = document.getElementById('mc-' + h.slice(4)); if (el) { el.scrollIntoView({ block: 'center' }); el.classList.add('flash'); } return; } else if (/^#\/lib/.test(h)) libPage(h.split('?')[1]); else if (h === '#/map') home(); else if (/^#\/methods/.test(h)) { if (PUB()) publicGuidesPage(h.split('/')[2]); else methodsPage(h.split('/')[2]); } else if (/^#\/tag\//.test(h)) tagPage(h.slice(6)); else if (h === '#/ex') { location.replace('#/rev'); return; } /* 用户 10-15 合并：旧链接落到全景页 */ else if (h === '#/score' && D.score) scorePage(); else front();
-    scrollTo(0, 0);
   }
   function syntheticRevenue() {
     const defaults = D.synthetic_example.inputs;
@@ -1606,9 +1667,11 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
     D = d;
     if (d.meta.dataset === 'synthetic') document.querySelector('main').insertAdjacentHTML('beforebegin', '<aside class="card" role="note">纯合成样例：文档、地区和参数均为虚构，无政策效力。</aside>');
     $('#ver').textContent = `更新 ${d.meta.exported.slice(0,10)}`;
+    if('scrollRestoration' in history)history.scrollRestoration='manual';
     setupShell();await Promise.all([loadReplyInsights(),loadContentLayer()]);
     if(d.meta.dataset==='synthetic'){contentLayer={schema:1,notices:[],classifications:[],source_links:[],source_gaps:[]};replyItems=[];}
     contentModel=EnergyContent.create(D,contentLayer,replyItems);await loadDailyBrief();
+    window.EnergyAtlas.setOpenHandler((id,opener)=>{const kind=replyItems.some(r=>r.id===id)?'reply':contentLayer.notices.some(n=>n.id===id)?'notice':'policy';showInlineAnalysis(kind,id,{opener});});
     const sel = $('#provSelect');
     sel.innerHTML += PROVS.map(p => `<option value="${esc(p)}">${esc(p)}</option>`).join('');
     sel.onchange = () => { if (sel.value) location.hash = '#/p/' + encodeURIComponent(sel.value); };
