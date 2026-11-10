@@ -24,7 +24,7 @@ function normalize(raw,layer,replies,daily){
 }
 'use strict';
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const base='';const url=(view,obj='')=>view==='home'?'#/':view==='map'?'#/map':view==='daily'?'#/policy'+(obj?'?date='+encodeURIComponent(obj):''):view==='topic'?'#/topics'+(obj&&obj!=='总览'?'?topic='+encodeURIComponent(obj):''):'#/view/'+view+'/'+encodeURIComponent(obj);
+const base='';const url=(view,obj='')=>view==='home'?'#/':view==='map'?'#/map':view==='daily'?'#/policy'+(obj?'?date='+encodeURIComponent(obj):''):view==='topic'?(obj==='绿色算力'?'#/view/topic/'+encodeURIComponent(obj):'#/topics'+(obj&&obj!=='总览'?'?topic='+encodeURIComponent(obj):'')):'#/view/'+view+'/'+encodeURIComponent(obj);
 let D,byId,opener=null;const state={view:'home',object:'辽宁',tab:'policy',topic:'全部',status:'全部状态',scope:'全国',national:false,limit:24,compare:[],graphMode:'matrix',mapMetric:'cap',mapPick:'',graphTopic:'储能',graphPage:0,techCell:null,month:''};
 const names={home:'研究总览',map:'投资分级地图',province:'省份看板',technology:'技术路线',topic:'专题研究',graph:'政策图谱',daily:'政策速递'},kindName={policy:'政策',notice:'通知',article:'资料',index:'索引'};
 const allText=d=>d.title+' '+d.summary,mention=(d,terms)=>terms.some(t=>allText(d).includes(t));
