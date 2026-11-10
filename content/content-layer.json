@@ -608,6 +608,16 @@
       "importance_reason": "北京绿色算力年度征集，涉及本地资格、推荐路径与报送时点。",
       "classification_basis": "北京组织2026年度国家绿色算力设施征集，11月16日前报送。地方申报要求本市独立法人、项目在京且全系统连续稳定运行一年以上；四家基础电信集团、金融机构及公共机构另循规定推荐渠道。征集不等最终认定，机架、能效等条件须合并核对。",
       "evidence_scope": "官方正文及必要适用边界；具体附件条款与个体项目资格另核。"
+    },
+    {
+      "id": "YJC508",
+      "canonical_document_id": "YJC508",
+      "content_type": "notice",
+      "subtype": "年度名单通知",
+      "importance": 4,
+      "importance_reason": "年度重点用能单位名单，关联园区企业节能管理的对象识别与监管要求。",
+      "classification_basis": "宁夏更新2026年重点用能单位名单，正文公布354家，实行动态管理。名单内单位应按规定报送能源利用状况报告、依规开展能源审计，并做好能耗在线监测接入、运行和数据上传；地方主管部门承担属地监管。可用于园区节能管理的对象识别，不等于项目审批、用能指标或补助资格。",
+      "evidence_scope": "官方正文及必要适用边界；具体附件条款与个体项目资格另核。"
     }
   ],
   "source_links": [
@@ -944,6 +954,11 @@
     {
       "policy_id": "YJC507",
       "url": "https://jxj.beijing.gov.cn/zwgk/2024zcwj/202611/t20261106_4935535.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "YJC508",
+      "url": "https://fzggw.nx.gov.cn/tzgg/202611/t20261109_5394762.html",
       "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
     }
   ],

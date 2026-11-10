@@ -1,13 +1,13 @@
 {
   "schema": 1,
   "timezone": "Asia/Shanghai",
-  "snapshot_version": "v472",
-  "snapshot_built_at": "2026-11-10 11:48",
+  "snapshot_version": "v473",
+  "snapshot_built_at": "2026-11-10 13:17",
   "scope": "仅已审公开政策与公告；该页公开日不等于最早首发；成文/收录索引不计今日新发。",
   "counts": {
     "policy": 27,
-    "notice": 28,
-    "important_notice": 19
+    "notice": 29,
+    "important_notice": 20
   },
   "items": [
     {
@@ -30,6 +30,29 @@
       "date_label": "该页公开日",
       "publication_verified": true,
       "issued_at": "2026-11-09",
+      "published_at": "2026-11-09",
+      "event_at": ""
+    },
+    {
+      "id": "YJC508",
+      "canonical_document_id": "YJC508",
+      "type": "notice",
+      "renderer": "policy",
+      "subtype": "年度名单通知",
+      "title": "2026年宁夏重点用能单位名单",
+      "summary": "宁夏更新2026年重点用能单位名单，正文公布354家，实行动态管理。名单内单位应按规定报送能源利用状况报告、依规开展能源审计，并做好能耗在线监测接入、运行和数据上传；地方主管部门承担属地监管。可用于园区节能管理的对象识别，不等于项目审批、用能指标或补助资格。",
+      "analysis_state": "summary",
+      "importance": 4,
+      "status": "年度名单·动态管理",
+      "region": "宁夏",
+      "source_url": "https://fzggw.nx.gov.cn/tzgg/202611/t20261109_5394762.html",
+      "source_label": "官方原发布页/附件",
+      "route": "#/notice/YJC508",
+      "display_date": "2026-11-09",
+      "date_basis": "published",
+      "date_label": "该页公开日",
+      "publication_verified": true,
+      "issued_at": "2026-11-04",
       "published_at": "2026-11-09",
       "event_at": ""
     },
