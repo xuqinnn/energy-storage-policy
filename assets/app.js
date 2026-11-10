@@ -465,6 +465,8 @@
     {id:'services',route:'#/services',zh:'咨询与定制',en:'Advisory',icon:'messages',subzh:'研究、采购与站点',suben:'Research, sourcing & sites'}
   ];
   function sectionOf(h) {
+    if(/^#\/view\/province/.test(h))return 'map';
+    if(/^#\/view\//.test(h))return 'topics';
     if(/^#\/(policy|brief|lib|notice)/.test(h))return 'policy';
     if(/^#\/learning/.test(h))return 'topics';
     if(/^#\/(topics|topic\/|research|methods|work|glossary)/.test(h))return 'topics';
@@ -605,7 +607,7 @@ ${tx('地区/场景','Region/scenario')}: ${form.elements.region.value.trim()}
 ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subject=tx(updates?'研究更新关注意向':'研究咨询需求',updates?'Research update interest':'Research enquiry');$('#inquiry-output').innerHTML=`<p>${tx('草稿已生成，尚未发送。','Draft ready. Nothing has been sent.')}</p><textarea readonly rows="5" aria-label="${tx('邮件草稿','Email draft')}">${esc(body)}</textarea><div class="hero-actions"><button type="button" class="btn" id="copy-inquiry">${tx('复制草稿','Copy draft')}</button><a class="btn pri" id="send-inquiry" href="mailto:xuqinnn@163.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}">${tx('在邮箱中打开','Open in email')} ↗</a></div>`;$('#copy-inquiry').onclick=async()=>{try{await navigator.clipboard.writeText(body);$('#copy-inquiry').textContent=tx('已复制','Copied');}catch(_){$('#inquiry-output textarea').select();$('#copy-inquiry').textContent=tx('已选中，请复制','Selected — copy the text');}};};}
   function subscribePage(){$('#app').innerHTML=`<section class="hero demo-page-head"><div class="eyebrow">${tx('研究更新','RESEARCH UPDATES')}</div><h1>${tx('保持关注，不被信息淹没。','Keep up with the questions that matter.')}</h1><p class="lede">${tx('中国能源政策、重点专题与新工具的更新意向登记。英文简报仍在筹备，不预售尚未交付的服务。','Register interest in China energy policy, research and tools. An English briefing is being explored; no unlaunched service is sold here.')}</p></section>${inquiryHTML(true)}`;wireInquiry(true);}
 
-  function front() { productHome(); }
+  function front() { if(en())productHome();else window.EnergyAtlas.mount(D,contentLayer,replyItems,dailyBrief); }
   // ---------- 专题页（研究线对外版正文＋自动拼：分省对照表、相关政策）：【编号】开简析卡，「方法卡 Mxx」链方法库 ----------
   function inlineMD(t) {
     return citeHTML(t).replace(/`([^`\n]+)`/g, '<code>$1</code>').replace(/\[([^\[\]\n]+)\]\((https:\/\/[^\s<>()]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1 ↗</a>').replace(/\[([^\[\]\n]+)\]\((#\/[A-Za-z0-9_/%\u3400-\u9fff-]+)\)/g, '<a href="$2">$1</a>').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/方法卡\s*(M\d{2})/g, (m, id) => PUB() ? '' : `<a href="#/methods/${id}">方法卡 ${id}</a>`);
@@ -1484,11 +1486,13 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
   // ---------- 路由 ----------
   function route() {
     const h = decodeURIComponent(location.hash || '#/');
+    $('#app').classList.remove('atlas-host');
     $('.nav').classList.remove('mobile-open'); $('.menu-toggle').setAttribute('aria-expanded','false'); const more=document.querySelector('.nav-more');if(more)more.open=false;
     applyLanguage();
     $('#language-notice')?.remove();
     if(en()&&!['#/','#/work','#/start','#/services','#/subscribe','#/explore'].includes(h)){const note=document.createElement('div');note.id='language-notice';note.className='language-notice';note.textContent='Chinese source content · English navigation is available. Policy documents retain their original wording.';$('#app').before(note);}
 
+    if(h.startsWith('#/view/')){setActiveSection(h);window.EnergyAtlas.mount(D,contentLayer,replyItems,dailyBrief);return;}
     if (h.startsWith('#/analysis/')) { location.hash = '#/' + h.slice(11); return; }
     const sec = (h.match(/^#\/([a-z]+)/) || [, 'home'])[1];
     setActiveSection(h);

@@ -87,3 +87,9 @@ ZCMD22仅保留旧资料索引与来源缺口说明，不计入本批已审通�
 Four national policy analyses are available in the existing policy workspace, topics, daily archive and search. They distinguish source facts, interpretation, scope and project checks, with 33 page-and-clause citations and original links. Issued dates and current official-page publication dates are separate; current web metadata does not establish the earliest publication or a separate effective date. No project eligibility, cash flow or real-parameter binding is inferred.
 
 Controlled collection feed: see [WB-FEED.md](WB-FEED.md). Pending collection notices are separate from reviewed-policy counts. Initial data are empty; the offline HTML never requests the remote feed. Source code/workflow availability is not proof of enabled GitHub permissions, scheduled execution or live publication.
+
+### Province, technology and policy relationships
+
+The Chinese homepage integrates recent reviewed policy/notice records, topic links and the existing policy map. Research views at `#/view/province/辽宁`, `#/view/technology/液流` and `#/view/graph/储能` reuse the current public snapshot; no second frozen dataset is shipped. Province pages link to the existing parameter/development board. Topics, daily brief, calculators and service routes remain available. Keyword intersections are file locators, not policy ratings; the time chart is the distribution of indexed publication dates, not national publication volume. Quoted relationships retain their existing source identity and scope.
+
+Run `node tests/test_atlas_model.js` to check date, classification, source-gap, relation-evidence and input-mutation boundaries. Existing automated builds and live data updates use the same assets.

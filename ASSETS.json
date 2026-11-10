@@ -18,7 +18,11 @@
         "tests/test_reply_insights.py",
         "assets/content-model.js",
         "tests/test_content_layer.py",
-        "tests/test_content_model.js"
+        "tests/test_content_model.js",
+        "assets/atlas.js",
+        "assets/atlas-map.js",
+        "assets/atlas.css",
+        "tests/test_atlas_model.js"
       ],
       "class": "B",
       "origin": "本项目Git历史可追溯的自有前台及本轮通用实现",
