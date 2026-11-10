@@ -250,7 +250,7 @@
   const evidencePlace=e=>[Number.isInteger(e.页)&&e.页>0?`物理p${e.页}`:'',e.条款||''].filter(Boolean).join(' ');
   function completeAnalysisHTML(b){
     const body=b?.完整分析;if(b?.分析验收!=='完整'||!body)return '';
-    return `<article class="complete-analysis" data-complete-analysis="${esc(b.编号)}"><h3>${esc(body.导读标题)}</h3><p class="note">${esc(body.日期说明)}</p>${body.章节.map(section=>`<section class="analysis-section"><h4>${esc(section.标题)}</h4><span class="analysis-kind">${esc(section.性质)}</span>${section.段落.map(p=>`<p>${esc(p)}</p>`).join('')}<p class="analysis-evidence">依据：${[...new Set(section.依据索引.map(i=>evidencePlace(b.依据[i])))].map(esc).join('；')}</p></section>`).join('')}<section class="analysis-section"><h4>适用边界</h4><ul>${body.边界.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></section><section class="analysis-section"><h4>下一步核对</h4><ol>${body.核对清单.map(x=>`<li>${esc(x)}</li>`).join('')}</ol><div class="analysis-methods">${body.方法链接.map(href=>`<a href="${esc(href)}">${href.includes('capacity-cost')?'容量与费用核对方法':'政策阅读方法'} →</a>`).join('')}</div></section></article>`;
+    return `<article class="complete-analysis modular-analysis" data-complete-analysis="${esc(b.编号)}"><div class="reading-section-label"><h3>分项阅读</h3><span>原文事实与研究解释分别标注</span></div><div class="analysis-chapters">${body.章节.map((section,i)=>`<details class="analysis-chapter" name="analysis-${esc(b.编号)}"><summary><span class="chapter-number">${String(i+1).padStart(2,'0')}</span><span><strong>${esc(section.标题)}</strong><small>${esc(section.性质)}</small></span><span class="chapter-toggle" aria-hidden="true">＋</span></summary><div class="chapter-copy">${section.段落.map(p=>`<p>${esc(p)}</p>`).join('')}<p class="analysis-evidence">原文位置：${[...new Set(section.依据索引.map(i=>evidencePlace(b.依据[i])))].map(esc).join('；')}</p></div></details>`).join('')}</div><section class="analysis-limits"><h4>适用边界</h4><ul>${body.边界.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></section><details class="analysis-checklist"><summary>使用前核对 · ${body.核对清单.length}项</summary><ol>${body.核对清单.map(x=>`<li>${esc(x)}</li>`).join('')}</ol><div class="analysis-methods">${body.方法链接.map(href=>`<a href="${esc(href)}">${href.includes('capacity-cost')?'容量与费用核对方法':'政策阅读方法'} →</a>`).join('')}</div></details></article>`;
   }
   function sheetHTML(code, hitAt) {
     const classified=contentModel?.records.get(code),held=!!classified?.review_hold;
@@ -261,20 +261,20 @@
       <h2 id="bsH">${esc((b && b.标题) || String(d.title || code).replace(/^\d{6}/, ''))}</h2>
       <p class="note">${esc(contentTypeLabel(classified))}${classified?.importance!==null&&classified?.importance!==undefined?` · 编辑重要性 ${classified.importance}级`:''}</p>
       ${b?.分析验收==='完整'?'<p class="note analysis-coverage">完整分析 · 原文事实、研究解释与项目核对分列</p>':''}${!b?`<p class="note analysis-coverage">${sum?(replyItems.some(r=>r.policy_ids.includes(code))?'政策摘要与关联答复':'文件摘要与来源'):'文件索引与来源'} · 完整分析待补</p>`:''}
-      ${!held && (d.no || (b && b.文号)) ? `<div class="docno">${esc((b && b.文号) || d.no)}</div>` : ''}
+      ${!held && (d.no || (b && b.文号)) ? `<div class="docno">${esc(clean((b && b.文号) || d.no))}</div>` : ''}
       <div class="dates">${held?`<span>旧索引日期 ${esc(d.date||'未载')}（公告日期未核）</span>`:''}${!held && ((b && b.发文日期) || d.date) ? `<span>成文 <b>${esc((b && b.发文日期) || d.date)}</b></span>` : ''}${!held && d.published && d.published !== ((b && b.发文日期) || d.date) ? `<span>公开 <b>${esc(d.published)}</b></span>` : ''}${(b && b.生效日期) || d.effective ? `<span>施行 <b>${esc((b && b.生效日期) || d.effective)}</b></span>` : ''}</div>
       ${sum ? `<p class="summary">${citeHTML(sum)}</p>` : ''}${mainTagsOf(code).length ? `<div class="chips">${mainTagsOf(code).map(tagLink).join('')}</div>` : ''}</div>`;
     const blk = [];
-    if(!held)blk.push(contentSourcesHTML(code));
+    const sourceBlock=!held?contentSourcesHTML(code):'';
     if(!held&&d.reference_warning){const warning=d.reference_warning;blk.push(`<section class="block" data-reference-warning><h3>${esc(warning.title)}</h3><p>${esc(warning.text)}</p><button type="button" class="analysis-policy-link" data-code="${esc(warning.policy_id)}">查看明示废止通知 →</button>${/^https?:\/\//.test(warning.url||'')?`<a class="btn" data-reference-source href="${esc(warning.url)}" target="_blank" rel="noopener noreferrer">废止通知官方来源 ↗</a>`:''}</section>`);}
     if(held)blk.push(`<div class="block" data-source-gap><h3>来源缺口</h3><p>${esc(classified.source_gap)}</p><p class="note">原索引状态与题名不构成公告发布、效力或补偿兑现的核验结果；原资料保留。</p></div>`);
-    if(classified?.importance_reason)blk.push(`<div class="block"><h3>编辑重要性 ${classified.importance}级</h3><p>${esc(classified.importance_reason)}</p></div>`);
+    const editorialNote=classified?.importance_reason?`<details class="analysis-editorial"><summary>收录说明 · 重要性 ${classified.importance}级</summary><p>${esc(classified.importance_reason)}</p></details>`:'';
     if(code==='ZCAH19')blk.push('<div class="block"><p class="note">发布页文号栏未载；正文所引505号属于被引用文件，本件自有文号仍待核。</p></div>');
-    if(classified?.classification_boundary)blk.push(`<div class="block"><h3>分类与适用边界</h3><p>${esc(classified.classification_boundary)}</p></div>`);
-    blk.push(shareContentHTML(code));
+    if(classified?.classification_boundary){const original=classified.classification_boundary,remaining=sum&&original.startsWith(sum)?original.slice(sum.length).trim():original;if(remaining)blk.push(`<div class="block" data-reading-boundary><h3>适用说明</h3><p>${esc(remaining)}</p></div>`);}
     if(b?.分析验收==='完整')blk.push(completeAnalysisHTML(b));
+    const legacyStart=blk.length;
     if (hitAt) blk.push(`<div class="block hit"><h4>正文提及 · 第 ${esc(hitAt.pg)} 页</h4><p>「${esc(hitAt.s)}」</p></div>`);
-    if (b && b.关键数字 && b.关键数字.length) blk.push(`<div class="block"><h4>关键数字</h4><div class="tbl"><table><thead><tr><th>参数</th><th>本件</th><th>前值</th></tr></thead><tbody>${b.关键数字.map(k => `<tr><td>${esc(k.参数)}</td><td class="new">${esc(k.新值)}</td><td class="old">${esc(k.前值)}</td></tr>`).join('')}</tbody></table></div></div>`);
+    if (b && b.关键数字 && b.关键数字.length) blk.push(`<div class="block" data-brief-numbers><h4>关键数字</h4><div class="tbl"><table><thead><tr><th>参数</th><th>本件</th><th>前值</th></tr></thead><tbody>${b.关键数字.map(k => `<tr><td>${esc(k.参数)}</td><td class="new">${esc(k.新值)}</td><td class="old">${esc(k.前值)}</td></tr>`).join('')}</tbody></table></div></div>`);
     if (b && Array.isArray(b.影响) && b.影响.length) blk.push(`<div class="block"><h4>影响</h4><div class="impact">${b.影响.map(i => `<div class="irow"><div><div class="who">${esc(i.对象)}</div><div class="item">${esc(i.收益项)}</div></div><span class="dir ${DIRC[i.方向] || 'flat'}">${ARW[i.方向] || ''} ${esc(i.方向)}</span><p class="why">${citeHTML(i.机制)}</p></div>`).join('')}</div><p class="disclaim">${esc(b.影响说明 || '定性判断，不构成投资建议')}。</p></div>`);
     if (b && !b.脉络) BRIEF_V1.filter(([k]) => b[k] && !(k === '横向' && typeof b[k] === 'object' && b[k].条目)).forEach(([k, t]) => blk.push(`<div class="block"><h4>${esc(t)}</h4>${fieldHTML(b[k])}</div>`));
     if (ml.length) blk.push(`<div class="block"><h4>脉络</h4><div class="tl">${ml.map(n => {
@@ -288,10 +288,12 @@
       blk.push(`<div class="block"><h4>横向 · 与他省</h4><p class="cap">口径：${esc(b.横向.口径)}；单位：${esc(b.横向.单位)}</p><div class="bars">${it.map(e => `<div class="bar ${e.本件 ? 'me' : ''}"><div>${esc(e.省)}<small>${esc(e.算法 || '')}</small></div><div class="track"><div class="fill" style="width:${((+e.值 || 0) / max * 100).toFixed(1)}%"></div></div><div class="v">${esc(e.值)}</div></div>`).join('')}</div>
         <p class="cap">${it.filter(e => !e.本件).map(e => `${esc(e.省)} <button type="button" class="cite ${statusClass((D.docs[e.编号] || {}).status)}" data-code="${esc(e.编号)}">${esc(e.编号)}</button> ${esc(e.年月)}${e.备注 ? '，' + esc(e.备注) : ''}`).join('；')}</p></div>`);
     } else if (b && b.横向 && typeof b.横向 === 'string' && b.脉络 && !externalSite()) blk.push(`<div class="block"><h4>横向 · 与他省</h4><p>${citeHTML(b.横向)}</p></div>`);
+    if(b?.分析验收==='完整'&&blk.length>legacyStart){const supplementary=blk.splice(legacyStart),numbers=supplementary.filter(x=>x.includes('data-brief-numbers')),rest=supplementary.filter(x=>!x.includes('data-brief-numbers'));if(numbers.length)blk.splice(legacyStart-1,0,...numbers);if(rest.length)blk.push(`<details class="analysis-supplement"><summary>补充数据与政策脉络</summary>${rest.join('')}</details>`);}
     if (b && (b.依据 || []).length) blk.push(`<details><summary>依据原文（${b.依据.length} 条）</summary>${b.分析验收==='完整'?'<p class="note">引文按阅读版整理字形与换行，物理页均可回原件核对。</p>':''}<div class="ev">${b.依据.map(e => `<div><span class="src">${b.分析验收==='完整'?esc(evidencePlace(e)):`${esc(e.编号)} ${esc(e.条款 || (e.页 ? "p" + e.页 : ""))}`}</span>${esc(e.原句)}</div>`).join('')}</div></details>`);
 
     if(replyItems.some(r=>r.policy_ids.includes(code)))blk.push(relatedReplyBlock(code));
-    return head + `<div class="sbody">${blk.join('')}</div>`;
+    blk.push(sourceBlock,shareContentHTML(code),editorialNote);
+    return head + `<div class="sbody reading-body">${blk.join('')}</div>`;
   }
   let bsOpener = null;
   function openSheet(code, hitAt, opener) {
@@ -323,8 +325,8 @@
   function briefPage(code) {
     const bs = (D.briefs || []).filter(b => b.编号&&!contentModel?.records.get(b.编号)?.review_hold).sort((a, b) => String(b.发文日期 || '').localeCompare(String(a.发文日期 || '')));
     $('#app').innerHTML = `<section class="hero"><div><div class="eyebrow">政策分析 · ${bs.length} 件</div>
-        <h1>新出的政策改了什么、和以前比、和别省比</h1>
-        <p class="lede">一件一卡，按发文日期新→旧。点卡片或网站任何位置的政策编号，打开分析：概述、关键数字、影响、脉络、观察点、横向比较与依据原文。</p></div></section>
+        <h1>政策分析</h1>
+        <p class="lede">按文件阅读核心条款、适用条件与政策关联。分析和原文依据分列，长文按需展开。</p></div></section>
       <div class="bcards">${bs.map(briefCard).join('') || '<div class="card note">暂无分析。</div>'}</div>`;
     document.querySelector('#app>.hero').insertAdjacentHTML('afterend',analysisWorkspaceHTML());
     if (code && D.docs[code])showInlineAnalysis('policy',code,{scroll:false});
@@ -1156,8 +1158,8 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
     return `<div class="block"><a data-share-link href="${esc(url.href)}">分享直达链接</a> · <button type="button" class="dim" data-copy-content="${esc(url.href)}">复制链接</button><span data-share-status role="status"></span></div>`;
   }
   function noticeAnalysisHTML(n) {
-    return `<div class="shead"><span class="reply-type">公告 · ${esc(n.subtype)}</span><h2 id="analysis-title" tabindex="-1">${esc(n.title)}</h2><p>${esc(n.issuer)} · 编辑重要性 ${n.importance}级</p><p class="note">${esc(n.importance_reason)}</p><div class="dates"><span>事件：<b>${esc(n.event_at)}</b></span><span>署名日期：${esc(n.issued_at)}</span><span>该页公开：${esc(n.published_at)}</span><span>最早首发：${esc(n.first_publication_date||'未确认')}</span></div><p class="note">${esc(n.publication_date_basis)}</p><p class="summary">${esc(n.summary)}</p></div>
-      <div class="sbody"><section class="block"><h3>我们的分析</h3><p>${esc(n.our_analysis)}</p><p class="analysis-boundary">${esc(n.boundary)}</p><p>${esc(n.region_scope)}</p></section><section class="block"><h3>依据原文</h3><blockquote>${esc(n.quote)}</blockquote><a class="btn" data-notice-source href="${esc(n.source_url)}" target="_blank" rel="noopener noreferrer">交易中心署名公告原页 ↗</a><p class="note">${esc(n.source_access_note)}</p><a data-notice-corroboration href="${esc(n.corroborating_url)}" target="_blank" rel="noopener noreferrer">能源局事件佐证 ↗</a></section><section class="block"><h3>公告所引文件</h3><p>${esc(n.cited_document_number)}：${esc(n.cited_document_verification)}</p><p>没有已审的正式参数或省网区映射，不据此广播到各省或收益工具。</p></section>${shareContentHTML(n.id)}</div>`;
+    return `<div class="shead"><span class="reply-type">公告 · ${esc(n.subtype)}</span><h2 id="analysis-title" tabindex="-1">${esc(n.title)}</h2><p>${esc(n.issuer)} · 编辑重要性 ${n.importance}级</p><details class="analysis-editorial"><summary>收录说明</summary><p>${esc(n.importance_reason)}</p></details><div class="dates"><span>事件：<b>${esc(n.event_at)}</b></span><span>署名日期：${esc(n.issued_at)}</span><span>该页公开：${esc(n.published_at)}</span><span>最早首发：${esc(n.first_publication_date||'未确认')}</span></div><p class="note">${esc(n.publication_date_basis)}</p><p class="summary">${esc(n.summary)}</p></div>
+      <div class="sbody"><section class="block"><h3>公告解读</h3><p>${esc(n.our_analysis)}</p><p class="analysis-boundary">${esc(n.boundary)}</p><p>${esc(n.region_scope)}</p></section><section class="block"><h3>依据原文</h3><blockquote>${esc(n.quote)}</blockquote><a class="btn" data-notice-source href="${esc(n.source_url)}" target="_blank" rel="noopener noreferrer">交易中心署名公告原页 ↗</a><p class="note">${esc(n.source_access_note)}</p><a data-notice-corroboration href="${esc(n.corroborating_url)}" target="_blank" rel="noopener noreferrer">能源局事件佐证 ↗</a></section><section class="block"><h3>公告所引文件</h3><p>${esc(n.cited_document_number)}：${esc(n.cited_document_verification)}</p><p>没有已审的正式参数或省网区映射，不据此广播到各省或收益工具。</p></section>${shareContentHTML(n.id)}</div>`;
   }
   function noticePage(id) {
     libPage('type=notice');const r=contentModel.records.get(id);
@@ -1181,7 +1183,7 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
   }
   function replyAnalysisHTML(r) {
     const flags=[['source_verified','答复原文'],['cited_policies_verified','援引政策'],['project_applicability_verified','项目适用']];
-    return `<div class="shead"><span class="reply-type">${esc(r.source_kind)} · 官方答复与研究解释</span><h2 id="analysis-title" tabindex="-1">${esc(r.title)}</h2><p>${esc(r.reply_title)} · ${esc(r.reply_number)}</p><div class="dates"><span>答复落款 <b>${esc(r.reply_issued_at)}</b></span><span>官网当前标注 ${esc(r.official_page_publishdate||'未确认')}</span><span>最早公开日 ${esc(r.first_publication_date||'未确认')}</span></div><p class="summary">${esc(r.summary)}</p></div><div class="sbody"><section class="block"><h3>我们的分析</h3><p>${esc(r.our_analysis)}</p><p class="analysis-boundary">${esc(r.boundary)}</p><p>${esc(r.region_scope)}</p></section><section class="block"><h3>依据原文</h3><blockquote>${esc(r.quote)}</blockquote><p>${esc(r.source_anchor)}</p><a class="btn" data-reply-source href="${esc(r.source_url)}" target="_blank" rel="noopener noreferrer">查看官方原网页 ↗</a></section><section class="block"><h3>分别核验</h3><div class="reply-checks">${flags.map(([key,label])=>`<span>${label}：${r.evidence_checks[key]?'已核':'未核'}</span>`).join('')}</div><p class="note">${esc(r.evidence_check_scope)}</p></section><section class="block"><h3>关联政策分析</h3>${r.policy_ids.length?r.policy_ids.map(code=>`<button type="button" class="analysis-policy-link" data-code="${esc(code)}">${esc(D.docs[code]?.title||'查看关联政策分析')} →</button>`).join(''):'<p class="note">暂无已审定的具体政策映射；不能据此判断不存在相关规则。</p>'}</section></div>`;
+    return `<div class="shead"><span class="reply-type">${esc(r.source_kind)} · 官方答复与研究解释</span><h2 id="analysis-title" tabindex="-1">${esc(r.title)}</h2><p>${esc(r.reply_title)} · ${esc(r.reply_number)}</p><div class="dates"><span>答复落款 <b>${esc(r.reply_issued_at)}</b></span><span>官网当前标注 ${esc(r.official_page_publishdate||'未确认')}</span><span>最早公开日 ${esc(r.first_publication_date||'未确认')}</span></div><p class="summary">${esc(r.summary)}</p></div><div class="sbody"><section class="block"><h3>答复解读</h3><p>${esc(r.our_analysis)}</p><p class="analysis-boundary">${esc(r.boundary)}</p><p>${esc(r.region_scope)}</p></section><section class="block"><h3>依据原文</h3><blockquote>${esc(r.quote)}</blockquote><p>${esc(r.source_anchor)}</p><a class="btn" data-reply-source href="${esc(r.source_url)}" target="_blank" rel="noopener noreferrer">查看官方原网页 ↗</a></section><section class="block"><h3>分别核验</h3><div class="reply-checks">${flags.map(([key,label])=>`<span>${label}：${r.evidence_checks[key]?'已核':'未核'}</span>`).join('')}</div><p class="note">${esc(r.evidence_check_scope)}</p></section><section class="block"><h3>关联政策分析</h3>${r.policy_ids.length?r.policy_ids.map(code=>`<button type="button" class="analysis-policy-link" data-code="${esc(code)}">${esc(D.docs[code]?.title||'查看关联政策分析')} →</button>`).join(''):'<p class="note">暂无已审定的具体政策映射；不能据此判断不存在相关规则。</p>'}</section></div>`;
   }
   function analysisWorkspaceHTML(province='') {
     return `<section id="analysis-workspace" class="inline-analysis" data-province="${esc(province)}" role="region" aria-label="${tx('本页分析工作区','Analysis workspace')}" hidden></section>`;
@@ -1190,6 +1192,7 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
     const panel=document.querySelector('#analysis-workspace'),current=inlineAnalysis.current;
     if(!panel||!current)return;
     tip.hidden=true; // Replacing the hovered source node does not dispatch mouseout.
+    const openDetails=panel.dataset.selected===current.id?new Set([...panel.querySelectorAll('details[open]>summary')].map(s=>s.textContent.trim())):new Set();
     let content;
     if(current.kind==='notice'){
       const n=contentLayer.notices.find(n=>n.id===current.id);if(!n)return;content=noticeAnalysisHTML(n);
@@ -1204,7 +1207,11 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
     }
     const province=panel.dataset.province;
     panel.hidden=false;panel.dataset.kind=current.kind;panel.dataset.selected=current.id;
+    panel.classList.add('reading-layout');
     panel.innerHTML=`<div class="analysis-toolbar"><span>${esc(province||tx('研究分析','Research analysis'))} · ${esc(contentTypeLabel(contentModel?.records.get(current.id)))}</span><div><button type="button" data-analysis-back>${inlineAnalysis.history.length?tx('返回上一项','Previous item'):tx('返回列表','Return to list')}</button><button type="button" data-analysis-close>${tx('收起分析','Collapse')}</button></div></div>${content}`;
+    if(openDetails.size)panel.querySelectorAll('details').forEach(d=>{if(openDetails.has(d.querySelector(':scope>summary')?.textContent.trim()))d.open=true;});
+    const summary=panel.querySelector('.shead .summary')?.textContent?.replace(/\s+/g,' ').trim();
+    if(summary)panel.querySelectorAll('.sbody p').forEach(p=>{if(p.textContent.replace(/\s+/g,' ').trim()===summary)p.remove();});
   }
   function refreshInlineAnalysis(){if(inlineAnalysis.route===decodeURIComponent(location.hash||'#/')&&document.querySelector('#analysis-workspace'))renderInlineAnalysis();}
   function showInlineAnalysis(kind,id,options={}) {
@@ -1218,7 +1225,7 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
     if(!panel)return;
     const source=options.opener;
     if(source&&!panel.contains(source)){
-      const row=source.closest('.daily-item,.doc-row,.chain,.related-policy-row,.analysis-policy-link,.bcard');
+      const row=source.closest('.daily-item,.doc-row,.chain,.relation-story,.related-policy-row,.analysis-policy-link,.bcard');
       const home=source.closest('.home-columns');
       if(row&&row.tagName!=='BUTTON')row.append(panel);
       else if(row)row.after(panel);
