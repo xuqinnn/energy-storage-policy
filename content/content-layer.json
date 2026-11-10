@@ -528,6 +528,66 @@
       "importance_reason": "更新市级储能推荐需求和布局，并明确项目手续、安全和自主入市要求。",
       "classification_basis": "广州更新新型储能电站推荐布局，附件列电网侧集中式总推荐布点43个、需求规模505万千瓦；新增分布式储能建设引导，优先支持4小时及以上长时项目。推荐需求不等已建装机、核准或收益承诺，项目仍须办理备案、并网及调度手续，自主入市、自负盈亏。",
       "evidence_scope": "官方通知正文及必要适用边界；具体名单身份与个体项目资格另核。"
+    },
+    {
+      "id": "YJC503",
+      "canonical_document_id": "YJC503",
+      "content_type": "notice",
+      "subtype": "项目公示",
+      "importance": 4,
+      "importance_reason": "能源AI试点拟入选项目公示，关系公示阶段与最终批准的区分。",
+      "classification_basis": "国家能源局综合司公示拟列入“人工智能+”能源试点的93个项目，公示期为11月5日至11日；异议须有真实身份、联系方式和具体事实依据。93为拟公示项目数，不等最终获批、补助或已实施数量，也不能直接推断其中储能项目比例。",
+      "evidence_scope": "官方通知正文及必要适用边界；具体名单身份与个体项目资格另核。"
+    },
+    {
+      "id": "YJC504",
+      "canonical_document_id": "YJC504",
+      "content_type": "notice",
+      "subtype": "典型案例公布",
+      "importance": 3,
+      "importance_reason": "公布用电营商环境案例，供服务模式研究与经验交流。",
+      "classification_basis": "国家能源局综合司公布现代化用电营商环境“三个一批”建设典型案例74个，经申报、推荐、评选和公示形成，供各地结合实际交流与推广。案例经验不直接成为全国统一办电时限、费用减免或项目资格，具体做法仍应对照当地有效规则和服务条件。",
+      "evidence_scope": "官方通知正文及必要适用边界；具体名单身份与个体项目资格另核。"
+    },
+    {
+      "id": "YJC505",
+      "canonical_document_id": "YJC505",
+      "content_type": "notice",
+      "subtype": "征求意见公告",
+      "importance": 4,
+      "importance_reason": "省级电力市场结算细则修订征求，影响结算规则研究。",
+      "classification_basis": "陕西就《电力市场结算实施细则（2027年版）》征求意见，面向有关市场经营主体，反馈截至12月9日。公告附草案和反馈表；拟修订安排不等于规则已生效，2027年版也不自动代表2027年1月1日实施，具体费用与结算条款须分别核对。",
+      "evidence_scope": "官方通知正文及必要适用边界；具体名单身份与个体项目资格另核。"
+    },
+    {
+      "id": "YJC506",
+      "canonical_document_id": "YJC506",
+      "content_type": "notice",
+      "subtype": "征求意见公告",
+      "importance": 4,
+      "importance_reason": "分时电价优化征求，涉及拟调整费项、对象和时间边界。",
+      "classification_basis": "陕西公开征求优化分时电价政策意见，反馈截至11月13日。草案拟将系统运行费纳入工商业分时浮动，排除电气化铁路牵引用电；拟2027年1月1日起暂行一年。上述均为草案安排，不得替代现行电价；峰谷时段等其他事项仍须对照1034号文件。",
+      "evidence_scope": "官方通知正文及必要适用边界；具体名单身份与个体项目资格另核。"
+    },
+    {
+      "id": "ZCSX38",
+      "canonical_document_id": "ZCSX38",
+      "content_type": "policy",
+      "subtype": "省级综合实施方案",
+      "importance": 5,
+      "importance_reason": "山西电力市场建设与多类资源入市的省级实施框架。",
+      "classification_basis": "山西部署中长期、现货、辅助服务和绿电绿证协同，在国家指导下探索容量市场，有序推动独立储能、抽水蓄能、虚拟电厂等资源参与，并衔接绿电直连与零碳园区。2030、2035年安排属于建设目标，不等市场已建成；方案不能直接作为容量价格、准入或结算标准。",
+      "evidence_scope": "官方通知正文及必要适用边界；具体名单身份与个体项目资格另核。"
+    },
+    {
+      "id": "ZCFJ49",
+      "canonical_document_id": "ZCFJ49",
+      "content_type": "policy",
+      "subtype": "省级综合实施方案",
+      "importance": 3,
+      "importance_reason": "福州城市支持措施中的零碳园区、绿电与能源项目条件。",
+      "classification_basis": "福建出台支持福州发展的综合措施，支持省级零碳园区、绿电直连和综合能源服务示范建设，另有海上新能源及用地用海支持条款。鼓励按国家级零碳园区标准建设，不等获得国家级认定、项目批复或统一补贴；措施自印发起实施，有效期5年。",
+      "evidence_scope": "官方通知正文及必要适用边界；具体名单身份与个体项目资格另核。"
     }
   ],
   "source_links": [
@@ -824,6 +884,36 @@
     {
       "policy_id": "YJC502",
       "url": "https://fgw.gz.gov.cn/tzgg/content/post_11090864.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "YJC503",
+      "url": "https://www.nea.gov.cn/20261105/585304b2c1a64107ac83af585da214d2/c.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "YJC504",
+      "url": "https://www.nea.gov.cn/20261109/dd6c5f3313a34d19ab874ec1dc5f75fa/c.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "YJC505",
+      "url": "https://sndrc.shaanxi.gov.cn/hdjl/dczj/202611/t20261109_3722721.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "YJC506",
+      "url": "https://sndrc.shaanxi.gov.cn/hdjl/dczj/202610/t20261030_3708293.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCSX38",
+      "url": "https://www.shanxi.gov.cn/zcwjk/bgtwj/202610/W020261026533893604255.pdf",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCFJ49",
+      "url": "https://www.fujian.gov.cn/zwgk/zxwj/szfbgtwj/202610/t20261026_7240245.htm",
       "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
     }
   ],
