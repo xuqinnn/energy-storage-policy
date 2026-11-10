@@ -1,13 +1,13 @@
 {
   "schema": 1,
   "timezone": "Asia/Shanghai",
-  "snapshot_version": "v471",
-  "snapshot_built_at": "2026-11-10 11:00",
+  "snapshot_version": "v472",
+  "snapshot_built_at": "2026-11-10 11:48",
   "scope": "仅已审公开政策与公告；该页公开日不等于最早首发；成文/收录索引不计今日新发。",
   "counts": {
-    "policy": 26,
-    "notice": 27,
-    "important_notice": 18
+    "policy": 27,
+    "notice": 28,
+    "important_notice": 19
   },
   "items": [
     {
@@ -54,6 +54,29 @@
       "publication_verified": true,
       "issued_at": "2026-11-09",
       "published_at": "2026-11-09",
+      "event_at": ""
+    },
+    {
+      "id": "YJC507",
+      "canonical_document_id": "YJC507",
+      "type": "notice",
+      "renderer": "policy",
+      "subtype": "年度征集通知",
+      "title": "2026年度国家绿色算力设施征集工作通知（北京）",
+      "summary": "北京组织2026年度国家绿色算力设施征集，11月16日前报送。地方申报要求本市独立法人、项目在京且全系统连续稳定运行一年以上；四家基础电信集团、金融机构及公共机构另循规定推荐渠道。征集不等最终认定，机架、能效等条件须合并核对。",
+      "analysis_state": "summary",
+      "importance": 4,
+      "status": "征集中",
+      "region": "北京",
+      "source_url": "https://jxj.beijing.gov.cn/zwgk/2024zcwj/202611/t20261106_4935535.html",
+      "source_label": "官方原发布页/附件",
+      "route": "#/notice/YJC507",
+      "display_date": "2026-11-06",
+      "date_basis": "published",
+      "date_label": "该页公开日",
+      "publication_verified": true,
+      "issued_at": "2026-10-27",
+      "published_at": "2026-11-06",
       "event_at": ""
     },
     {
@@ -928,6 +951,29 @@
       "publication_verified": true,
       "issued_at": "2026-10-12",
       "published_at": "2026-10-12",
+      "event_at": ""
+    },
+    {
+      "id": "ZCGJ186",
+      "canonical_document_id": "ZCGJ186",
+      "type": "policy",
+      "renderer": "policy",
+      "subtype": "安全费用管理规则",
+      "title": "关于做好电力企业安全生产费用提取和使用工作的通知",
+      "summary": "国家能源局要求电力企业按财资〔2022〕136号提取和使用安全生产费用，加强专项核算、内部审计和执法监管。未列入附件范围或负面清单的支出，应按改善安全条件、降低隐患或事故风险原则判断，不能视为任意列支，也不能据本通知推算新的提取比例或项目收益。",
+      "analysis_state": "summary",
+      "importance": 4,
+      "status": "现行有效",
+      "region": "全国",
+      "source_url": "https://www.nea.gov.cn/20261105/b975e2363c024aad8c4a7926b83658ad/c.html",
+      "source_label": "官方原发布页/附件",
+      "route": "#/brief/ZCGJ186",
+      "display_date": "2026-09-30",
+      "date_basis": "issued",
+      "date_label": "成文/索引日（公开日未核）",
+      "publication_verified": false,
+      "issued_at": "2026-09-30",
+      "published_at": "",
       "event_at": ""
     },
     {

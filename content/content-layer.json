@@ -588,6 +588,26 @@
       "importance_reason": "福州城市支持措施中的零碳园区、绿电与能源项目条件。",
       "classification_basis": "福建出台支持福州发展的综合措施，支持省级零碳园区、绿电直连和综合能源服务示范建设，另有海上新能源及用地用海支持条款。鼓励按国家级零碳园区标准建设，不等获得国家级认定、项目批复或统一补贴；措施自印发起实施，有效期5年。",
       "evidence_scope": "官方通知正文及必要适用边界；具体名单身份与个体项目资格另核。"
+    },
+    {
+      "id": "ZCGJ186",
+      "canonical_document_id": "ZCGJ186",
+      "content_type": "policy",
+      "subtype": "安全费用管理规则",
+      "importance": 4,
+      "importance_reason": "电力企业安全生产费用提取、使用及审计监管的持续管理要求。",
+      "classification_basis": "国家能源局要求电力企业按财资〔2022〕136号提取和使用安全生产费用，加强专项核算、内部审计和执法监管。未列入附件范围或负面清单的支出，应按改善安全条件、降低隐患或事故风险原则判断，不能视为任意列支，也不能据本通知推算新的提取比例或项目收益。",
+      "evidence_scope": "官方正文及必要适用边界；具体附件条款与个体项目资格另核。"
+    },
+    {
+      "id": "YJC507",
+      "canonical_document_id": "YJC507",
+      "content_type": "notice",
+      "subtype": "年度征集通知",
+      "importance": 4,
+      "importance_reason": "北京绿色算力年度征集，涉及本地资格、推荐路径与报送时点。",
+      "classification_basis": "北京组织2026年度国家绿色算力设施征集，11月16日前报送。地方申报要求本市独立法人、项目在京且全系统连续稳定运行一年以上；四家基础电信集团、金融机构及公共机构另循规定推荐渠道。征集不等最终认定，机架、能效等条件须合并核对。",
+      "evidence_scope": "官方正文及必要适用边界；具体附件条款与个体项目资格另核。"
     }
   ],
   "source_links": [
@@ -914,6 +934,16 @@
     {
       "policy_id": "ZCFJ49",
       "url": "https://www.fujian.gov.cn/zwgk/zxwj/szfbgtwj/202610/t20261026_7240245.htm",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCGJ186",
+      "url": "https://www.nea.gov.cn/20261105/b975e2363c024aad8c4a7926b83658ad/c.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "YJC507",
+      "url": "https://jxj.beijing.gov.cn/zwgk/2024zcwj/202611/t20261106_4935535.html",
       "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
     }
   ],
