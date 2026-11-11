@@ -60,13 +60,21 @@ function province(){const region=state.object;const regional=D.docs.filter(d=>sa
 const phases=[{name:'规划与建设',terms:['规划','行动','建设','布局']},{name:'项目与名单',terms:['项目','清单','名单','试点']},{name:'电价与交易',terms:['电价','补偿','结算','交易','市场']},{name:'安全与管理',terms:['安全','管理','监管','标准']}];
 function technology(){
  const selected=techDef(state.object)||D.technologies[0],scoped=D.docs.filter(d=>sameRegion(d,state.scope)),rows=scoped.filter(d=>mention(d,selected.terms));
- const cell=state.techCell?.tech===selected.name?state.techCell:null;
- const picked=cell?rows.filter(d=>mention(d,phases[cell.phase].terms)):rows;
+ const cell=state.techCell,active=cell?techDef(cell.tech):selected;
+ const technologyRows=D.technologies.map(tech=>{
+  const matches=scoped.filter(d=>mention(d,tech.terms));
+  return {tech,matches,counts:phases.map(p=>matches.filter(d=>mention(d,p.terms)).length)};
+ });
+ const picked=cell?technologyRows.find(row=>row.tech===active).matches.filter(d=>mention(d,phases[cell.phase].terms)):rows;
  return `${head(selected.name+' · 技术路线','按技术与政策环节阅读文件，具体条件回到原文。')}
  <nav class="technology-picker" aria-label="选择技术路线">${D.technologies.map(t=>`<a href="${url('technology',t.name)}" class="technology-choice ${selected.name===t.name?'selected':''}" ${selected.name===t.name?'aria-current="page"':''}><span class="technology-mark">${esc(t.short)}</span><strong>${esc(t.name)}</strong></a>`).join('')}</nav>
- <section class="panel route-lens"><div class="panel-head"><div><h2>按政策环节浏览</h2><p class="note">摘要提及索引；不代表政策支持等级。同一文件可涉及多个环节。</p></div>${scopeHTML()}</div>
- <div class="phase-picker"><button class="phase-choice ${!cell?'selected':''}" data-clear-cell aria-pressed="${!cell}"><span>全部文件</span><b>${rows.length}</b></button>${phases.map((p,i)=>{const n=rows.filter(d=>mention(d,p.terms)).length;return `<button class="phase-choice ${cell?.phase===i?'selected':''}" data-tech-cell="${selected.name}|${i}" aria-pressed="${cell?.phase===i}"><span>${p.name}</span><b>${n}</b></button>`}).join('')}</div></section>
- ${compareTray()}${list(picked,selected.name+' · '+(cell?phases[cell.phase].name:'相关文件'))}`;
+ <section class="panel route-lens"><div class="panel-head"><div><h2>技术路线与政策环节对照</h2><p class="note">数字为去重后的文件提及数，同一文件可涉及多个环节。</p></div>${scopeHTML()}</div>
+ <div class="matrix-scroll technology-matrix" role="region" aria-label="技术路线与政策环节对照表" tabindex="0">
+  <table class="matrix"><thead><tr><th scope="col">技术路线</th>${phases.map(p=>`<th scope="col">${p.name}</th>`).join('')}</tr></thead>
+  <tbody>${technologyRows.map(({tech,counts})=>`<tr class="${tech===active?'selected':''}"><th scope="row"><a href="${url('technology',tech.name)}">${esc(tech.name)}</a></th>
+   ${counts.map((n,i)=>`<td>${n?`<button type="button" data-tech-cell="${esc(tech.name)}|${i}" aria-pressed="${cell?.tech===tech.name&&cell.phase===i}" aria-label="${esc(tech.name)}，${phases[i].name}，${n}份文件">${n}</button>`:'<span class="matrix-empty" aria-label="无匹配">—</span>'}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+ <div class="route-selection">${cell?`<strong>${esc(active.name)} · ${phases[cell.phase].name}</strong><button type="button" class="text-link" data-clear-cell>查看${esc(selected.name)}全部文件</button>`:`<strong>${esc(selected.name)} · 全部相关文件</strong>`}</div></section>
+ ${compareTray()}${list(picked,active.name+' · '+(cell?phases[cell.phase].name:'相关文件'))}`;
 }
 
 function topic(){const t=topicDef(state.object);if(!t)return `${head('按专题组织阅读','政策、通知、技术提及与沿革，围绕同一主题关联。')}<div class="theme-grid">${D.topics.map((t,i)=>{const rows=D.docs.filter(d=>topicMatch(d,t.name));return `<a class="theme-card" href="${url('topic',t.name)}"><span class="theme-sign">${icon(topicIcons[i])}</span><h3>${t.name}</h3><p>${t.terms.join(' / ')}</p><footer><span>${rows.length} 条摘要提及</span><span>进入专题 →</span></footer></a>`}).join('')}</div>`;
