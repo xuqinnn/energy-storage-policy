@@ -1,12 +1,12 @@
 {
   "schema": 1,
   "timezone": "Asia/Shanghai",
-  "snapshot_version": "v473",
-  "snapshot_built_at": "2026-11-10 13:17",
+  "snapshot_version": "v474",
+  "snapshot_built_at": "2026-11-11 13:09",
   "scope": "仅已审公开政策与公告；该页公开日不等于最早首发；成文/收录索引不计今日新发。",
   "counts": {
     "policy": 27,
-    "notice": 29,
+    "notice": 30,
     "important_notice": 20
   },
   "items": [
@@ -283,6 +283,29 @@
       "date_label": "该页公开日",
       "publication_verified": true,
       "issued_at": "2026-10-29",
+      "published_at": "2026-11-03",
+      "event_at": ""
+    },
+    {
+      "id": "YJC509",
+      "canonical_document_id": "YJC509",
+      "type": "notice",
+      "renderer": "policy",
+      "subtype": "专家库组建通知",
+      "title": "江西省电力应急专家库",
+      "summary": "江西省能源局组建江西省电力应急专家库，正文载明纳入98人，实行动态管理。入库专家参与预案评审以及突发电力事件分析、研判、处置和复盘评估；所在单位支持省市县共享专家资源。",
+      "analysis_state": "summary",
+      "importance": 3,
+      "status": "动态管理",
+      "region": "江西",
+      "source_url": "https://drc.jiangxi.gov.cn/jxsfzhggwyh/col/col14590/content/content_2117434687471812608.html",
+      "source_label": "官方原发布页/附件",
+      "route": "#/notice/YJC509",
+      "display_date": "2026-11-03",
+      "date_basis": "published",
+      "date_label": "该页公开日",
+      "publication_verified": true,
+      "issued_at": "2026-10-30",
       "published_at": "2026-11-03",
       "event_at": ""
     },

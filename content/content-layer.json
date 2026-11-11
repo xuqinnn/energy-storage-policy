@@ -618,6 +618,16 @@
       "importance_reason": "年度重点用能单位名单，关联园区企业节能管理的对象识别与监管要求。",
       "classification_basis": "宁夏更新2026年重点用能单位名单，正文公布354家，实行动态管理。名单内单位应按规定报送能源利用状况报告、依规开展能源审计，并做好能耗在线监测接入、运行和数据上传；地方主管部门承担属地监管。可用于园区节能管理的对象识别，不等于项目审批、用能指标或补助资格。",
       "evidence_scope": "官方正文及必要适用边界；具体附件条款与个体项目资格另核。"
+    },
+    {
+      "id": "YJC509",
+      "canonical_document_id": "YJC509",
+      "content_type": "notice",
+      "subtype": "专家库组建通知",
+      "importance": 3,
+      "importance_reason": "明确江西电力应急专家库的工作职责和动态管理。",
+      "classification_basis": "江西省能源局组建江西省电力应急专家库，正文载明纳入98人，实行动态管理。入库专家参与预案评审以及突发电力事件分析、研判、处置和复盘评估；所在单位支持省市县共享专家资源。",
+      "evidence_scope": "通知正文与所载人数；个体名单及资格以官方附件为准。"
     }
   ],
   "source_links": [
@@ -959,6 +969,11 @@
     {
       "policy_id": "YJC508",
       "url": "https://fzggw.nx.gov.cn/tzgg/202611/t20261109_5394762.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "YJC509",
+      "url": "https://drc.jiangxi.gov.cn/jxsfzhggwyh/col/col14590/content/content_2117434687471812608.html",
       "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
     }
   ],
