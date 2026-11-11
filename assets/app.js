@@ -297,6 +297,10 @@
         ],
       },
     },
+    ZCAH66: {
+      horizontal: '安徽与陕西均以165元/千瓦·年的煤电容量电价为基准，按暂定6小时折算。陕西文件自2026年8月1日起执行，安徽文件自2027年1月1日起执行。项目资格和结算按各地文件核对。',
+      peers: ['ZCSN31'],
+    },
     ZCSN31: {
       reason: '文件将陕西电网侧独立储能容量电价由前期项目结算函转入清单制管理。项目适用性取决于是否参与配储、是否纳入清单以及考核达标情况。',
     },
@@ -353,7 +357,7 @@
   function comparisonName(id,label,current){
     return id!==current && canOpenPolicy(id)?`<button type="button" class="analysis-policy-link" data-code="${esc(id)}" aria-label="${esc(label+' · '+docName(id))}">${esc(label)} <span aria-hidden="true">→</span></button>`:esc(label);
   }
-  function comparisonHTML(code, brief, context){
+  function comparisonHTML(code, brief, context, topic=null){
     const compare=brief?.横向;
     const rows=Array.isArray(compare?.条目)?compare.条目:[];
     const columns=context?.comparisonColumns;
@@ -369,15 +373,16 @@
       const chart=reviewedNumericComparisons.has(code)&&rows.length>1&&compare.口径&&compare.单位&&rows.every(row=>typeof row.值==='number'&&Number.isFinite(row.值)&&row.值>=0);
       const max=chart?Math.max(1,...rows.map(row=>row.值)):1;
       const unit=compare.单位&&compare.单位!=='—'?compare.单位:'';
-      return `<section class="block" data-policy-comparison><h3>${hasPeer?'横向比较':'参数口径'}</h3>
+      return `<section class="block" data-policy-comparison><h3>${topic?'同口径比较':hasPeer?'横向比较':'参数口径'}</h3>
         ${context?.horizontal?fieldHTML(context.horizontal):''}
         <div class="tbl comparison-frame" tabindex="0" role="region" aria-label="${hasPeer?'省际对照表':'参数口径表'}">
           <table class="comparison-rows"><caption>${esc(compare.口径||'')}${unit?` <span>· ${esc(unit)}</span>`:''}</caption>
-          <thead><tr><th scope="col">地区与文件</th><th scope="col">${chart?'折算标准':'文件口径'}</th><th scope="col">算法与条件</th></tr></thead>
+          <thead><tr><th scope="col">${topic?'地区':'地区与文件'}</th><th scope="col">${chart?'折算标准':'文件口径'}</th><th scope="col">算法与条件</th></tr></thead>
           <tbody>${rows.map(row=>{
-            const current=row.编号===code;
-            return `<tr${current?' class="comparison-current"':''}><th scope="row">${comparisonName(row.编号,row.省||'相关文件',code)}
-              <small>${[current?'本件':'',row.年月].filter(Boolean).map(esc).join(' · ')}</small></th>
+            const current=topic?row.省===topic.province:row.编号===code;
+            const label=topic?'当前省份':'本件';
+            return `<tr${current?' class="comparison-current"':''}><th scope="row">${comparisonName(row.编号,row.省||'相关文件',topic?null:code)}
+              <small>${topic?`${current?'<span>当前省份</span> ':''}<time>${esc(row.年月||'')}</time>`:[current?label:'',row.年月].filter(Boolean).map(esc).join(' · ')}</small></th>
               <td class="comparison-value"><b>${esc(row.值??'—')}</b>${chart?`<span class="comparison-track" aria-hidden="true"><span style="width:${(row.值/max*100).toFixed(1)}%"></span></span>`:''}</td>
               <td>${[row.算法,row.备注].filter(Boolean).map(v=>`<span class="comparison-condition">${esc(v)}</span>`).join('')||'—'}</td></tr>`;
           }).join('')}</tbody></table>
@@ -806,14 +811,37 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
     const guide=(D.public_guides||[]).find(g=>g.id===id);if(!guide)return '';
     return `<section class="card prose-topic research-path" data-research-path="${id}"><details><summary>${tx('沿一个问题完成研究：','Work through an evidence brief: ')}${esc(guide.title)}</summary>${mdHTML(guide.md)}<p><a href="#/methods/${id}">${tx('打开这条路径的直达页','Open a direct link to this brief')}</a></p></details></section>`;
   }
-  function topicWorkspaceHTML(name,allLessons=false){
+  function capacityTopicHTML(province, from){
+    const comparison=briefOf('ZCSN31');
+    if(!comparison?.横向?.条目?.length)return '';
+    const returnRoute=from==='parameters'?'#/p/':'#/view/province/';
+    const back=province?`<a class="text-link" href="${returnRoute}${encodeURIComponent(province)}">返回${esc(province)}看板 →</a>`:'';
+    return `<section id="topic-capacity" class="card topic-capacity" aria-labelledby="capacity-topic-title">
+      <header class="capacity-topic-head">
+        <div><h2 id="capacity-topic-title" tabindex="-1">独立储能容量电价</h2>
+        <p>${province?`当前地区 · ${esc(province)}`:'地区对照'}</p></div>
+        ${back}
+      </header>
+      <div class="capacity-topic-body">
+        ${comparisonHTML('ZCSN31',comparison,null,{province})}
+        <p class="note">按同样的 4 小时配置套用表中三地的文件公式。项目适用资格、施行日和结算扣减以各地条款为准。</p>
+        ${canOpenPolicy('ZCLN38')?`<div class="capacity-other">
+          <div><h3>辽宁 · 可靠容量补偿</h3><p>按核定可靠容量、年度标准、供需系数与扣减条件结算。另读机制对照。</p></div>
+          <button type="button" class="analysis-policy-link" data-code="ZCLN38" aria-controls="analysis-workspace">查看辽宁条款 →</button>
+        </div>`:''}
+      </div></section>`;
+  }
+  function topicWorkspaceHTML(name,allLessons=false,params=new URLSearchParams()){
     const t=(D.topics||[]).find(t=>t.名===name);if(!t)return '';
     const base=p=>p.split(/[·(（]/)[0],rank=p=>/^(国家|全国)/.test(p)?0:PROVS.includes(base(p))||base(p)==='内蒙古'?1:2;
     const subs=Object.keys(t.rows).filter(p=>!/^研究参考/.test(p)).sort((a,b)=>rank(a)-rank(b)||base(a).localeCompare(base(b),'zh')||a.localeCompare(b,'zh'));
     const codes=[...new Set([...(D.briefs||[]).filter(b=>b.分析验收==='完整'&&b.完整分析?.专题.includes(name)).map(b=>b.编号),...[...new Set(TOPIC_TAGS(name).flatMap(k=>((D.tagdocs||{})[k]||{主:[]}).主))].sort((a,b)=>String(D.docs[b]?.published||D.docs[b]?.date||'').localeCompare(String(D.docs[a]?.published||D.docs[a]?.date||''))).slice(0,40)])];
     const reviewed=D.topic_learning?.topics.find(topic=>topic.name===name);
     const introduction=reviewed?`<h2>${esc(reviewed.title)}</h2><p class="lede">${esc(reviewed.intro)}</p><p>${esc(reviewed.goal)}</p>${reviewed.sections.map(lessonSectionHTML).join('')}`:mdHTML(t.md);
-    return `<div id="topic-workspace" data-topic="${esc(name)}">${analysisWorkspaceHTML()}<article class="card prose-topic topic-reading">${introduction}${reviewed?`<details class="topic-original-study"><summary>查看已审案例与适用条件</summary><div class="prose-topic">${mdHTML(t.md)}</div></details>`:''}${name==='零碳园区'?'<p><a href="#/park-demo">查看园区储能合成演示 →</a></p>':''}</article>${researchPathHTML(name)}${topicLearningHTML(name,allLessons)}<section class="card related-policy-panel"><h2>相关政策与公告 <small class="note">${codes.length} 项</small></h2><p class="note">整行可悬停或聚焦查看提示，点击后在本页核对解析、来源与适用边界。</p>${relatedPolicyRows(codes)}</section><details class="card topic-comparison"><summary>展开分省对照 · ${subs.length} 行</summary><p class="note">数值与适用条件按原有审定快照；“—”表示本站未采集。</p><div class="tbl topic-tbl"><table><thead><tr><th>省份</th>${t.cols.map(([,h])=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${subs.map(p=>`<tr><th>${PROVS.includes(base(p))?`<a href="#/p/${encodeURIComponent(base(p))}">${esc(p)}</a>`:esc(p)}</th>${t.cols.map(([m])=>`<td>${t.rows[p][m]?citeHTML(clean(t.rows[p][m]).replace(/^【结论】\s*/,'')):'<span class="note">—</span>'}</td>`).join('')}</tr>`).join('')}</tbody></table></div></details></div>`;
+    const selectedProvince=params.get('province');
+    const province=selectedProvince&&(D.provinces[selectedProvince]||selectedProvince==='内蒙古')?selectedProvince:'';
+    const capacity=name==='储能'?capacityTopicHTML(province,params.get('from')):'';
+    return `<div id="topic-workspace" data-topic="${esc(name)}">${analysisWorkspaceHTML()}${capacity}<article class="card prose-topic topic-reading">${introduction}${reviewed?`<details class="topic-original-study"><summary>查看已审案例与适用条件</summary><div class="prose-topic">${mdHTML(t.md)}</div></details>`:''}${name==='零碳园区'?'<p><a href="#/park-demo">查看园区储能合成演示 →</a></p>':''}</article>${researchPathHTML(name)}${topicLearningHTML(name,allLessons)}<section class="card related-policy-panel"><h2>相关政策与公告 <small class="note">${codes.length} 项</small></h2><p class="note">整行可悬停或聚焦查看提示，点击后在本页核对解析、来源与适用边界。</p>${relatedPolicyRows(codes)}</section><details class="card topic-comparison"><summary>展开分省对照 · ${subs.length} 行</summary><p class="note">数值与适用条件按原有审定快照；“—”表示本站未采集。</p><div class="tbl topic-tbl"><table><thead><tr><th>省份</th>${t.cols.map(([,h])=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${subs.map(p=>`<tr><th>${PROVS.includes(base(p))?`<a href="#/p/${encodeURIComponent(base(p))}">${esc(p)}</a>`:esc(p)}</th>${t.cols.map(([m])=>`<td>${t.rows[p][m]?citeHTML(clean(t.rows[p][m]).replace(/^【结论】\s*/,'')):'<span class="note">—</span>'}</td>`).join('')}</tr>`).join('')}</tbody></table></div></details></div>`;
   }
   function wireKnowledgeReading(name,allLessons=false){
     const workspace=document.getElementById('topic-workspace');if(!workspace)return;
@@ -823,6 +851,7 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
     const contents=document.createElement('aside');contents.className='kb-contents';contents.setAttribute('aria-label',tx('本页阅读目录','Contents on this page'));
     const sections=[
       ['overview',tx('研究概览与适用条件','Overview & conditions'),reading.querySelector('article.topic-reading')],
+      ['capacity',tx('独立储能容量电价','Storage capacity pricing'),reading.querySelector('#topic-capacity')],
       ['learning',tx('学习与应用','Learn & apply'),reading.querySelector('#topic-learning')],
       ['policies',tx('相关政策与公告','Related policies & notices'),reading.querySelector('.related-policy-panel')],
       ['comparison',tx('分省条件对照','Compare regional conditions'),reading.querySelector('.topic-comparison')]
@@ -854,9 +883,14 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
 
   function topicIndex(query=''){
     const params=new URLSearchParams(query),name=(D.topics||[]).some(t=>t.名===params.get('topic'))?params.get('topic'):(D.topics?.[0]?.名||'储能'),allLessons=params.get('section')==='learning';
-    $('#app').innerHTML=`<div class="page-head"><div><h1>${tx('重点专题研究','Research themes')}</h1><p>${tx('选专题，在同一页阅读原理、政策、学习与地区条件。','Choose a theme; read its principles, instruments and regional conditions together.')}</p></div></div><div class="topic-switcher topic-choice-row" role="group" aria-label="选择研究专题">${KNOWLEDGE_THEMES.filter(t=>(D.topics||[]).some(p=>p.名===t.name)).map(t=>`<button type="button" class="chip ${t.name===name?'active':''}" data-topic-select="${esc(t.name)}" aria-pressed="${t.name===name}">${icon(t.icon)}${esc(tx(t.name,t.en))}</button>`).join('')}<a class="chip" href="#/view/topic/绿色算力">绿色算力 →</a></div>${topicWorkspaceHTML(name,allLessons)}${researchContinuations()}`;
+    $('#app').innerHTML=`<div class="page-head"><div><h1>${tx('重点专题研究','Research themes')}</h1><p>${tx('选专题，在同一页阅读原理、政策、学习与地区条件。','Choose a theme; read its principles, instruments and regional conditions together.')}</p></div></div><div class="topic-switcher topic-choice-row" role="group" aria-label="选择研究专题">${KNOWLEDGE_THEMES.filter(t=>(D.topics||[]).some(p=>p.名===t.name)).map(t=>`<button type="button" class="chip ${t.name===name?'active':''}" data-topic-select="${esc(t.name)}" aria-pressed="${t.name===name}">${icon(t.icon)}${esc(tx(t.name,t.en))}</button>`).join('')}<a class="chip" href="#/view/topic/绿色算力">绿色算力 →</a></div>${topicWorkspaceHTML(name,allLessons,params)}${researchContinuations()}`;
     document.querySelectorAll('[data-topic-select]').forEach(button=>button.onclick=()=>{location.hash='#/topics?topic='+encodeURIComponent(button.dataset.topicSelect);});
     wireKnowledgeReading(name,allLessons);
+    if(params.get('section')==='capacity'){
+      const directory=document.querySelector('#topic-workspace .kb-section-index');
+      directory?.querySelector('[aria-current]')?.removeAttribute('aria-current');
+      directory?.querySelector('[data-kb-target="capacity"]')?.setAttribute('aria-current','true');
+    }
     if(allLessons)requestAnimationFrame(()=>document.querySelector('#topic-learning')?.scrollIntoView({block:'start'}));
   }
   function topicPage(arg){
@@ -1400,7 +1434,9 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
     if(source&&!panel.contains(source)){
       const row=source.closest('.daily-item,.doc-row,.chain,.relation-story,.related-policy-row,.analysis-policy-link,.bcard');
       const home=source.closest('.home-columns');
-      if(row&&row.tagName!=='BUTTON')row.append(panel);
+      const capacity=source.closest('#topic-capacity');
+      if(capacity)capacity.after(panel);
+      else if(row&&row.tagName!=='BUTTON')row.append(panel);
       else if(row)row.after(panel);
       else if(home)home.after(panel);
       else if(source.closest('.panel'))source.closest('.panel').after(panel);
@@ -1475,6 +1511,7 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
     app.innerHTML = `
       <div class="crumb"><a href="#/map">${PUB() ? '政策地图' : '投资分级地图'}</a> / 省份看板</div>
       <section class="hero"><div><div class="eyebrow">电网侧独立储能 · 省份看板</div><h1>${esc(p)}</h1>
+        <p><a class="text-link" href="#/topics?topic=储能&amp;section=capacity&amp;province=${encodeURIComponent(p)}&amp;from=parameters">看容量电价专题与省际对照 →</a></p>
         <div class="chips">${chips.map(([k, v]) => `<span class="chip">${k}　<b>${esc(v)}</b></span>`).join('')}</div></div></section>
       <section class="kpis">
         ${kpi('容量机制', cap != null && cap !== 0 ? `${cap}` : '—', esc(capUnit(p) || '无省级容量补偿或未采集'))}
@@ -1730,6 +1767,11 @@ ${tx('问题','Question')}: ${form.elements.question.value.trim()}`;const subjec
       const restorePosition=()=>{if(activeRoute!==expected)return;
       if(saved){const panel=document.querySelector('#analysis-workspace'),y=saved.selection&&Number.isFinite(saved.readerTop)&&panel&&!panel.hidden?scrollY+panel.getBoundingClientRect().top-saved.readerTop:saved.y||0;scrollTo({top:y,left:0,behavior:'instant'});}
       else if(params.get('section')==='learning')document.querySelector('#topic-learning')?.scrollIntoView({block:'start'});
+      else if(params.get('section')==='capacity'){
+        const section=document.querySelector('#topic-capacity');
+        section?.scrollIntoView({block:'start'});
+        section?.querySelector('h2')?.focus({preventScroll:true});
+      }
       else if(params.get('entry')&&inlineAnalysis.current)document.querySelector('#analysis-workspace')?.scrollIntoView({block:'start'});
       else if(params.get('entry')&&document.querySelector('[data-daily-entry] details[open]'))document.querySelector('[data-daily-entry] details[open]').closest('article').scrollIntoView({block:'center'});
       else scrollTo({top:0,left:0,behavior:'instant'});
