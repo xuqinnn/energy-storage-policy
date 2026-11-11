@@ -707,6 +707,16 @@
   margin-bottom: 0;
   color: var(--reader-muted);
 }
+.atlas-shell .inline-analysis.reading-layout > .analysis-toolbar {
+  position: sticky;
+  top: 77px;
+  z-index: 3;
+}
+.atlas-shell .reading-layout .sbody h3 { scroll-margin-top: 10rem; }
+@media(max-width: 780px) {
+  .atlas-shell .inline-analysis.reading-layout > .analysis-toolbar { top: 110px; }
+  .atlas-shell .reading-layout .sbody h3 { scroll-margin-top: 13rem; }
+}
 .reading-layout .analysis-toolbar button {
   min-height: 2.75rem;
   padding: .45rem .75rem;
@@ -847,13 +857,27 @@
 .reading-layout .tl .nhead { display: flex; flex-wrap: wrap; align-items: baseline; gap: .15rem .65rem; }
 .reading-layout .tl .nrel { background: #edf4f2; color: var(--reader-accent); border-radius: 3px; padding: 0 .4rem; }
 .reading-layout .tl ul { margin: .25rem 0 0; padding-left: 1.1rem; }
-.reading-layout .sbody .bars { display: grid; gap: .6rem; margin: .7rem 0; }
-.reading-layout .sbody .bar { display: grid; grid-template-columns: minmax(5rem,7rem) minmax(0,1fr) 3.2rem; align-items: center; gap: .65rem; }
-.reading-layout .bar small { display: block; font-size: 1rem; color: var(--reader-muted); }
-.reading-layout .bar .track { height: .65rem; background: #e9f0ef; border-radius: 2px; }
-.reading-layout .bar .fill { height: 100%; background: #73938d; border-radius: 2px; }
-.reading-layout .bar.me .fill { background: var(--reader-accent); }
-.reading-layout .bar .v { text-align: right; font-variant-numeric: tabular-nums; }
+.reading-layout .sbody .tl { list-style: none; }
+.reading-layout .history-changes { display: grid; gap: .75rem; margin: .75rem 0 1rem; }
+.reading-layout .history-changes h4 { font-size: 1.1rem; margin-bottom: .2rem; }
+.reading-layout .comparison-frame { margin-top: .8rem; border-top: 1px solid var(--reader-line); }
+.reading-layout .comparison-frame caption { text-align: left; padding: .55rem .65rem; font-size: 1rem; color: var(--reader-muted); }
+.reading-layout .comparison-frame tbody th { background: transparent; font-weight: 650; }
+.reading-layout .comparison-frame .comparison-current { background: #f1f6f4; }
+.reading-layout .comparison-rows th:first-child { width: 23%; }
+.reading-layout .comparison-rows th:nth-child(2) { width: 35%; }
+.reading-layout .comparison-rows small { display: block; font-size: 1rem; font-weight: 400; color: var(--reader-muted); }
+.reading-layout .comparison-condition { display: block; }
+.reading-layout .comparison-value { font-variant-numeric: tabular-nums; }
+.reading-layout .comparison-track { display: block; height: .45rem; margin: .28rem 0; background: #e2ece9; border-radius: 2px; }
+.reading-layout .comparison-track > span { display: block; height: 100%; background: #608680; border-radius: inherit; }
+.reading-layout .comparison-current .comparison-track > span { background: var(--reader-accent); }
+.reading-layout .comparison-frame .analysis-policy-link, .reading-layout .tl .analysis-policy-link {
+  padding: 0; border: 0; background: none; text-align: left; color: var(--reader-accent);
+  text-decoration: underline; text-underline-offset: .17em; cursor: pointer;
+}
+.reading-layout .analysis-sources details { margin-top: .6rem; }
+.reading-layout :is(button,a,[tabindex]):focus-visible { outline: 2px solid var(--reader-accent); outline-offset: 3px; }
 
 #bsheet { max-width: min(65rem, calc(100vw - 24px)); }
 #bsheet .reading-layout {
