@@ -608,7 +608,7 @@
     document.body.dataset.purpose=en()?'international-services':'portfolio';
     const cta=document.querySelector('.header-cta'); if(cta) cta.href=en()?'#/services':'#/policy';
     document.title=tx('独立能源研究站 · 政策、专题与投资研究','Independent Energy Research · China energy intelligence');
-    document.querySelector('.brand').innerHTML=icon('bolt')+'<span>'+tx('独立能源研究站','Independent Energy Research')+'</span>';
+    document.querySelector('.brand').innerHTML='<i class="energy-mark" aria-hidden="true"></i><span>'+tx('独立能源研究站','Independent Energy Research')+'</span>';
 
     document.querySelectorAll('[data-zh][data-en]').forEach(el=>el.textContent=el.dataset[en()?'en':'zh']);
     const button=$('#language-switch');button.textContent=en()?'中文':'EN';button.setAttribute('aria-label',en()?'切换为中文':'Switch to English');
