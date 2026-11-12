@@ -628,6 +628,26 @@
       "importance_reason": "明确江西电力应急专家库的工作职责和动态管理。",
       "classification_basis": "江西省能源局组建江西省电力应急专家库，正文载明纳入98人，实行动态管理。入库专家参与预案评审以及突发电力事件分析、研判、处置和复盘评估；所在单位支持省市县共享专家资源。",
       "evidence_scope": "通知正文与所载人数；个体名单及资格以官方附件为准。"
+    },
+    {
+      "id": "YJC510",
+      "canonical_document_id": "YJC510",
+      "content_type": "notice",
+      "subtype": "推荐清单通告",
+      "importance": 3,
+      "importance_reason": "推荐清单及产品碳足迹核算参考。",
+      "classification_basis": "工业和信息化部等四部门公布第四批工业产品碳足迹核算规则团体标准推荐清单，共30项。清单可用于查找相关产品核算方法，具体适用范围以对应标准为准。",
+      "evidence_scope": "本次公布的是推荐清单，不是强制性标准或认证结论。"
+    },
+    {
+      "id": "YJC511",
+      "canonical_document_id": "YJC511",
+      "content_type": "notice",
+      "subtype": "试点工作动态",
+      "importance": 4,
+      "importance_reason": "新疆小时级绿电交易的已报道试点。",
+      "classification_basis": "新疆能源监管办介绍，新疆在批发用户侧试点疆内小时级绿电交易，与常规绿电交易同步开市，按日前24个时段组织，当日成交10.6万千瓦时。绿证划转依托国家绿证核发交易系统。",
+      "evidence_scope": "10.6万千瓦时为该试点当日成交电量。报道未载明开市具体日期，也未公布可普遍适用的交易规则、价格或收益。"
     }
   ],
   "source_links": [
@@ -974,6 +994,16 @@
     {
       "policy_id": "YJC509",
       "url": "https://drc.jiangxi.gov.cn/jxsfzhggwyh/col/col14590/content/content_2117434687471812608.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "YJC510",
+      "url": "https://www.miit.gov.cn/jgsj/jns/gzdt/art/2026/art_335e4e3fcc624fafa91ca2a36d6868ce.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "YJC511",
+      "url": "https://www.nea.gov.cn/20261110/2d88c447346d4cad9b11452b476ae93f/c.html",
       "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
     }
   ],

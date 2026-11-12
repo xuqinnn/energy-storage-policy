@@ -6,7 +6,7 @@ const replies=JSON.parse(fs.readFileSync(path.join(root,'content/reply-insights.
 if(data.meta.dataset==='synthetic'){console.log('Synthetic-only build: real classification contract not applicable.');process.exit(0);}
 const before=JSON.stringify(data),model=M.create(data,layer,replies),stats=M.stats(model);
 assert.strictEqual(JSON.stringify(data),before,'classification must not change source statuses, dates or parameters');
-assert.deepStrictEqual([stats.policy,stats.notices,stats.important,stats.unscored],[27,30,20,2]);
+assert.deepStrictEqual([stats.policy,stats.notices,stats.important,stats.unscored],[27,32,21,2]);
 assert.strictEqual(model.records.size,new Set([...Object.keys(data.docs),...layer.notices.map(n=>n.id),...replies.map(r=>r.id)]).size);
 for(const id of ['ZCHEB52','ZCLN37']){assert.strictEqual(M.query(model,{q:id,type:'notice'})[0].importance,3);}
 assert(M.query(model,{q:'广州电力交易中心 正式运行',type:'notice'}).some(r=>r.id==='NTF-GZPEC-20261024-FORMAL'));
@@ -23,7 +23,7 @@ assert.strictEqual(M.query(model,{q:'YJC491',type:'notice'}).length,0);
 assert(stats.classification_pending>0);
 for(const [id,date] of [['YJC488','2026-10-29'],['YJC489','2026-10-30'],['YJC490','2026-10-30']]){assert.strictEqual(model.records.get(id).content_type,'notice');assert.strictEqual(model.records.get(id).sortDate,date);assert.strictEqual(M.query(model,{q:id,type:'policy'}).length,0);}
 for(const id of ['ZCSN34','ZCSD45','ZCAH63'])assert.strictEqual(model.records.get(id).importance,4);
-assert.strictEqual(layer.classifications.length,60);
+assert.strictEqual(layer.classifications.length,62);
 for(const [id,province,published] of [['ZCSH43','上海','2026-10-20'],['ZCSD53','山东','2026-10-15']]){
   assert.strictEqual(M.query(model,{q:id,type:'policy',prov:province})[0].id,id);
   assert.strictEqual(M.query(model,{q:id,type:'notice'}).length,0,'policy wording is not a notice event');
@@ -45,7 +45,7 @@ assert.throws(()=>M.create({...data,docs:{...data.docs,[layer.notices[0].id]:{ti
 assert.throws(()=>M.validate({...layer,classifications:[...layer.classifications,layer.classifications[0]]}));
 assert.throws(()=>M.validate({...layer,private_source_path:'excluded'}));
 const related=layer.source_links.filter(s=>!s.role.startsWith('ORIGINAL_'));
-assert.strictEqual(related.length,6);assert.strictEqual(layer.source_links.length-related.length,63);
+assert.strictEqual(related.length,6);assert.strictEqual(layer.source_links.length-related.length,65);
 assert(related.filter(s=>['ZCAH16','ZCAH18'].includes(s.policy_id)).every(s=>s.role==='OFFICIAL_REPRINT_ATTACHMENT'&&s.url.endsWith('.pdf')));
 console.log('Content search, deduplication, limited counts, dates, low/unscored notices, source roles and negative contracts passed.');
 
