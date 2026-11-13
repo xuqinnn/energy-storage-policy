@@ -66,13 +66,39 @@
     if(model){const reviewed=[...model.records.values()].filter(r=>['policy','notice'].includes(r.content_type)&&!r.review_hold);if(reviewed.length!==d.items.length||d.items.some(r=>{const original=model.records.get(r.id);return !original||original.content_type!==r.type||original.importance!==r.importance||original.kind!==r.renderer;}))throw Error('速递与统一内容模型不一致');}
     if(meta&&(d.snapshot_version!==meta.version||d.snapshot_built_at!==meta.exported))throw Error('速递与资料快照版本不一致');return d;
   }
+  const shiftDay=(day,offset)=>new Date(Date.parse(day)+offset*86400000).toISOString().slice(0,10);
+  function editionRange(day,mode,now=today()){
+    if(!validDate(day)||!validDate(now))return null;
+    if(mode==='day')return {start:day,end:day};
+    if(mode==='week'){
+      const offset=(new Date(day).getUTCDay()+6)%7;
+      const start=shiftDay(day,-offset);
+      const end=shiftDay(start,6);
+      return {start,end:end>now&&start<=now?now:end};
+    }
+    if(mode==='month'){
+      const start=day.slice(0,7)+'-01';
+      const last=new Date(day);last.setUTCMonth(last.getUTCMonth()+1,0);
+      const end=last.toISOString().slice(0,10);
+      return {start,end:end>now&&start<=now?now:end};
+    }
+    if(mode==='all')return {start:'',end:now};
+    return {start:shiftDay(day,mode==='30'?-29:-6),end:day};
+  }
   function dailyQuery(d,f={},now=today()){
-    const mode=f.range||'day',day=f.date||now,days=mode==='30' ? 30 : 7;
-    const tokens=String(f.q||'').toLocaleLowerCase().trim().split(/\s+/).filter(Boolean);
-    if(!validDate(day))return [];
+    const mode=f.range||'day';
+    const period=editionRange(f.date||now,mode,now);
+    if(!period)return [];
+    const tokens=String(f.q||'').trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
+    const issue=['day','week','month'].includes(mode);
     return d.items.filter(r=>(!f.type||r.type===f.type)&&(!f.prov||r.region===f.prov)&&(!f.important||(r.type==='notice'&&r.importance!==null&&r.importance>=4))&&
       tokens.every(t=>[r.title,r.summary,r.issuer,r.subtype,r.region,r.search_text,r.source_excerpt].join(' ').toLocaleLowerCase().includes(t))&&
-      (mode==='index'?!r.publication_verified:r.publication_verified&&!!r.display_date&&(mode==='all'||mode==='day'?mode==='all'||r.display_date===day:Math.round((Date.parse(day)-Date.parse(r.display_date))/864e5)>=0&&Math.round((Date.parse(day)-Date.parse(r.display_date))/864e5)<days)));
+      (mode==='index'?r.date_basis!=='published':r.publication_verified&&(!issue||r.date_basis==='published')&&!!r.display_date&&r.display_date>=period.start&&r.display_date<=period.end&&r.display_date<=now));
+  }
+  function editionLead(items){
+    const complete=items.filter(row=>!row.collection_only&&row.summary&&row.source_url&&row.importance>=4);
+    complete.sort((a,b)=>b.importance-a.importance||(a.type===b.type?0:a.type==='policy'?-1:1)||b.display_date.localeCompare(a.display_date));
+    return complete[0]||null;
   }
   // View projection only: feed objects must already pass WBFeed validation and version-bound overlay.
   // It never changes the formal snapshot, classification counts, legal status or parameters.
@@ -115,5 +141,5 @@
     items.sort((a,b)=>String(b.display_date||'').localeCompare(String(a.display_date||''))||(depth[a.analysis_state]??2)-(depth[b.analysis_state]??2)||a.id.localeCompare(b.id));
     return {items,corrections,counts:d?.counts||null};
   }
-  return {TYPES,SOURCE_LABELS,validate,create,query,stats,today,validDate,validateDaily,dailyQuery,mergeDaily};
+  return {TYPES,SOURCE_LABELS,validate,create,query,stats,today,validDate,validateDaily,editionRange,dailyQuery,editionLead,mergeDaily};
 });

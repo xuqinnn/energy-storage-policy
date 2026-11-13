@@ -5,12 +5,12 @@ const ctx={window:{},document:{addEventListener(){}},URLSearchParams,EnergyConte
 vm.createContext(ctx);vm.runInContext(fs.readFileSync(path.join(__dirname,'../assets/atlas.js'),'utf8'),ctx);
 const {readDailyFilters,dailyRoute}=ctx.window.EnergyAtlas;
 const read=q=>readDailyFilters(new URLSearchParams(q),'2026-11-10','');
-assert.equal(read('').range,'7','empty landing should show recent content rather than an unlabelled empty day');
+assert.equal(read('').range,'day','default route is an issue, with the view selecting a real recent date when needed');
 assert.equal(read('').date,'2026-11-10');
 assert.equal(read('date=2026-11-09').range,'day','shared date links must retain their single-day meaning');
 assert.equal(read('date=2026-11-09').date,'2026-11-09');
 assert.equal(read('date=not-a-date').date,'2026-11-10','invalid dates cannot become issue/publication dates');
-for(const range of ['day','7','30','all','index'])assert.equal(read('range='+range).range,range);
+for(const range of ['day','week','month','7','30','all','index'])assert.equal(read('range='+range).range,range);
 const selected=read('range=30&prov=陕西&type=notice&q=结算&important=1');
 const route=dailyRoute(selected,'YJC505');
 const params=new URLSearchParams(route.split('?')[1]);

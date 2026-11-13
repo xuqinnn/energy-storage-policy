@@ -36,8 +36,8 @@
       "subtype": "建设名单发布及名单内推进安排",
       "importance": 5,
       "importance_reason": "国家首批建设名单及推进安排是涉及多地区园区的重要实施事件，编辑评5；不以全国唯一/全覆盖或通用准入阈值为理由。",
-      "classification_basis": "主对象是经申报/推荐/评审等程序确定的首批建设名单，并附名单内建设、支持、跟踪及验收后认定安排；不是已完成零碳认定的名单，也不能概括为无任何管理条件。",
-      "evidence_scope": "原件所见身份/主对象/分类与评分理由/明示日期；无新增完整内容、数值参数或权利资格接受"
+      "classification_basis": "三部门公布第一批国家级零碳园区建设名单，共52个园区。列入建设名单后仍须按要求推进建设，经评估验收后认定，不能将建设名单等同已完成零碳认证。",
+      "evidence_scope": "建设名单不证明所有园区均已达到同一绿电比例，也不构成项目收益或实施成效承诺。"
     },
     {
       "id": "ZCGJ110",
@@ -46,8 +46,8 @@
       "subtype": "官方答复（人大建议办理）",
       "importance": 4,
       "importance_reason": "对新能源、调节资源和绿电直连的官方办理表述有研究解释价值，评4；答复中的统计与援引政策不作为新增义务或投资参数。",
-      "classification_basis": "p1具体建议办理答复、p2机关落款；属于官方解释/办理信息，不自动成为普遍适用规则。",
-      "evidence_scope": "原件所见身份/主对象/分类与评分理由/明示日期；无新增完整内容、数值参数或权利资格接受"
+      "classification_basis": "国家能源局就相关人大建议作出办理答复，介绍新能源、调节资源及绿电直连有关工作。答复可作为理解主管部门政策思路的资料，具体项目仍应核对所援引的正式规则及适用条件。",
+      "evidence_scope": "本件为人大建议办理答复，不自动成为普遍适用的新规则。同源研究资料不重复计算为另一件公告；成文为6月30日，官网公开为7月24日。"
     },
     {
       "id": "ZCSN34",
@@ -648,6 +648,36 @@
       "importance_reason": "新疆小时级绿电交易的已报道试点。",
       "classification_basis": "新疆能源监管办介绍，新疆在批发用户侧试点疆内小时级绿电交易，与常规绿电交易同步开市，按日前24个时段组织，当日成交10.6万千瓦时。绿证划转依托国家绿证核发交易系统。",
       "evidence_scope": "10.6万千瓦时为该试点当日成交电量。报道未载明开市具体日期，也未公布可普遍适用的交易规则、价格或收益。"
+    },
+    {
+      "id": "YJC512",
+      "canonical_document_id": "YJC512",
+      "content_type": "notice",
+      "subtype": "项目申报通知",
+      "importance": 3,
+      "importance_reason": "申报窗口、交易条件或重要制度实施信息；编辑评分。",
+      "classification_basis": "安庆市工业和信息化局组织先进光伏和新型储能项目申报，覆盖安庆市在研在建项目。申报期为2026年11月11日至24日，县级部门审核及推荐材料报送截止11月26日。",
+      "evidence_scope": "通知所载为申报安排，拟支持名单须后续评审和公示。附件参数另核。"
+    },
+    {
+      "id": "YJC513",
+      "canonical_document_id": "YJC513",
+      "content_type": "notice",
+      "subtype": "补助申报通知",
+      "importance": 4,
+      "importance_reason": "申报窗口、交易条件或重要制度实施信息；编辑评分。",
+      "classification_basis": "嘉善县受理2024—2025年度分布式光伏、新型储能，以及2025年度公共充换电基础设施补助申报。储能申报主体为项目建设单位，项目须在2024—2025年于嘉善县境内依法合规建成投运、装机达到1兆瓦及以上且纳入县级电力负荷管控管理中心统一调控，为用户侧新型储能项目；按放电额定功率150元/千瓦一次性补助，单个项目不超过100万元。受理期为2026年11月18日至20日。",
+      "evidence_scope": "本次各类申报补助总额合计控制在2471971.25元以内；超过总额时，各项目补助按比例下调。补助标准须与建设年度、规模、统一调控和项目材料要求共同适用，不等于所有储能项目均可获得定额补助。附件表单未逐项审定。"
+    },
+    {
+      "id": "YJC514",
+      "canonical_document_id": "YJC514",
+      "content_type": "notice",
+      "subtype": "征求意见公告",
+      "importance": 4,
+      "importance_reason": "申报窗口、交易条件或重要制度实施信息；编辑评分。",
+      "classification_basis": "青海省发展改革委公开征求调整电力中长期交易限价标准的意见，拟将市场申报和出清限价上限调整为0.3896元/千瓦时。意见须在2026年11月20日18时前通过电子邮件向价格处反馈。",
+      "evidence_scope": "征求稿尚未正式印发，公告没有载明实施日。0.3896元/千瓦时为拟议的中长期申报与出清上限，暂不更新现行参数。"
     }
   ],
   "source_links": [
@@ -1004,6 +1034,31 @@
     {
       "policy_id": "YJC511",
       "url": "https://www.nea.gov.cn/20261110/2d88c447346d4cad9b11452b476ae93f/c.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "YJC512",
+      "url": "https://gxj.anqing.gov.cn/xxfb/tzgg/2004235531.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "YJC513",
+      "url": "https://www.jiashan.gov.cn/col/col1229373860/art/2026/art_e71656a182414dc28281bbb3e8d54837.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "YJC514",
+      "url": "http://fgw.qinghai.gov.cn/xwzx/tzgg/202611/t20261111_93038.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCGJ45",
+      "url": "https://www.ndrc.gov.cn/xwdt/tzgg/202512/t20251226_1402634_ext.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCGJ110",
+      "url": "https://www.nea.gov.cn/20260724/1ea02aba60e74c00a988fb71fca1e903/c.html",
       "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
     }
   ],

@@ -15,9 +15,10 @@ import importlib.util
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE if (HERE / 'index.html').is_file() else HERE.parent
-WEB_FILES = ['assets/atlas.js','assets/atlas-map.js','assets/atlas.css','assets/wb-feed.js'] + ['assets/research-ui.css', 'assets/vendor/open-props-1.7.23.min.css', 'assets/vendor/tabler-icons.js', 'assets/vendor/OPEN-PROPS-LICENSE.txt', 'assets/vendor/TABLER-LICENSE.txt', 'assets/vendor/DESIGN-SOURCES.json'] + ['index.html', 'assets/app.js', 'assets/storage-math.js', 'assets/app.css', 'assets/vendor/echarts.min.js', 'assets/vendor/LICENSE', 'assets/vendor/NOTICE']
+WEB_FILES = ['assets/watch-channels.js','assets/watch.js','assets/observatory.css','assets/atlas.js','assets/atlas-map.js','assets/atlas.css','assets/wb-feed.js'] + ['assets/research-ui.css', 'assets/vendor/open-props-1.7.23.min.css', 'assets/vendor/tabler-icons.js', 'assets/vendor/OPEN-PROPS-LICENSE.txt', 'assets/vendor/TABLER-LICENSE.txt', 'assets/vendor/DESIGN-SOURCES.json'] + ['index.html', 'assets/app.js', 'assets/storage-math.js', 'assets/app.css', 'assets/vendor/echarts.min.js', 'assets/vendor/LICENSE', 'assets/vendor/NOTICE']
 DOC_FILES = ['tests/test_interactions.js','tests/test_atlas_model.js','content/reply-insights.json', 'tests/test_reply_insights.py', 'content/reading-notes.json', 'README.md', 'LICENSE', 'LICENSE-DATA.md', 'CONTRIBUTING.md', 'ASSETS.json', '.gitignore', 'examples/synthetic.json', 'tests/test_public.py', 'tests/test_storage_math.js', 'examples/method-arithmetic.json', 'tools/park_examples.py', 'examples/park-scenarios.json', 'tests/test_park_examples.py']
 WEB_FILES += ['assets/content-model.js']
+DOC_FILES += ['tests/test_watch_heat.js']
 DOC_FILES += ['content/content-layer.json','tests/test_content_layer.py','tests/test_content_model.js','tests/test_daily_brief.py','tests/test_daily_model.js']
 DOC_FILES += ['content/wb-feed-reviews.json','content/wb-feed-snapshot.json','tools/wb_feed_guard.py','tools/wb_feed_runtime.py','tests/test_wb_feed.py','tests/test_wb_feed.js','.github/workflows/wb-feed.yml','WB-FEED.md']
 ALLOWED_TOP = {'meta','metrics','provinces','docs','cards','events','dev','diff','score','example','briefs','links','tags','tagdocs','methods','lib','research','learning','stats','mech','topics','topicmap','synthetic_example','public_guides','topic_learning'}
@@ -178,12 +179,12 @@ def validate_reply_insights(path):
     return validate_reply_schema(json.loads(Path(path).read_text(encoding='utf-8')))
 
 
-CONTENT_LAYER_SHA = '16d6536145620e4c4dfa816aa883034b02f4ad6bd2bab23cc646a9160c684d25'
+CONTENT_LAYER_SHA = 'cb6dc568a3dd7e28e22e924b9d00ed4ed399e145101cddef95786c665703a766'
 CORE_ANALYSIS_IDS = {'ZCGJ13','ZCGJ120','ZCGJ03','ZCGJ04'}
 CORE_ANALYSES_SHA = '2771497116d19595f252645ff8ca8074395fdd71fbaf8093a452b9a1cf494dd1'
 DAILY_REVIEW_IDS = {'ZCGJ182','YJC485','YJC486','YJC487','YJC488','YJC489','YJC490','ZCGJ184','ZCHUN45','ZCNF36','ZCJL42'}
 ARTICLE_REVIEW_IDS = {'YJC491','YJC492','YJC493','YJC494','YJC495','YJC496'}
-CONTENT_CLASS_IDS = {'YJC510','YJC511','YJC509','YJC508','ZCGJ186','YJC507','YJC503','YJC504','YJC505','YJC506','ZCSX38','ZCFJ49','YJC501','YJC502','ZCGJ185','ZCHUN46','ZCGD52','ZCHEB62','ZCHEB63','ZCHEB64','YJC499','YJC500','ZCLN38','ZCSC55','ZCGD51','ZCGD50','YJC497','YJC498'} | ARTICLE_REVIEW_IDS | DAILY_REVIEW_IDS | CORE_ANALYSIS_IDS | {'ZCGJ45','ZCGJ110','ZCSN34','ZCGX34','ZCHEB52','ZCLN37','ZCSD45','ZCAH63','ZCTJ19','ZCSH43','ZCSD53','ZCXJ32','ZCGJ183','YJC491'}
+CONTENT_CLASS_IDS = {'YJC512','YJC513','YJC514','YJC510','YJC511','YJC509','YJC508','ZCGJ186','YJC507','YJC503','YJC504','YJC505','YJC506','ZCSX38','ZCFJ49','YJC501','YJC502','ZCGJ185','ZCHUN46','ZCGD52','ZCHEB62','ZCHEB63','ZCHEB64','YJC499','YJC500','ZCLN38','ZCSC55','ZCGD51','ZCGD50','YJC497','YJC498'} | ARTICLE_REVIEW_IDS | DAILY_REVIEW_IDS | CORE_ANALYSIS_IDS | {'ZCGJ45','ZCGJ110','ZCSN34','ZCGX34','ZCHEB52','ZCLN37','ZCSD45','ZCAH63','ZCTJ19','ZCSH43','ZCSD53','ZCXJ32','ZCGJ183','YJC491'}
 NOTICE_FIELDS = {'id','content_type','subtype','title','issuer','importance','importance_reason','issued_at','published_at','publication_date_basis','first_publication_date','event_at','summary','our_analysis','quote','source_url','source_access_note','corroborating_url','boundary','region_scope','verified_region_codes','policy_ids','cited_document_number','cited_document_verification'}
 SOURCE_ROLES = {'ORIGINAL_PUBLICATION_OR_ATTACHMENT','ORIGINAL_EXPLANATORY_ATTACHMENT','OFFICIAL_RELEASE_REPORT','OFFICIAL_INSTITUTION_REPRINT','OFFICIAL_INTERPRETATION','OFFICIAL_REPRINT_ATTACHMENT','OFFICIAL_ANALYSIS_MENTION_ONLY'}
 
@@ -225,7 +226,7 @@ def validate_content_schema(layer):
     expected_ratings['ZCNF36']=5
     expected_ratings['ZCJL42']=5
     expected_ratings.update({'ZCLN38':5,'ZCSC55':4})
-    expected_ratings.update({'ZCGJ185': 4, 'ZCHUN46': 4, 'ZCGD52': 4, 'ZCHEB62': 4, 'ZCHEB63': 3, 'ZCHEB64': 4, 'YJC499': 3, 'YJC500': 4, 'YJC501':4, 'YJC502':4, 'YJC503':4,'YJC504':3,'YJC505':4,'YJC506':4,'ZCSX38':5,'ZCFJ49':3,'ZCGJ186':4,'YJC507':4,'YJC508':4,'YJC509':3,'YJC510':3,'YJC511':4})
+    expected_ratings.update({'ZCGJ185': 4, 'ZCHUN46': 4, 'ZCGD52': 4, 'ZCHEB62': 4, 'ZCHEB63': 3, 'ZCHEB64': 4, 'YJC499': 3, 'YJC500': 4, 'YJC501':4, 'YJC502':4, 'YJC503':4,'YJC504':3,'YJC505':4,'YJC506':4,'ZCSX38':5,'ZCFJ49':3,'ZCGJ186':4,'YJC507':4,'YJC508':4,'YJC509':3,'YJC510':3,'YJC511':4,'YJC512':3,'YJC513':4,'YJC514':4})
     expected_ratings.update({code:4 for code in ['ZCGD51','ZCGD50','YJC497','YJC498']})
     if {x['id']:x['importance'] for x in layer['classifications']}!=expected_ratings:raise ValueError('content layer schema: unreviewed importance revision')
     gaps=layer['source_gaps']
@@ -233,13 +234,13 @@ def validate_content_schema(layer):
     seen=set();original=0
     for link in layer['source_links']:
         if not isinstance(link,dict) or set(link)!={'policy_id','url','role'}:raise ValueError('content layer schema: source fields')
-        if link['policy_id'] in seen or not (re.fullmatch(r'ZC[A-Z]+\d+',link['policy_id']) or link['policy_id'] in {'YJC485','YJC486','YJC487','YJC488','YJC489','YJC490','YJC497','YJC498','YJC499','YJC500','YJC501','YJC502','YJC503','YJC504','YJC505','YJC506','YJC507','YJC508','YJC509','YJC510','YJC511'}):raise ValueError('content layer schema: duplicate source identity')
+        if link['policy_id'] in seen or not (re.fullmatch(r'ZC[A-Z]+\d+',link['policy_id']) or link['policy_id'] in {'YJC485','YJC486','YJC487','YJC488','YJC489','YJC490','YJC497','YJC498','YJC499','YJC500','YJC501','YJC502','YJC503','YJC504','YJC505','YJC506','YJC507','YJC508','YJC509','YJC510','YJC511','YJC512','YJC513','YJC514'}):raise ValueError('content layer schema: duplicate source identity')
         seen.add(link['policy_id'])
         if link['role'] not in SOURCE_ROLES or not isinstance(link['url'],str) or not re.match(r'^https?://',link['url']):raise ValueError('content layer schema: source role or URL')
         original+=link['role'].startswith('ORIGINAL_')
         if link['policy_id'] in {'ZCAH14','ZCAH16','ZCAH17','ZCAH18','ZCGJ175','ZCHEB60'} and link['role'].startswith('ORIGINAL_'):
             raise ValueError('content layer schema: related source promoted to original')
-    if len(seen)!=71 or original!=65:raise ValueError('content layer schema: expected 65 original / 6 related links')
+    if len(seen)!=76 or original!=70:raise ValueError('content layer schema: expected 70 original / 6 related links')
     text=json.dumps(layer,ensure_ascii=False)
     if any(token in text for token in ('/Users/','file://','source_path','source_raw_sha256','raw_path','workbook_written')) or re.search(r'<[!/a-zA-Z]',text):
         raise ValueError('content layer schema: private fields or unsafe markup')

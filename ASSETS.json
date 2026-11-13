@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "project": "独立能源研究站",
+  "project": "能碳政策研究站",
   "rules": "公开可用不等于允许第三方全文再分发；源码、数据和第三方材料分别许可",
   "assets": [
     {
@@ -23,7 +23,11 @@
         "assets/atlas-map.js",
         "assets/atlas.css",
         "tests/test_atlas_model.js",
-        "tests/test_interactions.js"
+        "tests/test_interactions.js",
+        "assets/observatory.css",
+        "assets/watch.js",
+        "assets/watch-channels.js",
+        "tests/test_watch_heat.js"
       ],
       "class": "B",
       "origin": "本项目Git历史可追溯的自有前台及本轮通用实现",

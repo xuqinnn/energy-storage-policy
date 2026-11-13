@@ -48,7 +48,7 @@ class ContentProjectionTest(unittest.TestCase):
 
     def test_final_nine_fields_source_hold_and_scores_are_enforced(self):
         layer=self.layer()
-        self.assertEqual(len(layer['classifications']),62)
+        self.assertEqual(len(layer['classifications']),65)
         for code in ('YJC488','YJC489','YJC490'):
             record=next(c for c in layer['classifications'] if c['id']==code)
             self.assertEqual((record['content_type'],record['importance']),('notice',4))

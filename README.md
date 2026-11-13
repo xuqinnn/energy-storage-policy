@@ -1,4 +1,4 @@
-# 独立能源研究站
+# 能碳政策研究站
 
 面向储能开发、园区能源负责人和独立顾问的免费研究站。公共页面直接访问；咨询与定制是自愿的独立服务。项目不代表原任职企业。
 
@@ -99,3 +99,13 @@ Run `node tests/test_atlas_model.js` to check date, classification, source-gap, 
 Chinese topic, daily, map, province, tool and service pages share the research navigation frame. Existing lessons and methods remain intact. Content opens in the selected card or nearby reading workspace, with return/focus restoration. The daily landing shows the most recent seven calendar days; explicit date links still mean one day, unknown dates remain in the separate index, filters apply directly and share links retain their filters. Search timers stop affecting a page after navigation.
 
 Run `node tests/test_interactions.js` for date defaults and share/return URL contracts. This UI update does not change collection schedules, source acceptance, formal policy counts or calculator parameters.
+
+### Research observatory
+
+The home observatory pairs a compact reading queue with provincial publication activity. Its topic and time filters also apply to the policy timeline. Select a populated timeline cell to see its records in place. The all-topic map uses a red scale. Each selected topic uses its timeline color, with the same score domain within the date range. Each eligible policy contributes its reviewed importance once to its province. Notices and undated records do not contribute.
+
+Research themes contain their own policy-condition maps and inline evidence dossiers. Each map derives its categories from cited local policy status for the selected criterion. The categories do not assert returns, project eligibility or province-wide coverage. The existing storage indicator map remains available from the storage topic. Chinese and English share the structure and source IDs. Untranslated policy text retains its original wording.
+
+Energy & Carbon Daily groups reviewed policies and notices by verified publication date. Each issue has an archive link, a lead when supported, a short reading list and thematic sections. Source excerpts remain distinct from reviewed entries. The weekly and monthly views reuse the daily records and date filters. Research materials have their own channels and source links. When the lead belongs to a curated dossier, the issue shows the publication milestones available by its cutoff and labels any scheduled effective date. The dossier expands within its research theme with the underlying documents and sources.
+
+The public build uses the reviewed snapshot. The standalone preview uses the same snapshot with no remote-feed request. See [AISafetyHot](https://aisafetyhot.com/zh) for the reading-queue and topic-lane interaction reference and [Impeccable](https://github.com/pbakaus/impeccable) for the review method.
