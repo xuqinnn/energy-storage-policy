@@ -738,6 +738,36 @@
       "importance_reason": "常规监管执行动态。",
       "classification_basis": "湖南能源监管办部署迎峰度冬能源保供，组织电网企业测算今冬明春电力电量平衡，统筹供应保障、风险防范和应急管理，并调研重点用能企业的供电质量需求及需求响应参与能力。",
       "evidence_scope": "当前原件为监管工作动态，调研不等于已开展需求响应交易；所引通知无完整原文，不新增价格或资格参数。"
+    },
+    {
+      "id": "ZCJX32",
+      "canonical_document_id": "ZCJX32",
+      "content_type": "policy",
+      "subtype": "新能源与绿证",
+      "importance": 4,
+      "importance_reason": "与项目开发和用能质量直接相关的地方规则及项目公示；编辑评分，不是投资评级。",
+      "classification_basis": "柴桑区自11月12日起临时暂停受理全区户用分布式光伏项目备案申请，并排查已建、在建户用项目的房屋荷载、施工质量与电气安全；恢复时间另行通知。",
+      "evidence_scope": "暂停的是户用项目备案申请受理，不据此认定既有项目一律停建、已备案资格取消或全部光伏禁止建设。"
+    },
+    {
+      "id": "ZCHUN47",
+      "canonical_document_id": "ZCHUN47",
+      "content_type": "policy",
+      "subtype": "宏观综合",
+      "importance": 4,
+      "importance_reason": "与项目开发和用能质量直接相关的地方规则及项目公示；编辑评分，不是投资评级。",
+      "classification_basis": "湖南完善电压敏感用户认定、治理与动态调整机制，按自愿申请、电网核实、政府备案组织，认定不作为办电接电前置条件。",
+      "evidence_scope": "认定不是办电接电前置条件；3/10/5工作日不相加成统一办结期限。30工作日有未同步提交方案前提；36个月是双方书面约定治理计划的原则期限。文件不直接给予统一补贴、电价资格或储能收益保证。"
+    },
+    {
+      "id": "YJC518",
+      "canonical_document_id": "YJC518",
+      "content_type": "notice",
+      "subtype": "项目公示",
+      "importance": 4,
+      "importance_reason": "与项目开发和用能质量直接相关的地方规则及项目公示；编辑评分，不是投资评级。",
+      "classification_basis": "河北公示第三批拟安排绿电直连项目4个，电源均为风电，合计110万千瓦；3个并网型、1个离网型，公示期为11月11日至15日。",
+      "evidence_scope": "公示不等于最终名单、项目核准或取得机制电价与容量电价资格；不预设公示后自动下达，也不与其他批次重复相加。"
     }
   ],
   "source_links": [
@@ -1149,6 +1179,21 @@
     {
       "policy_id": "YJC517",
       "url": "https://www.nea.gov.cn/20261113/772d4bf3d06d486f9753d4e351626d05/c.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCJX32",
+      "url": "https://www.chaisang.gov.cn/zxzx/gsgg/202611/t20261112_7364227.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCHUN47",
+      "url": "https://fgw.hunan.gov.cn/fgw/xxgk_70899/tzgg/202611/t20261111_34099884.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "YJC518",
+      "url": "https://hbdrc.hebei.gov.cn/gggs_980/202611/t20261112_141595.html",
       "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
     }
   ],
