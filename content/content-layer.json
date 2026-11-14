@@ -678,6 +678,66 @@
       "importance_reason": "申报窗口、交易条件或重要制度实施信息；编辑评分。",
       "classification_basis": "青海省发展改革委公开征求调整电力中长期交易限价标准的意见，拟将市场申报和出清限价上限调整为0.3896元/千瓦时。意见须在2026年11月20日18时前通过电子邮件向价格处反馈。",
       "evidence_scope": "征求稿尚未正式印发，公告没有载明实施日。0.3896元/千瓦时为拟议的中长期申报与出清上限，暂不更新现行参数。"
+    },
+    {
+      "id": "ZCGJ187",
+      "canonical_document_id": "ZCGJ187",
+      "content_type": "policy",
+      "subtype": "储能专项",
+      "importance": 5,
+      "importance_reason": "中期制度安排、年度交易规则或重要技术标准进展；编辑评分，不是投资评级。",
+      "classification_basis": "到2030年，全国新型储能装机规模达到3亿千瓦、平均储能时长3小时左右。方案部署电源侧、电网侧和多场景应用，支持绿电直连、零碳园区、虚拟电厂与数据中心配置储能，完善市场及价格机制。",
+      "evidence_scope": "总目标与分场景规模不能相加；清单制、现货运行阶段条件分别适用。政策未给出本件统一容量补偿单价。"
+    },
+    {
+      "id": "ZCTJ20",
+      "canonical_document_id": "ZCTJ20",
+      "content_type": "policy",
+      "subtype": "电力市场交易",
+      "importance": 5,
+      "importance_reason": "中期制度安排、年度交易规则或重要技术标准进展；编辑评分，不是投资评级。",
+      "classification_basis": "天津安排2027年市场化交易，直接交易电量总规模暂定460亿千瓦时（含绿电），同步发布中长期、零售、绿电、独立储能和履约保障五个配套工作方案。",
+      "evidence_scope": "2027为年度交易安排，不是具体施行日；附件3及4另有自发布日起执行条款。40%已含约30亿千瓦时，不重复相加。1.6/1.92为特定合同电价上限系数，不是容量补偿。"
+    },
+    {
+      "id": "ZCJX31",
+      "canonical_document_id": "ZCJX31",
+      "content_type": "policy",
+      "subtype": "宏观综合",
+      "importance": 5,
+      "importance_reason": "中期制度安排、年度交易规则或重要技术标准进展；编辑评分，不是投资评级。",
+      "classification_basis": "江西规划到2030年力争新型储能规模超过500万千瓦、虚拟电厂调节能力达到300万千瓦、需求响应能力达到290万千瓦，支持零碳园区建设绿电直连和智能微电网。",
+      "evidence_scope": "2030年总规模与规划期新增分列。公开日11月12日仅见隐藏标记，本件不计作已核11月13日新发；规划不直接作为收益参数。"
+    },
+    {
+      "id": "YJC515",
+      "canonical_document_id": "YJC515",
+      "content_type": "notice",
+      "subtype": "标准立项动态",
+      "importance": 4,
+      "importance_reason": "中期制度安排、年度交易规则或重要技术标准进展；编辑评分，不是投资评级。",
+      "classification_basis": "我国牵头提出的虚拟电厂一次调频功能要求与规范在国际电工委员会立项，将由多国专家开展编制。该进展关系虚拟电厂调频能力与设备性能验证的技术标准建设。",
+      "evidence_scope": "本件为官方标准立项动态，尚非正式发布施行的标准，也不直接授予市场准入或收益资格；事件仅称近日。"
+    },
+    {
+      "id": "YJC516",
+      "canonical_document_id": "YJC516",
+      "content_type": "notice",
+      "subtype": "保供监管动态",
+      "importance": 3,
+      "importance_reason": "常规监管执行动态。",
+      "classification_basis": "西北能源监管局部署2026年迎峰度冬能源保供，要求强化电网安全、网源协同、市场调节、电煤储备和民生供应，并按日排查、周报告、月总结跟踪重点地区、时段和薄弱环节。",
+      "evidence_scope": "当前原件是工作动态，所提通知尚无文号及全文；不能据报道补写一般适用的新交易规则。"
+    },
+    {
+      "id": "YJC517",
+      "canonical_document_id": "YJC517",
+      "content_type": "notice",
+      "subtype": "保供监管动态",
+      "importance": 3,
+      "importance_reason": "常规监管执行动态。",
+      "classification_basis": "湖南能源监管办部署迎峰度冬能源保供，组织电网企业测算今冬明春电力电量平衡，统筹供应保障、风险防范和应急管理，并调研重点用能企业的供电质量需求及需求响应参与能力。",
+      "evidence_scope": "当前原件为监管工作动态，调研不等于已开展需求响应交易；所引通知无完整原文，不新增价格或资格参数。"
     }
   ],
   "source_links": [
@@ -1059,6 +1119,36 @@
     {
       "policy_id": "ZCGJ110",
       "url": "https://www.nea.gov.cn/20260724/1ea02aba60e74c00a988fb71fca1e903/c.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCGJ187",
+      "url": "https://www.ndrc.gov.cn/xwdt/tzgg/202611/t20261113_1408811.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCTJ20",
+      "url": "https://gyxxh.tj.gov.cn/ZWGK4147/ZCWJ6355/wjwj/202611/t20261113_7655646.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "ZCJX31",
+      "url": "https://jiangxi.gov.cn/jxsrmzf/qygh/pc/content/content_2120707118789623808.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "YJC515",
+      "url": "https://www.samr.gov.cn/xw/sj/art/2026/art_209469b89a514e32813315aff4157d4c.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "YJC516",
+      "url": "https://www.nea.gov.cn/20261113/b4cc3804015241cfa3327241a311bf1d/c.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
+    },
+    {
+      "policy_id": "YJC517",
+      "url": "https://www.nea.gov.cn/20261113/772d4bf3d06d486f9753d4e351626d05/c.html",
       "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
     }
   ],
