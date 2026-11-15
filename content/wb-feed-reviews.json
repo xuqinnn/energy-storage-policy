@@ -118,6 +118,12 @@
       "record_sha256": "c23e702bed900d5e5eede585ff7e4b74bd682bfbb5df53cb8ead6f447b82c7e1",
       "status": "accepted",
       "formal_id": "ZCLN38"
+    },
+    {
+      "id": "wb_c307ea3c19cc681d4d0e",
+      "record_sha256": "d14b01c871b86c24bd12e3a929db5e41abe145f44f771e11aa410348fab107e7",
+      "status": "accepted",
+      "formal_id": "ZCGJ187"
     }
   ]
 }

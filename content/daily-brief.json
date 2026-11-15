@@ -1,13 +1,13 @@
 {
   "schema": 1,
   "timezone": "Asia/Shanghai",
-  "snapshot_version": "v479",
-  "snapshot_built_at": "2026-11-15 04:17",
+  "snapshot_version": "v480",
+  "snapshot_built_at": "2026-11-15 13:04",
   "scope": "仅已审公开政策与公告；该页公开日不等于最早首发；成文/收录索引不计今日新发。",
   "counts": {
     "policy": 32,
-    "notice": 39,
-    "important_notice": 25
+    "notice": 41,
+    "important_notice": 26
   },
   "items": [
     {
@@ -145,6 +145,29 @@
       "date_label": "该页公开日",
       "publication_verified": true,
       "issued_at": "2026-11-12",
+      "published_at": "2026-11-12",
+      "event_at": ""
+    },
+    {
+      "id": "YJC520",
+      "canonical_document_id": "YJC520",
+      "type": "notice",
+      "renderer": "policy",
+      "subtype": "方法学发布动态",
+      "title": "国网四川电科院：四川发布电力需求侧响应碳普惠方法学",
+      "summary": "国网四川公司发布消息：电科院牵头申报的成都“碳惠天府”商业用户电力需求侧响应方法学获批发布，以未参与响应为基准情景，区分工作日与非工作日，采用15分钟级分时计量。",
+      "analysis_state": "summary",
+      "importance": 4,
+      "status": "方法学发布动态",
+      "region": "四川",
+      "source_url": "https://www.sc.sgcc.com.cn/html/main/col81/2026-11/12/20261112151223716993066_1.html",
+      "source_label": "官方原发布页/附件",
+      "route": "#/notice/YJC520",
+      "display_date": "2026-11-12",
+      "date_basis": "published",
+      "date_label": "该页公开日",
+      "publication_verified": true,
+      "issued_at": "",
       "published_at": "2026-11-12",
       "event_at": ""
     },
@@ -1250,6 +1273,29 @@
       "publication_verified": false,
       "issued_at": "2026-10-14",
       "published_at": "",
+      "event_at": ""
+    },
+    {
+      "id": "YJC519",
+      "canonical_document_id": "YJC519",
+      "type": "notice",
+      "renderer": "policy",
+      "subtype": "标准发布动态",
+      "title": "IEC TS 61400-28-2:2026：风电退役与回收准备技术规范发布",
+      "summary": "IEC于2026年10月14日发布风电退役与回收准备技术规范，覆盖机组拆卸、材料整理及送往再利用或回收设施前的准备。",
+      "analysis_state": "summary",
+      "importance": 3,
+      "status": "标准发布动态",
+      "region": "国际",
+      "source_url": "https://webstore.iec.ch/en/publication/68386",
+      "source_label": "官方原发布页/附件",
+      "route": "#/notice/YJC519",
+      "display_date": "2026-10-14",
+      "date_basis": "published",
+      "date_label": "该页公开日",
+      "publication_verified": true,
+      "issued_at": "",
+      "published_at": "2026-10-14",
       "event_at": ""
     },
     {
