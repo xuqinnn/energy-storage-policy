@@ -798,6 +798,16 @@
       "importance_reason": "与能源转型相关的标准动态或地方报道；不作为政策支持评级。",
       "classification_basis": "据南通发布、我苏转载报道，11月12日江苏零碳园区建设推进会发布44家建设名单，南通有4家入选。如皋经济技术开发区按整体范围推进，其余3家按园中园范围推进。",
       "evidence_scope": "这是媒体转载报道，保留原标题、作者与出处，不充当江苏省级原通知。建设名单不等于建成认定，不据报道写入正式获批园区参数；本页不证明1032号全文、名单动态管理或正式验收程序。"
+    },
+    {
+      "id": "ZCSN51",
+      "canonical_document_id": "ZCSN51",
+      "content_type": "policy",
+      "subtype": "电价机制",
+      "importance": 4,
+      "importance_reason": "直接改变陕西工商业用户系统运行费的分时计费范围及损益结算。",
+      "classification_basis": "自2027年1月1日起，陕西将系统运行费纳入工商业分时电价浮动范围，适用于电网代理购电和市场化购电用户，电气化铁路牵引用电除外。执行期暂定一年。",
+      "evidence_scope": "浮动比例适用于系统运行费折价。峰谷时段等其他事项沿用陕发改价格〔2025〕1034号；本件未给出系统运行费基准单价，不能据此直接计算全电价或项目收益。"
     }
   ],
   "source_links": [
@@ -1240,6 +1250,11 @@
       "policy_id": "YJC521",
       "url": "https://m.ourjiangsu.com/news/2026/11/13/1570861221685194752.html",
       "role": "OFFICIAL_INSTITUTION_REPRINT"
+    },
+    {
+      "policy_id": "ZCSN51",
+      "url": "https://sndrc.shaanxi.gov.cn/zfxxgk/zc/fgwj/sfzggwwj/2026/202611/t20261118_3725834.html",
+      "role": "ORIGINAL_PUBLICATION_OR_ATTACHMENT"
     }
   ],
   "source_gaps": [
