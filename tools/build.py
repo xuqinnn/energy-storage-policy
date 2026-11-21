@@ -179,12 +179,12 @@ def validate_reply_insights(path):
     return validate_reply_schema(json.loads(Path(path).read_text(encoding='utf-8')))
 
 
-CONTENT_LAYER_SHA = '48dfb11b16cbf629247296750fa72cde1b3ac28dc0a36570d86e1f4d42f6faca'
+CONTENT_LAYER_SHA = '0b80cd8cabe0fec95b985bdcc2f5e9f09f3f0dbdc963e9dbe088107ac350156d'
 CORE_ANALYSIS_IDS = {'ZCGJ13','ZCGJ120','ZCGJ03','ZCGJ04'}
 CORE_ANALYSES_SHA = '2771497116d19595f252645ff8ca8074395fdd71fbaf8093a452b9a1cf494dd1'
 DAILY_REVIEW_IDS = {'ZCGJ182','YJC485','YJC486','YJC487','YJC488','YJC489','YJC490','ZCGJ184','ZCHUN45','ZCNF36','ZCJL42'}
 ARTICLE_REVIEW_IDS = {'YJC521','YJC491','YJC492','YJC493','YJC494','YJC495','YJC496'}
-CONTENT_CLASS_IDS = {'ZCSN51','YJC519','YJC520','ZCJX32','ZCHUN47','YJC518','ZCGJ187','ZCTJ20','ZCJX31','YJC515','YJC516','YJC517','YJC512','YJC513','YJC514','YJC510','YJC511','YJC509','YJC508','ZCGJ186','YJC507','YJC503','YJC504','YJC505','YJC506','ZCSX38','ZCFJ49','YJC501','YJC502','ZCGJ185','ZCHUN46','ZCGD52','ZCHEB62','ZCHEB63','ZCHEB64','YJC499','YJC500','ZCLN38','ZCSC55','ZCGD51','ZCGD50','YJC497','YJC498'} | ARTICLE_REVIEW_IDS | DAILY_REVIEW_IDS | CORE_ANALYSIS_IDS | {'ZCGJ45','ZCGJ110','ZCSN34','ZCGX34','ZCHEB52','ZCLN37','ZCSD45','ZCAH63','ZCTJ19','ZCSH43','ZCSD53','ZCXJ32','ZCGJ183','YJC491'}
+CONTENT_CLASS_IDS = {'ZCBJ22','ZCSN51','YJC519','YJC520','ZCJX32','ZCHUN47','YJC518','ZCGJ187','ZCTJ20','ZCJX31','YJC515','YJC516','YJC517','YJC512','YJC513','YJC514','YJC510','YJC511','YJC509','YJC508','ZCGJ186','YJC507','YJC503','YJC504','YJC505','YJC506','ZCSX38','ZCFJ49','YJC501','YJC502','ZCGJ185','ZCHUN46','ZCGD52','ZCHEB62','ZCHEB63','ZCHEB64','YJC499','YJC500','ZCLN38','ZCSC55','ZCGD51','ZCGD50','YJC497','YJC498'} | ARTICLE_REVIEW_IDS | DAILY_REVIEW_IDS | CORE_ANALYSIS_IDS | {'ZCGJ45','ZCGJ110','ZCSN34','ZCGX34','ZCHEB52','ZCLN37','ZCSD45','ZCAH63','ZCTJ19','ZCSH43','ZCSD53','ZCXJ32','ZCGJ183','YJC491'}
 NOTICE_FIELDS = {'id','content_type','subtype','title','issuer','importance','importance_reason','issued_at','published_at','publication_date_basis','first_publication_date','event_at','summary','our_analysis','quote','source_url','source_access_note','corroborating_url','boundary','region_scope','verified_region_codes','policy_ids','cited_document_number','cited_document_verification'}
 SOURCE_ROLES = {'ORIGINAL_PUBLICATION_OR_ATTACHMENT','ORIGINAL_EXPLANATORY_ATTACHMENT','OFFICIAL_RELEASE_REPORT','OFFICIAL_INSTITUTION_REPRINT','OFFICIAL_INTERPRETATION','OFFICIAL_REPRINT_ATTACHMENT','OFFICIAL_ANALYSIS_MENTION_ONLY'}
 
@@ -215,7 +215,7 @@ def validate_content_schema(layer):
         code=item['id']
         if code in seen or code not in CONTENT_CLASS_IDS or code!=item['canonical_document_id']:raise ValueError('content layer schema: duplicate or unknown identity')
         seen.add(code)
-        expected_type='article_report' if code in ARTICLE_REVIEW_IDS else 'policy' if code in ({'ZCAH63','ZCSH43','ZCSD53','ZCXJ32','ZCGJ182','ZCGJ183','ZCHUN45','ZCGJ184','ZCNF36','ZCJL42','ZCGD50','ZCGD51','ZCLN38','ZCSC55','ZCGJ185','ZCHUN46','ZCGD52','ZCHEB62','ZCHEB63','ZCHEB64','ZCSX38','ZCFJ49','ZCGJ186','ZCGJ187','ZCTJ20','ZCJX31','ZCJX32','ZCHUN47','ZCSN51'} | CORE_ANALYSIS_IDS) else 'notice'
+        expected_type='article_report' if code in ARTICLE_REVIEW_IDS else 'policy' if code in ({'ZCAH63','ZCSH43','ZCSD53','ZCXJ32','ZCGJ182','ZCGJ183','ZCHUN45','ZCGJ184','ZCNF36','ZCJL42','ZCGD50','ZCGD51','ZCLN38','ZCSC55','ZCGJ185','ZCHUN46','ZCGD52','ZCHEB62','ZCHEB63','ZCHEB64','ZCSX38','ZCFJ49','ZCGJ186','ZCGJ187','ZCTJ20','ZCJX31','ZCJX32','ZCHUN47','ZCSN51','ZCBJ22'} | CORE_ANALYSIS_IDS) else 'notice'
         if item['content_type']!=expected_type or type(item['importance']) is not int or not 1<=item['importance']<=5:
             raise ValueError('content layer schema: unreviewed classification or rating')
         if not all(isinstance(item[k],str) and item[k].strip() for k in ('subtype','importance_reason','classification_basis','evidence_scope')):raise ValueError('content layer schema: missing classification boundary')
@@ -225,7 +225,7 @@ def validate_content_schema(layer):
     expected_ratings['YJC491']=3
     expected_ratings['ZCNF36']=5
     expected_ratings['ZCJL42']=5
-    expected_ratings.update({'ZCLN38':5,'ZCSC55':4,'ZCGJ187':5,'ZCTJ20':5,'ZCJX31':5,'YJC515':4,'YJC516':3,'YJC517':3,'ZCJX32':4,'ZCHUN47':4,'YJC518':4,'YJC519':3,'YJC520':4,'YJC521':3,'ZCSN51':4})
+    expected_ratings.update({'ZCLN38':5,'ZCSC55':4,'ZCGJ187':5,'ZCTJ20':5,'ZCJX31':5,'YJC515':4,'YJC516':3,'YJC517':3,'ZCJX32':4,'ZCHUN47':4,'YJC518':4,'YJC519':3,'YJC520':4,'YJC521':3,'ZCSN51':4,'ZCBJ22':4})
     expected_ratings.update({'ZCGJ185': 4, 'ZCHUN46': 4, 'ZCGD52': 4, 'ZCHEB62': 4, 'ZCHEB63': 3, 'ZCHEB64': 4, 'YJC499': 3, 'YJC500': 4, 'YJC501':4, 'YJC502':4, 'YJC503':4,'YJC504':3,'YJC505':4,'YJC506':4,'ZCSX38':5,'ZCFJ49':3,'ZCGJ186':4,'YJC507':4,'YJC508':4,'YJC509':3,'YJC510':3,'YJC511':4,'YJC512':3,'YJC513':4,'YJC514':4})
     expected_ratings.update({code:4 for code in ['ZCGD51','ZCGD50','YJC497','YJC498']})
     if {x['id']:x['importance'] for x in layer['classifications']}!=expected_ratings:raise ValueError('content layer schema: unreviewed importance revision')

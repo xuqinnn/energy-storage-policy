@@ -5,7 +5,7 @@
   "snapshot_built_at": "2026-11-21 13:03",
   "scope": "仅已审公开政策与公告；该页公开日不等于最早首发；成文/收录索引不计今日新发。",
   "counts": {
-    "policy": 33,
+    "policy": 34,
     "notice": 41,
     "important_notice": 26
   },
@@ -30,6 +30,29 @@
       "date_label": "该页公开日",
       "publication_verified": true,
       "issued_at": "2026-11-17",
+      "published_at": "2026-11-18",
+      "event_at": ""
+    },
+    {
+      "id": "ZCBJ22",
+      "canonical_document_id": "ZCBJ22",
+      "type": "policy",
+      "renderer": "policy",
+      "subtype": "电力市场交易",
+      "title": "北京市2027年电力市场化交易方案、绿色电力交易方案",
+      "summary": "北京印发2027年电力市场化交易与绿色电力交易方案，自2027年1月1日起施行；2026年度方案届时同时废止。两方案分别安排市场参与、交易组织与绿电交易。",
+      "analysis_state": "summary",
+      "importance": 4,
+      "status": "已公布未施行",
+      "region": "北京",
+      "source_url": "https://csglw.beijing.gov.cn/zwxx/2024zcwj/202611/t20261118_4951205.html",
+      "source_label": "官方来源",
+      "route": "#/brief/ZCBJ22",
+      "display_date": "2026-11-18",
+      "date_basis": "published",
+      "date_label": "该页公开日",
+      "publication_verified": true,
+      "issued_at": "2026-11-09",
       "published_at": "2026-11-18",
       "event_at": ""
     },
