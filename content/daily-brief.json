@@ -1,13 +1,13 @@
 {
   "schema": 1,
   "timezone": "Asia/Shanghai",
-  "snapshot_version": "v482",
-  "snapshot_built_at": "2026-11-21 13:03",
+  "snapshot_version": "v483",
+  "snapshot_built_at": "2026-11-22 13:07",
   "scope": "仅已审公开政策与公告；该页公开日不等于最早首发；成文/收录索引不计今日新发。",
   "counts": {
     "policy": 34,
-    "notice": 41,
-    "important_notice": 26
+    "notice": 42,
+    "important_notice": 27
   },
   "items": [
     {
@@ -99,6 +99,29 @@
       "date_label": "该页公开日",
       "publication_verified": true,
       "issued_at": "2026-10-29",
+      "published_at": "2026-11-13",
+      "event_at": ""
+    },
+    {
+      "id": "YJC522",
+      "canonical_document_id": "YJC522",
+      "type": "notice",
+      "renderer": "policy",
+      "subtype": "储能奖励资金公示",
+      "title": "上海市2026年新型储能奖励项目目录及度电奖励拟拨付资金公示",
+      "summary": "上海公示2026年新型储能奖励项目目录及拟拨付资金。目录含3个项目，度电奖励表含2个项目，拟奖励金额合计3260.645万元。公示期为11月13日至19日。",
+      "analysis_state": "summary",
+      "importance": 4,
+      "status": "项目资金公示",
+      "region": "上海",
+      "source_url": "https://fgw.sh.gov.cn/fgw_gsgg/20261113/53a8d1a0ef3742698da41f07f1fcfa33.html",
+      "source_label": "官方来源",
+      "route": "#/notice/YJC522",
+      "display_date": "2026-11-13",
+      "date_basis": "published",
+      "date_label": "该页公开日",
+      "publication_verified": true,
+      "issued_at": "",
       "published_at": "2026-11-13",
       "event_at": ""
     },
