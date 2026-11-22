@@ -1,15 +1,38 @@
 {
   "schema": 1,
   "timezone": "Asia/Shanghai",
-  "snapshot_version": "v483",
-  "snapshot_built_at": "2026-11-22 13:07",
+  "snapshot_version": "v484",
+  "snapshot_built_at": "2026-11-22 15:02",
   "scope": "仅已审公开政策与公告；该页公开日不等于最早首发；成文/收录索引不计今日新发。",
   "counts": {
-    "policy": 34,
+    "policy": 35,
     "notice": 42,
     "important_notice": 27
   },
   "items": [
+    {
+      "id": "ZCSD54",
+      "canonical_document_id": "ZCSD54",
+      "type": "policy",
+      "renderer": "policy",
+      "subtype": "分布式新能源自发自用",
+      "title": "泰安市关于加强和规范分布式新能源自发自用项目建设工作的通知",
+      "summary": "泰安规范配电网可开放容量不足区域的分布式新能源自发自用项目，要求科学配置储能并同步规划、建设、投运；按企业申报、县级初审、市级评审、省级备案组织。通知自发布之日起实施，有效期2年。",
+      "analysis_state": "summary",
+      "importance": 4,
+      "status": "现行有效",
+      "region": "山东",
+      "source_url": "https://fgw.taian.gov.cn/art/2026/11/20/art_166230_10322169.html",
+      "source_label": "官方来源",
+      "route": "#/brief/ZCSD54",
+      "display_date": "2026-11-20",
+      "date_basis": "published",
+      "date_label": "该页公开日",
+      "publication_verified": true,
+      "issued_at": "2026-11-13",
+      "published_at": "2026-11-20",
+      "event_at": ""
+    },
     {
       "id": "ZCSN51",
       "canonical_document_id": "ZCSN51",

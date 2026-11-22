@@ -124,6 +124,12 @@
       "record_sha256": "d14b01c871b86c24bd12e3a929db5e41abe145f44f771e11aa410348fab107e7",
       "status": "accepted",
       "formal_id": "ZCGJ187"
+    },
+    {
+      "id": "wb_6324e620859201f0e780",
+      "record_sha256": "0ba6455ae603c96bde279628cbf121fcf7491474f0ee4543569eb31802d3534e",
+      "status": "accepted",
+      "formal_id": "ZCSD54"
     }
   ]
 }
